@@ -11,7 +11,7 @@ export default function Home() {
         <title>Portfolio | Ammiel Yawson</title>
         <meta
           name="description"
-          content="Hi my name is Ammiel, I'm a Frontend Web Developer with some practical knowledge about Backend Development."
+          content="Hi my name is Ammiel, I'm a Frontend Web Developer with some practical knowledge in Backend Development."
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
