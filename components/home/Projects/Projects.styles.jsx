@@ -146,41 +146,35 @@ const ProjectCardRoot = styled.div`
   &:not(.in-highlight) {
     .title {
       position: absolute;
-      bottom: -3.2rem;
       left: 2.4rem;
       transition: opacity 300ms 150ms ease, bottom 300ms 150ms ease;
-      opacity: 0;
+      bottom: 1.25rem;
+      opacity: 1;
+      @media (max-width: 460px) {
+        bottom: 1.5rem;
+      }
+      @media (min-width: 768px) {
+        bottom: 0.4rem;
+      }
+      @media (min-width: 992px) {
+        bottom: -2%;
+      }
     }
 
     .image-container:after {
       content: "";
       position: absolute;
-      bottom: -6rem;
+      bottom: -1%;
       left: 0;
       width: 100%;
       height: 5.6rem;
       max-height: 100%;
-
-      opacity: 0;
+      
+      opacity: 0.92;
       transition: opacity 300ms ease, bottom 300ms ease;
       box-shadow: 0 1rem 3.2rem rgba(0, 0, 0, 0.2);
       background: var(--color-project-card-bg);
     }
-
-    // &:hover {
-      .image-container:after {
-        bottom: 0;
-        opacity: 0.92;
-      }
-
-      .title {
-        bottom: 1rem;
-        opacity: 1;
-        @media (min-width: 768px) {
-          bottom: -2%;
-        }
-      }
-    // }
   }
 
   &.in-highlight {
