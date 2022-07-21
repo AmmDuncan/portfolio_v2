@@ -52,9 +52,10 @@ function ProjectsContainer() {
       perspective: 1500,
       gyroscope: true,
     });
+    const node = highlightRef.current;
 
     return () =>
-      highlightRef.current && highlightRef.current.vanillaTilt.destroy();
+      node && node.vanillaTilt.destroy();
   }, [highlightRef]);
 
   return (
