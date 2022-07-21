@@ -3,7 +3,7 @@ import HeroDecor from "../HeroDecor/HeroDecor";
 import { Ctas, HeroRoot, Highlight } from "./Hero.styles";
 import { Button } from "../../common";
 import PhoneIcon from "./icons/PhoneIcon";
-import SuitcaseIcon from "./icons/SuitCaseIcon";
+import SuitcaseIcon from "./icons/SuitcaseIcon";
 
 function Hero() {
   return (
