@@ -5,7 +5,7 @@ const NavbarRoot = styled.nav`
   display: flex;
   align-items: center;
   position: sticky;
-  z-index: 100;
+  z-index: 10000;
   top: 0;
   transition: background-color 0.25s ease;
 
@@ -52,7 +52,6 @@ const NavbarRoot = styled.nav`
   .active {
     font-weight: 600;
   }
-
 `;
 
 const Title = styled.div`
