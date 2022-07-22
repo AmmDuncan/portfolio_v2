@@ -11,6 +11,10 @@ const NavbarRoot = styled.nav`
 
   @media (min-width: 768px) {
     height: 9.6rem;
+
+    .sidebar-root {
+      display: none;
+    }
   }
 
   &.with-bg {
@@ -23,6 +27,32 @@ const NavbarRoot = styled.nav`
     align-items: center;
     justify-content: space-between;
   }
+
+  .nav-list {
+    display: none;
+    grid: 1fr / auto-flow max-content;
+    gap: 3.2rem;
+    padding: 0;
+    list-style: none;
+    font-size: 1.8rem;
+
+    @media (min-width: 768px) {
+      display: grid;
+    }
+  }
+
+  .link {
+    display: grid;
+    grid: 1fr / auto-flow max-content;
+    gap: 0.4rem;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .active {
+    font-weight: 600;
+  }
+
 `;
 
 const Title = styled.div`
@@ -53,6 +83,76 @@ const NavButton = styled.div`
   &:hover {
     transform: scale(1.1);
   }
+
+  @media (min-width: 768px) {
+    display: none;
+  }
 `;
 
-export { NavbarRoot, Title, NavButton };
+const SidebarRoot = styled.div`
+  position: fixed;
+
+  .nav-list {
+    display: grid;
+    grid: auto-flow max-content / 1fr;
+    align-items: center;
+    width: calc(100% - 4.8rem);
+    height: 100%;
+    margin-inline: auto;
+    gap: 4.8rem;
+  }
+
+  .link {
+    justify-content: center;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    max-width: 30rem;
+
+    display: grid;
+    grid: auto-flow max-content / 1fr;
+    place-content: center;
+    justify-items: center;
+    gap: 4rem;
+
+    transition: left 300ms ease;
+    background: var(--color-bg);
+
+    .close {
+      position: absolute;
+      right: 2rem;
+      top: 2rem;
+      padding: 0.4rem;
+      cursor: pointer;
+    }
+  }
+
+  .overlay {
+    position: fixed;
+    z-index: -1;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(0.4rem);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+
+  &.open {
+    .sidebar {
+      left: 0;
+    }
+
+    .overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+`;
+
+export { NavbarRoot, Title, NavButton, SidebarRoot };

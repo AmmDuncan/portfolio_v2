@@ -7,7 +7,7 @@ import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import "@fontsource/crimson-text/400.css";
 
-import BaseLayout from "../layouts/Base";
+import BaseLayout from "../layouts/BaseLayout";
 
 function MyApp({ Component, pageProps }) {
   return (

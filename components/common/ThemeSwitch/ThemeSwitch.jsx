@@ -6,7 +6,7 @@ import { ThemeSwitchRoot } from "./ThemeSwitch.styles";
 function ThemeSwitch() {
   const [night, setNight] = React.useState(false);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     try {
       const prefersDark = window.matchMedia("prefers-color-scheme").matches;
       const lsValue = localStorage.getItem("ammiel-port-theme");
@@ -18,7 +18,7 @@ function ThemeSwitch() {
     }
   }, []);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (night) {
       document.body.classList.add("dark");
     } else {

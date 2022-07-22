@@ -1,5 +1,5 @@
 import Navbar from "../components/layout/Navbar";
-import ThemeSwitch from "../components/home/ThemeSwitch/ThemeSwitch";
+import ThemeSwitch from "../components/common/ThemeSwitch/ThemeSwitch";
 
 function BaseLayout(props) {
   return (
