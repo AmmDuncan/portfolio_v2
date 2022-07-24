@@ -4,21 +4,24 @@ import { Ctas, HeroRoot, Highlight } from "./Hero.styles";
 import { Button } from "../../common";
 import PhoneIcon from "./icons/PhoneIcon";
 import SuitcaseIcon from "./icons/SuitcaseIcon";
+import { useRouter } from "next/router";
 
 function Hero() {
+  const router = useRouter();
+
+  function goToProjects() {
+    router.push("/projects");
+  }
+
   return (
     <HeroRoot>
       <Container className="hero__container">
         <section className="content">
           <h1>
-            I build software solutions with fluent{" "}
-            <Highlight>user interfaces</Highlight>.
+            I build software solutions with fluent <Highlight>user interfaces</Highlight>.
           </h1>
 
-          <p>
-            Fullstack Web Developer-Frontend Heavy, User Interface Designer,
-            Writer sometimes.
-          </p>
+          <p>Fullstack Web Developer-Frontend Heavy, User Interface Designer, Writer sometimes.</p>
         </section>
         <section className="decor">
           <HeroDecor />
@@ -29,7 +32,7 @@ function Hero() {
           <Button className="primary">
             Get in touch <PhoneIcon />
           </Button>
-          <Button>
+          <Button onClick={goToProjects}>
             View projects <SuitcaseIcon />
           </Button>
         </Container>

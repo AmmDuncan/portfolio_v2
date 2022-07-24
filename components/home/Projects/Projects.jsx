@@ -5,11 +5,8 @@ import VanillaTilt from "vanilla-tilt";
 
 import { Button, Container } from "../../common";
 import ProjectCardDecor from "./icons/Decor";
-import {
-  ProjectsRoot,
-  ProjectsContainerRoot,
-  ProjectCardRoot,
-} from "./Projects.styles";
+import { ProjectsRoot, ProjectsContainerRoot, ProjectCardRoot } from "./Projects.styles";
+import { useRouter } from "next/router";
 
 const projects = [
   { name: "Kwerty.io", imgSrc: "/assets/projects/kwerty.png" },
@@ -19,16 +16,22 @@ const projects = [
 ];
 
 function Projects() {
+  const router = useRouter();
+
+  function goToProjects() {
+    router.push("/projects");
+  }
+
   return (
     <ProjectsRoot>
       <Container>
         <h2>Projects</h2>
         <header className="header">
           <p>
-            Here are some of the projects I&apos;ve worked on. A collection of
-            both client and side projects.
+            Here are some of the projects I&apos;ve worked on. A collection of both client and side
+            projects.
           </p>
-          <Button>
+          <Button onClick={goToProjects}>
             View more
             <HiArrowRight />
           </Button>
@@ -54,8 +57,7 @@ function ProjectsContainer() {
     });
     const node = highlightRef.current;
 
-    return () =>
-      node && node.vanillaTilt.destroy();
+    return () => node && node.vanillaTilt.destroy();
   }, [highlightRef]);
 
   return (
@@ -79,14 +81,9 @@ function ProjectsContainer() {
   );
 }
 
-const ProjectCard = React.forwardRef(function (
-  { src, alt, title, highlight },
-  ref
-) {
+const ProjectCard = React.forwardRef(function ({ src, alt, title, highlight }, ref) {
   return (
-    <ProjectCardRoot
-      className={`project__card ${highlight ? "in-highlight" : ""}`}
-    >
+    <ProjectCardRoot className={`project__card ${highlight ? "in-highlight" : ""}`}>
       <div className="image-root" ref={ref}>
         <div className="image-container">
           <Image src={src} alt={alt} layout="fill" />

@@ -47,6 +47,7 @@ const NavbarRoot = styled.nav`
     gap: 0.4rem;
     align-items: center;
     cursor: pointer;
+    font-weight: 300;
   }
 
   .active {
