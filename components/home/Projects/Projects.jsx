@@ -1,19 +1,15 @@
 import React from "react";
 import Image from "next/image";
 import { HiArrowRight } from "react-icons/hi";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { FiExternalLink } from "react-icons/fi";
 import VanillaTilt from "vanilla-tilt";
 
 import { Button, Container } from "../../common";
-import ProjectCardDecor from "./icons/Decor";
 import { ProjectsRoot, ProjectsContainerRoot, ProjectCardRoot } from "./Projects.styles";
-import { useRouter } from "next/router";
-
-const projects = [
-  { name: "Kwerty.io", imgSrc: "/assets/projects/kwerty.png" },
-  { name: "HRMs by Enyata", imgSrc: "/assets/projects/hrms.png" },
-  // { name: "Pomout", imgSrc: "/assets/projects/pomout.png" },
-  { name: "Dev in Details", imgSrc: "/assets/projects/devindets.png" },
-];
+import { projects } from "../../../data/projects";
+import ProjectCardDecor from "./icons/Decor";
 
 function Projects() {
   const router = useRouter();
@@ -70,18 +66,19 @@ function ProjectsContainer() {
           src={first.imgSrc}
           alt={first.name}
           title={first.name}
+          link={first.link}
           highlight={true}
           ref={highlightRef}
         />
       </div>
-      {projects.slice(1, 3).map(({ imgSrc: src, alt, name }) => (
-        <ProjectCard src={src} alt={alt} title={name} key={name} />
+      {projects.slice(1, 3).map(({ imgSrc: src, alt, name, link }) => (
+        <ProjectCard src={src} alt={alt} title={name} link={link} key={name} />
       ))}
     </ProjectsContainerRoot>
   );
 }
 
-const ProjectCard = React.forwardRef(function ({ src, alt, title, highlight }, ref) {
+const ProjectCard = React.forwardRef(function ({ src, alt, title, highlight, link }, ref) {
   return (
     <ProjectCardRoot className={`project__card ${highlight ? "in-highlight" : ""}`}>
       <div className="image-root" ref={ref}>
@@ -89,7 +86,15 @@ const ProjectCard = React.forwardRef(function ({ src, alt, title, highlight }, r
           <Image src={src} alt={alt} layout="fill" />
         </div>
       </div>
-      <div className="title">{title}</div>
+      {!link && <div className="title">{title}</div>}
+      {link && (
+        <Link href={link}>
+          <a className="title with-link" target="_blank" rel="noopener noreferrer">
+            {title}
+            <FiExternalLink />
+          </a>
+        </Link>
+      )}
     </ProjectCardRoot>
   );
 });

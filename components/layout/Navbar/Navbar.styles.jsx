@@ -58,6 +58,12 @@ const NavbarRoot = styled.nav`
 const Title = styled.div`
   display: flex;
   align-items: center;
+  cursor: pointer;
+  transition: transform 200ms ease;
+
+  &:hover {
+    transform: scale(1.015);
+  }
 
   .name {
     margin-left: 0.8rem;

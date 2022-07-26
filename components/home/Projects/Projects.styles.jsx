@@ -57,11 +57,7 @@ const ProjectsContainerRoot = styled.div`
     align-content: space-between;
     padding: 3.2rem 2rem 2rem;
     box-shadow: 0 0.8rem 1.6rem rgba(0, 0, 0, 0.15) inset;
-    background: linear-gradient(
-      180deg,
-      var(--color-primary),
-      var(--color-purple-600) 100%
-    );
+    background: linear-gradient(180deg, var(--color-primary), var(--color-purple-600) 100%);
 
     .decor {
       width: 100%;
@@ -137,13 +133,27 @@ const ProjectCardRoot = styled.div`
     /* color: var(--color-gray-100); */
   }
 
+  .title.with-link {
+    display: grid;
+    grid: 1fr / auto-flow;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.8rem;
+  }
+
   img {
     object-fit: cover;
     object-position: 0 0;
   }
 
+  body.dark & {
+    .image-root {
+      filter: brightness(90%);
+    }
+  }
+
   // styles for outside highlight
-  &:not(.in-highlight) {
+  &:not(.in-highlight):not(.on-projects) {
     .title {
       position: absolute;
       left: 2.4rem;
@@ -169,7 +179,7 @@ const ProjectCardRoot = styled.div`
       width: 100%;
       height: 5.6rem;
       max-height: 100%;
-      
+
       opacity: 0.92;
       transition: opacity 300ms ease, bottom 300ms ease;
       box-shadow: 0 1rem 3.2rem rgba(0, 0, 0, 0.2);
@@ -187,6 +197,62 @@ const ProjectCardRoot = styled.div`
     .image-root {
       background: var(--color-project-card-highlight-bg);
       transform-style: preserve-3d;
+    }
+  }
+
+  &.on-projects {
+    text-align: left;
+    .title {
+      margin-bottom: 0;
+      color: var(--color-text);
+      font-weight: 500;
+      font-size: 1.8rem;
+
+      @media (min-width: 768px) {
+        font-size: 2rem;
+      }
+    }
+
+    .project-card__content {
+      display: grid;
+      grid: auto-flow max-content / 1fr;
+      padding: 0.8rem;
+    }
+
+    .description {
+      max-width: 48rem;
+      margin-inline: 0;
+      margin-block: 0.8rem 1.6rem;
+      @media (min-width: 572px) {
+        font-size: 1.8rem;
+        line-height: 1.5;
+        font-weight: 300;
+      }
+    }
+
+    .tools {
+      padding: 0;
+      list-style: none;
+      margin: 1rem 0 0;
+      display: flex;
+      flex-flow: row wrap;
+
+      li {
+        padding: 0.8rem 2rem;
+        background: var(--color-project-c-bg);
+        margin-right: 1.2rem;
+        margin-bottom: 1.2rem;
+        border-radius: 1rem 1rem 0 0;
+        border-bottom: 2px solid var(--color-project-c-border);
+
+        &:first-of-type {
+          border-bottom: 2px solid var(--color-primary);
+        }
+      }
+    }
+
+    .image-root {
+      background: var(--color-project-card-bg);
     }
   }
 
