@@ -33,7 +33,7 @@ const ProjectsRoot = styled.div`
     }
 
     @media (min-width: 1300px) {
-      gap: 5.6rem 4rem;
+      gap: 6.4rem 4rem;
     }
 
     /* @media (min-width: 992px) {
