@@ -231,7 +231,7 @@ const ProjectCardRoot = styled.div`
     }
 
     .tools-header {
-      margin: 1rem 0 0;
+      margin: 0.5rem 0 0;
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.15rem;

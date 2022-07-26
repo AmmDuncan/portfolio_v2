@@ -25,14 +25,15 @@ const ProjectsRoot = styled.div`
     display: grid;
     grid: auto-flow / 1fr;
     margin-top: 2.4rem;
-    gap: 4rem 2.4rem;
+    gap: 4.8rem 2.4rem;
 
     @media (min-width: 768px) {
       grid: auto-flow / repeat(2, 1fr);
+      gap: 4.8rem 3.2rem;
     }
 
-    @media (min-width: 992px) {
-      gap: 4.8rem 3.2rem;
+    @media (min-width: 1300px) {
+      gap: 5.6rem 4rem;
     }
 
     /* @media (min-width: 992px) {

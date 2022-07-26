@@ -29,7 +29,7 @@ export const sideProjects = [
     name: "Pomout - Pomodoro Timer",
     imgSrc: "/assets/projects/pomout.png",
     description:
-      "Productivity web application to help you work in short bursts to avoid burningn out.",
+      "Productivity web application to help you work in short bursts to avoid burning out.",
     tools: ["React", "Styled-components", "Figma"],
     link: "https://pomout.vercel.app",
   },
