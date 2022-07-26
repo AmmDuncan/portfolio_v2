@@ -19,7 +19,7 @@ export const projects = [
     name: "Dev in Details",
     imgSrc: "/assets/projects/devindets.png",
     description: "Marketing website for a Digital Agency",
-    tools: ["Next.js", "Sass"],
+    tools: ["Next.js", "Sass", "Figma"],
     link: "https://dev-in-details.vercel.app/",
   },
 ];

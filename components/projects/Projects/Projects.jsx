@@ -57,6 +57,7 @@ function ProjectList({ projects }) {
               </Link>
             )}
             <p className="description">{description}</p>
+            <p className="tools-header">Tools used:</p>
             <ul className="tools">
               {tools.map((tool) => (
                 <li key={tool}>{tool}</li>

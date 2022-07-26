@@ -230,6 +230,15 @@ const ProjectCardRoot = styled.div`
       }
     }
 
+    .tools-header {
+      margin: 1rem 0 0;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.15rem;
+      font-weight: 500;
+      opacity: 0.5;
+    }
+
     .tools {
       padding: 0;
       list-style: none;
