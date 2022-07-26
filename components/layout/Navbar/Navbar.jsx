@@ -80,7 +80,7 @@ function Links(props) {
 
 function controlNavBg({ setClasses }) {
   return () => {
-    if (window.scrollY > 100) {
+    if (window.scrollY > 88) {
       setClasses("with-bg");
     } else {
       setClasses("");

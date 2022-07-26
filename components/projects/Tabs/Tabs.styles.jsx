@@ -14,7 +14,7 @@ export const TabsRoot = styled.div`
   align-items: stretch;
 
   margin-inline: auto;
-  margin-block: 3.2rem 4.8rem;
+  margin-block: 2.4rem 4.8rem;
   padding: 0.4rem;
   border-radius: 0.8rem;
   background: var(--color-tab-bg);
