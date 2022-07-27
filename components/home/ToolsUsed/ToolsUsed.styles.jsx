@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 const ToolsUsedRoot = styled.section`
-  padding-block: 24rem 11rem;
+  padding-block: 26rem 11rem;
   height: max-content;
 
   h2 {

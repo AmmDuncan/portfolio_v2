@@ -30,7 +30,7 @@ const HeroRoot = styled.div`
   @media (min-width: 572px) {
     h1 {
       max-width: max(45rem, 90vw);
-      margin-block: 13.5rem 2.4rem;
+      margin-block: 10rem 2.4rem;
       font-size: min(8rem, max(4.8rem, 8vw));
       line-height: 0.9;
     }
@@ -112,7 +112,7 @@ const Ctas = styled.section`
   }
 
   @media (min-width: 768px) {
-    margin-top: 9.6rem;
+    margin-top: 8rem;
 
     .ctas__container {
       gap: 2.4rem;

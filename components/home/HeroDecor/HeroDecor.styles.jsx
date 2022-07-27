@@ -5,7 +5,7 @@ const HeroDecorRoot = styled.div`
   width: 21.9rem;
   display: grid;
   grid: repeat(3, 11rem) / 1fr;
-  margin-top: 7.2rem;
+  margin-top: 6.4rem;
   /* opacity: 0.3; */
 
   svg {
