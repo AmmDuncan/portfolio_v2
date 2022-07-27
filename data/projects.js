@@ -36,7 +36,8 @@ export const sideProjects = [
   {
     name: "Snake Game",
     imgSrc: "/assets/projects/snake.png",
-    description: "My version of retro snake game.",
+    description:
+      "My version of retro snake game. Use arrow keys to move the snake about. On mobile, press toggle controls button to show on-screen controls.",
     tools: ["JavaScript", "HTML5", "CSS3"],
     link: "https://snake.ammielyawson.com",
   },
