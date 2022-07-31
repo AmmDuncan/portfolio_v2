@@ -13,6 +13,10 @@ function Hero() {
     router.push("/projects");
   }
 
+  function mailMe() {
+    router.push("mailto:ammielgyanyawson@gmail.com");
+  }
+
   return (
     <HeroRoot>
       <Container className="hero__container">
@@ -29,7 +33,7 @@ function Hero() {
       </Container>
       <Ctas>
         <Container className="ctas__container">
-          <Button className="primary">
+          <Button className="primary" onClick={mailMe}>
             Get in touch <PhoneIcon />
           </Button>
           <Button onClick={goToProjects}>

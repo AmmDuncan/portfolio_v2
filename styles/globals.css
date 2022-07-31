@@ -53,6 +53,9 @@ html {
 
   /* ---- TABS ---- */
   --color-tab-bg: var(--color-purple-100);
+
+  /* ---- ABOUT ---- */
+  --color-image-bg: var(--color-gray-50);
 }
 
 
@@ -91,6 +94,9 @@ body.dark {
 
   /* ---- TABS ---- */
   --color-tab-bg: var(--color-gray-800);
+
+  /* ---- ABOUT ---- */
+  --color-image-bg: var(--color-gray-900);
 }
 
 body {

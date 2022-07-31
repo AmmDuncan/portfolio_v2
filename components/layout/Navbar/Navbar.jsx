@@ -1,8 +1,8 @@
 import React from "react";
+import cx from "classnames";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { FiExternalLink } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
-import cx from "classnames";
 import { useRouter } from "next/router";
 
 import { LogoPurple } from "../../../assets";
