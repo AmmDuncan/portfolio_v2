@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const AboutContentRoot = styled.div`
   margin-bottom: 8rem;
-  max-width: 40ch;
+  max-width: 48ch;
   margin-inline: auto;
 
   h1 {
@@ -14,6 +14,9 @@ const AboutContentRoot = styled.div`
     color: royalblue;
     text-decoration: underline;
   }
+
+  p {
+  }
   @media (min-width: 768px) {
     max-width: 64ch;
 
@@ -22,6 +25,13 @@ const AboutContentRoot = styled.div`
     }
     p {
       font-size: 1.8rem;
+    }
+  }
+  @media (min-width: 992px) {
+    max-width: 68ch;
+
+    p {
+      font-size: 2rem;
     }
   }
 `;
@@ -37,7 +47,7 @@ function AboutContent() {
       </p>
       <p>
         I sometimes write about things I find interesting and things I believe will be useful to
-        others and myself in the future; at least as a reference. View my posts{" "}
+        others and myself in the future; at least as a reference. You can view my posts{" "}
         <Link href="https://blog.ammielyawson.com">
           <a target="_blank">here</a>
         </Link>

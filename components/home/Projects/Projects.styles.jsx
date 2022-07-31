@@ -222,7 +222,7 @@ const ProjectCardRoot = styled.div`
     .description {
       max-width: 48rem;
       margin-inline: 0;
-      margin-block: 0.8rem 1.6rem;
+      margin-block: 0.8rem 1.4rem;
       @media (min-width: 572px) {
         font-size: 1.8rem;
         line-height: 1.5;
