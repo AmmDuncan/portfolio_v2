@@ -254,9 +254,9 @@ const ProjectCardRoot = styled.div`
         border-radius: 1rem 1rem 0 0;
         border-bottom: 2px solid var(--color-project-c-border);
 
-        &:first-of-type {
+        /* &:first-of-type {
           border-bottom: 2px solid var(--color-primary);
-        }
+        } */
       }
     }
 
