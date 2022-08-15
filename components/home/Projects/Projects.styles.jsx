@@ -249,8 +249,8 @@ const ProjectCardRoot = styled.div`
       li {
         padding: 0.8rem 2rem;
         background: var(--color-project-c-bg);
-        margin-right: 1.2rem;
-        margin-bottom: 1.2rem;
+        margin-right: 1rem;
+        margin-bottom: 1rem;
         border-radius: 1rem 1rem 0 0;
         border-bottom: 2px solid var(--color-project-c-border);
 
