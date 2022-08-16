@@ -2,11 +2,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import React, { useState, useEffect, Children } from "react";
 
-const ActiveLink = ({
-                      children,
-                      activeClassName,
-                      ...props
-                    }) => {
+const ActiveLink = ({ children, activeClassName, ...props }) => {
   const { asPath, isReady } = useRouter();
 
   const child = Children.only(children);
@@ -18,15 +14,12 @@ const ActiveLink = ({
     if (isReady) {
       // Dynamic route will be matched via props.as
       // Static route will be matched via props.href
-      const link = new URL(
-        (props.as || props.href),
-        location.href
-      )
+      const link = new URL(props.as || props.href, location.href);
       const linkPathname = link.pathname;
       const linkOrigin = link.origin;
 
       // Using URL().pathname to get rid of query and hash
-      const activeLink = new URL(asPath, location.href)
+      const activeLink = new URL(asPath, location.href);
       const activePathname = activeLink.pathname;
       const activeOrigin = activeLink.origin;
 
@@ -50,13 +43,13 @@ const ActiveLink = ({
     childClassName,
     activeClassName,
     setClassName,
-    className
+    className,
   ]);
 
   return (
     <Link {...props}>
       {React.cloneElement(child, {
-        className: className || null
+        className: className || null,
       })}
     </Link>
   );

@@ -3,7 +3,7 @@ export const projects = [
     name: "Kwerty.io",
     imgSrc: "/assets/projects/kwerty.png",
     description:
-      "Public data bank that simplifies data with customizable charts for easy digestion by users",
+      "Public data bank that uses various visualization methods to simplify data for easy digestion by users.",
     tools: ["Vue", "Vuex", "Chart.js", "Storyblok", "Sass"],
     link: "https://kwerty.io",
   },
@@ -11,14 +11,14 @@ export const projects = [
     name: "HRMs by Enyata",
     imgSrc: "/assets/projects/hrms.png",
     description:
-      "Software to manage Human Resource in a company from Hiring, to Assessments, to Employee managament",
+      "Software to manage Human Resource in a company from Hiring, to Assessments, to Employee managament.",
     tools: ["React", "Chakra-ui", "Emotion", "React-Hook-Forms"],
   },
   // { name: "Pomout", imgSrc: "/assets/projects/pomout.png" },
   {
     name: "Dev in Details",
     imgSrc: "/assets/projects/devindets.png",
-    description: "Marketing website for a Digital Agency",
+    description: "Marketing website for a Digital Agency.",
     tools: ["React", "Next.js", "Sass", "Figma"],
     link: "https://dev-in-details.vercel.app/",
   },
@@ -45,7 +45,7 @@ export const sideProjects = [
   {
     name: "Rock, Paper, Scissors",
     imgSrc: "/assets/projects/rock-paper-scissors.png",
-    description: "Rock paper scissors challenge from FrontendMentor.io",
+    description: "Rock paper scissors challenge from FrontendMentor.io.",
     tools: ["Vue", "Sass"],
     link: "https://myrockpaperscissors.vercel.app",
   },
