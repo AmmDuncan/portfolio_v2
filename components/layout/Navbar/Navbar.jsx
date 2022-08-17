@@ -18,10 +18,8 @@ function Navbar() {
 
   const navEventHandler = React.useCallback((...args) => controlNavBg({ setClasses })(...args), []);
   React.useEffect(() => {
-    console.log("adding event");
     document.addEventListener("scroll", navEventHandler);
     return () => {
-      console.log("removing event");
       document.removeEventListener("scroll", navEventHandler);
     };
   }, [navEventHandler]);
