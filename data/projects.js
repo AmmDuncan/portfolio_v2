@@ -22,6 +22,12 @@ export const projects = [
     tools: ["React", "Next.js", "Sass", "Figma"],
     link: "https://dev-in-details.vercel.app/",
   },
+  {
+    name: "Portfolio",
+    imgSrc: "/assets/projects/portfolio.png",
+    description: "The site you're currently scrolling.",
+    tools: ["React", "Next.js", "Figma", "styled-components"],
+  },
 ];
 
 export const sideProjects = [

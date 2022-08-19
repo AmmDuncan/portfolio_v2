@@ -1,5 +1,6 @@
 import Image from "next/image";
 import styled from "styled-components";
+import { motion } from "framer-motion";
 
 const MyImageRoot = styled.div`
   position: relative;
@@ -32,12 +33,22 @@ const MyImageRoot = styled.div`
 
 function MyImage() {
   return (
-    <MyImageRoot>
-      <div className="shape">
+    <MyImageRoot
+      as={motion.div}
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 1, type: "spring", mass: 2, damping: 13 }}
+    >
+      <motion.div
+        className="shape"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1, type: "spring", mass: 2, damping: 8, delay: 0.15 }}
+      >
         <div className="image-container">
           <Image src="/assets/images/memoji.png" alt="me" layout="fill" />
         </div>
-      </div>
+      </motion.div>
     </MyImageRoot>
   );
 }

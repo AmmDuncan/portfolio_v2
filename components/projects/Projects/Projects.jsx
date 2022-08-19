@@ -7,6 +7,7 @@ import { ProjectsRoot } from "./Projects.styles";
 import { projects, sideProjects } from "../../../data/projects";
 import { ProjectCardRoot } from "../../../components/home/Projects/Projects.styles";
 import Tabs from "../Tabs/Tabs";
+import { motion } from "framer-motion";
 
 const projectTypes = {
   Projects: projects,
@@ -24,11 +25,21 @@ function Projects() {
   return (
     <ProjectsRoot>
       <Container>
-        <h1>Projects</h1>
-        <p>
+        <motion.h1
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, type: "spring", mass: 2, damping: 13 }}
+        >
+          Projects
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, type: "spring", mass: 1.5, delay: 0.15, damping: 15 }}
+        >
           Here are some of the projects I&apos;ve worked on. A collection of both client and side
           projects.
-        </p>
+        </motion.p>
         <Tabs active={active} setActive={setActive} />
         <ProjectList projects={projectList} />
       </Container>
@@ -39,8 +50,21 @@ function Projects() {
 function ProjectList({ projects }) {
   return (
     <div className="project-list">
-      {projects.map(({ name, imgSrc: src, description, tools, link }) => (
-        <ProjectCardRoot key={name} className="on-projects">
+      {projects.map(({ name, imgSrc: src, description, tools, link }, index) => (
+        <ProjectCardRoot
+          key={name}
+          className="on-projects"
+          as={motion.div}
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ scale: 1, opacity: 1 }}
+          transition={{
+            duration: 0.4,
+            type: "tween",
+            mass: 1.5,
+            damping: 15,
+            delay: 0.2 + 0.1 * index,
+          }}
+        >
           <div className="image-root">
             <div className="image-container">
               <Image src={src} alt={name} layout="fill" />

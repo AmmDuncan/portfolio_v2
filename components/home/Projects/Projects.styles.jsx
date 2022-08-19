@@ -216,13 +216,13 @@ const ProjectCardRoot = styled.div`
     .project-card__content {
       display: grid;
       grid: auto-flow max-content / 1fr;
-      padding: 0.8rem;
+      padding: 0.4rem;
     }
 
     .description {
       max-width: 48rem;
       margin-inline: 0;
-      margin-block: 0.8rem 1.4rem;
+      margin-block: 0.4rem 1rem;
       @media (min-width: 572px) {
         font-size: 1.8rem;
         line-height: 1.5;
