@@ -53,7 +53,7 @@ function ProjectList({ projects }) {
       className="project-list"
       initial={{ opacity: 0, y: 24 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ type: "spring", mass: 1.75, delay: 0.4 }}
+      transition={{ type: "spring", mass: 1.75, delay: 0.45 }}
     >
       {projects.map(({ name, imgSrc: src, description, tools, link }, index) => (
         <ProjectCardRoot key={name} className="on-projects">
