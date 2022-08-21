@@ -11,7 +11,7 @@ function Tabs({ active, setActive }) {
       as={motion.div}
       initial={{ opacity: 0, y: 24 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 1, type: "spring", mass: 1.5, delay: 0.3, damping: 18 }}
+      transition={{ duration: 1, type: "spring", mass: 1.5, delay: 0.3 }}
     >
       {tabs.map((tab) => (
         <div
