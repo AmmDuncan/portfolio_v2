@@ -7,11 +7,11 @@ import { StyledUnderline, ToolsUsedRoot, Skills } from "./ToolsUsed.styles";
 import StartIcon from "./icons/StarIcon";
 
 const skills = [
-  { skill: "html", usage: "frequently" },
-  { skill: "css-3", usage: "frequently" },
-  { skill: "javascript", usage: "frequently" },
-  { skill: "react", usage: "frequently" },
   { skill: "vue-js", usage: "frequently" },
+  { skill: "react", usage: "frequently" },
+  { skill: "javascript", usage: "frequently" },
+  { skill: "css-3", usage: "frequently" },
+  { skill: "html", usage: "frequently" },
   { skill: "sass", usage: "frequently" },
   { skill: "nodejs", usage: "occasionally" },
   { skill: "express", usage: "occasionally" },
