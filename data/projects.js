@@ -55,4 +55,18 @@ export const sideProjects = [
     tools: ["Vue", "Sass"],
     link: "https://myrockpaperscissors.vercel.app",
   },
+  {
+    name: "Movie Search App",
+    imgSrc: "/assets/projects/movie-app.png",
+    description: "Designed and developed to teach a class on single page apps with Vuejs",
+    tools: ["Vue", "Vue Router", "Vuex", "Figma", "CSS"],
+    link: "https://movies.ammielyawson.com",
+  },
+  {
+    name: "Countries App",
+    imgSrc: "/assets/projects/countries-app.png",
+    description: "Country search app challenge from FrontendMentor.io.",
+    tools: ["Vue", "Vue Router", "Vuex", "CSS"],
+    link: "https://countries.ammielyawson.com",
+  },
 ];
