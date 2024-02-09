@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { HeroDecorRoot } from "./HeroDecor.styles";
 import { motion } from "framer-motion";
+import { LogoPurple } from "../../../assets";
 
 function HeroDecor() {
   return (
@@ -10,8 +11,11 @@ function HeroDecor() {
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 1, type: "spring", delay: 0.35 }}
     >
-      <Shape1 />
-      <Shape2 />
+      {/* <Shape1 />
+      <Shape2 /> */}
+      <div style={{display: 'grid', placeContent: 'center'}}>
+      <LogoPurple style={{ transform: "scale(6)" }}/>
+      </div>
     </HeroDecorRoot>
   );
 }

@@ -1,11 +1,33 @@
 export const projects = [
   {
+    name: "SeedFi",
+    imgSrc: "/assets/projects/seedfi.jpeg",
+    description:
+    "SeedFi provides simplified digital lending. Apply online, get quick approval, and access funds for your needs. No more hassle!",
+    tools: ["React", "Tailwind CSS", "Jest", "Sass"],
+    link: "https://theseedfi.com/",
+  },
+  {
+    name: "Fluxtribe",
+    imgSrc: "/assets/projects/fluxtribe.png",
+    description:
+      "Fluxtribe aims to encourage users to reach their lifestyle goals by giving them a sense of community and accountability, while also rewarding them.",
+    tools: ["React", "Tailwind CSS", "Vitest", "Sass"],
+  },
+  {
     name: "Kwerty.io",
     imgSrc: "/assets/projects/kwerty.png",
     description:
-      "Public data bank that uses various visualization methods to simplify data for easy digestion by users.",
+    "Public data bank that uses various visualization methods to simplify data for easy digestion by users.",
     tools: ["Vue", "Vuex", "Chart.js", "Storyblok", "Sass"],
     link: "https://kwerty.io",
+  },
+  {
+    name: "Bigberg",
+    imgSrc: "/assets/projects/big-berg.jpeg",
+    description:
+      "A dashboard for managing commerce related operations such as order managagement, product management, and customer management.",
+    tools: ["Vue", "Nuxt", "Tailwind CSS"],
   },
   {
     name: "Connect Four",
