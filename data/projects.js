@@ -1,5 +1,21 @@
 export const projects = [
   {
+    name: "Rotate",
+    imgSrc: "/assets/projects/withrotate.png",
+    description:
+      "360° AI protection platform with managed detection and response spanning email, devices, data, users and applications.",
+    tools: ["React", "Next.js", "Tanstack Query", "React-Hook-Form", "Zod", "Playwright", "Storybook", "Recharts"],
+    link: "https://withrotate.com",
+  },
+  {
+    name: "StoreLink",
+    imgSrc: "/assets/projects/storelink.png",
+    description:
+      "Platform that lets social sellers in Ghana create their own online store in minutes, automating their current selling flow.",
+    tools: ["Next.js", "Supabase", "Recharts", "Paystack"],
+    link: "https://dev.storelinkgh.com",
+  },
+  {
     name: "SeedFi",
     imgSrc: "/assets/projects/seedfi.jpeg",
     description:
@@ -23,6 +39,30 @@ export const projects = [
     link: "https://kwerty.io",
   },
   {
+    name: "HRMs by Enyata",
+    imgSrc: "/assets/projects/hrms.png",
+    description:
+      "Software to manage Human Resource in a company from Hiring, to Assessments, to Employee managament.",
+    tools: ["React", "Chakra-ui", "Emotion", "React-Hook-Forms"],
+  },
+  // { name: "Pomout", imgSrc: "/assets/projects/pomout.png" },
+  {
+    name: "Portfolio",
+    imgSrc: "/assets/projects/portfolio.png",
+    description: "The site you're currently scrolling.",
+    tools: ["React", "Next.js", "Figma", "styled-components"],
+  },
+];
+
+export const sideProjects = [
+  {
+    name: "Dev in Details",
+    imgSrc: "/assets/projects/devindets.png",
+    description: "Marketing website for a Digital Agency.",
+    tools: ["React", "Next.js", "Sass", "Figma"],
+    link: "https://dev-in-details.vercel.app/",
+  },
+  {
     name: "Hangman",
     imgSrc: "/assets/projects/hangman.png",
     description: "A hangman game built with Next.js and Tailwind CSS",
@@ -36,30 +76,6 @@ export const projects = [
     tools: ["Vue", "Pinia", "Vue-Router"],
     link: "https://connect-four.ammielyawson.com/",
   },
-  {
-    name: "HRMs by Enyata",
-    imgSrc: "/assets/projects/hrms.png",
-    description:
-      "Software to manage Human Resource in a company from Hiring, to Assessments, to Employee managament.",
-    tools: ["React", "Chakra-ui", "Emotion", "React-Hook-Forms"],
-  },
-  // { name: "Pomout", imgSrc: "/assets/projects/pomout.png" },
-  {
-    name: "Dev in Details",
-    imgSrc: "/assets/projects/devindets.png",
-    description: "Marketing website for a Digital Agency.",
-    tools: ["React", "Next.js", "Sass", "Figma"],
-    link: "https://dev-in-details.vercel.app/",
-  },
-  {
-    name: "Portfolio",
-    imgSrc: "/assets/projects/portfolio.png",
-    description: "The site you're currently scrolling.",
-    tools: ["React", "Next.js", "Figma", "styled-components"],
-  },
-];
-
-export const sideProjects = [
   {
     name: "Pomout - Pomodoro Timer",
     imgSrc: "/assets/projects/pomout.png",
