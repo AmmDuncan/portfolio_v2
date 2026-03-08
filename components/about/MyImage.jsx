@@ -46,7 +46,7 @@ function MyImage() {
         transition={{ duration: 1, type: "spring", mass: 2, damping: 8, delay: 0.15 }}
       >
         <div className="image-container">
-          <Image src="/assets/images/memoji.png" alt="me" layout="fill" />
+          <Image src="/assets/images/memoji.png" alt="me" fill />
         </div>
       </motion.div>
     </MyImageRoot>

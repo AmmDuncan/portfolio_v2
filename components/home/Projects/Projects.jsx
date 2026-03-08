@@ -83,16 +83,14 @@ const ProjectCard = React.forwardRef(function ({ src, alt, title, highlight, lin
     <ProjectCardRoot className={`project__card ${highlight ? "in-highlight" : ""}`}>
       <div className="image-root" ref={ref}>
         <div className="image-container">
-          <Image src={src} alt={alt} layout="fill" />
+          <Image src={src} alt={alt} fill />
         </div>
       </div>
       {!link && <div className="title">{title}</div>}
       {link && (
-        <Link href={link}>
-          <a className="title with-link" target="_blank" rel="noopener noreferrer">
+        <Link href={link} className="title with-link" target="_blank" rel="noopener noreferrer">
             {title}
             <FiExternalLink />
-          </a>
         </Link>
       )}
     </ProjectCardRoot>

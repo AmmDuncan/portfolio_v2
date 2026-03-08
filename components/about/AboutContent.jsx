@@ -63,9 +63,7 @@ function AboutContent() {
       >
         I sometimes write about things I find interesting and things I believe will be useful to
         others and myself in the future; at least as a reference. You can view my posts{" "}
-        <Link href="https://blog.ammielyawson.com">
-          <a target="_blank">here</a>
-        </Link>
+        <Link href="https://blog.ammielyawson.com" target="_blank">here</Link>
         .
       </motion.p>
     </AboutContentRoot>

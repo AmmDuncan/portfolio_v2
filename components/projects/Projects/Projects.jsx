@@ -59,17 +59,15 @@ function ProjectList({ projects }) {
         <ProjectCardRoot key={name} className="on-projects">
           <div className="image-root">
             <div className="image-container">
-              <Image src={src} alt={name} layout="fill" />
+              <Image src={src} alt={name} fill />
             </div>
           </div>
           <div className="project-card__content">
             {!link && <div className="title">{name}</div>}
             {link && (
-              <Link href={link}>
-                <a className="title with-link" target="_blank" rel="noopener noreferrer">
+              <Link href={link} className="title with-link" target="_blank" rel="noopener noreferrer">
                   {name}
                   <FiExternalLink />
-                </a>
               </Link>
             )}
             <p className="description">{description}</p>

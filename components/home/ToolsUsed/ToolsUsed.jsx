@@ -52,7 +52,7 @@ function ToolsUsed() {
                 delay: 0.6 + 0.1 * index,
               }}
             >
-              <Image src={`/assets/images/${skill}.svg`} alt="" layout="fill" />
+              <Image src={`/assets/images/${skill}.svg`} alt="" fill />
             </motion.div>
           ))}
           {usage && (
