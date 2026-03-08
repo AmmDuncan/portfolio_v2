@@ -4,7 +4,7 @@ export const projects = [
     imgSrc: "/assets/projects/withrotate.png",
     description:
       "360° AI protection platform with managed detection and response spanning email, devices, data, users and applications.",
-    tools: ["React", "Next.js", "Tanstack Query", "React-Hook-Form", "Zod", "Playwright", "Storybook", "Recharts"],
+    tools: ["React", "Next.js", "Chakra UI", "Tanstack Query", "Playwright", "Storybook", "Recharts"],
     link: "https://withrotate.com",
   },
   {
@@ -12,8 +12,16 @@ export const projects = [
     imgSrc: "/assets/projects/storelink.png",
     description:
       "Platform that lets social sellers in Ghana create their own online store in minutes, automating their current selling flow.",
-    tools: ["Next.js", "Supabase", "Recharts", "Paystack"],
+    tools: ["Next.js", "Tailwind CSS", "Supabase", "Recharts", "Paystack"],
     link: "https://dev.storelinkgh.com",
+  },
+  {
+    name: "Finding Consensus",
+    imgSrc: "/assets/projects/findingconsensus.png",
+    description:
+      "Platform that aggregates and visualizes expert opinions on AI policy questions to help find consensus.",
+    tools: ["React", "Next.js", "Tailwind CSS"],
+    link: "https://findingconsensus.ai",
   },
   {
     name: "SeedFi",
