@@ -13,7 +13,7 @@ export const projects = [
     description:
       "Platform that lets social sellers in Ghana create their own online store in minutes, automating their current selling flow.",
     tools: ["Next.js", "Tailwind CSS", "Supabase", "Recharts", "Paystack"],
-    link: "https://dev.storelinkgh.com",
+    link: "https://storelinkgh.com",
   },
   {
     name: "Finding Consensus",
