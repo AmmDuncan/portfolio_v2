@@ -1,5 +1,21 @@
 export const projects = [
   {
+    name: "easel",
+    imgSrc: "/assets/projects/easel.png",
+    description:
+      "A live browser tab for every AI coding session. An MCP server that lets agents push HTML — mockups, diagrams, diffs, comparisons — to a scrolling feed you keep open in split-screen.",
+    tools: ["TypeScript", "Node.js", "MCP"],
+    link: "https://github.com/AmmDuncan/easel",
+  },
+  {
+    name: "Pitstop",
+    imgSrc: "/assets/projects/pitstop.png",
+    description:
+      "An in-app review loop for AI-agent work. The agent walks your browser through every surface it touched, pinning your feedback to each step and acting on it with full context.",
+    tools: ["TypeScript", "Bun", "SolidJS", "MCP", "SSE"],
+    link: "https://github.com/AmmDuncan/pitstop",
+  },
+  {
     name: "Rotate",
     imgSrc: "/assets/projects/withrotate.png",
     description:
