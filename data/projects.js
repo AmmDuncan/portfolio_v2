@@ -1,5 +1,29 @@
 export const projects = [
   {
+    name: "Rotate",
+    imgSrc: "/assets/projects/withrotate.png",
+    description:
+      "360° AI protection platform with managed detection and response spanning email, devices, data, users and applications.",
+    tools: [
+      "React",
+      "Next.js",
+      "Chakra UI",
+      "Tanstack Query",
+      "Playwright",
+      "Storybook",
+      "Recharts",
+    ],
+    link: "https://withrotate.com",
+  },
+  {
+    name: "StoreLink",
+    imgSrc: "/assets/projects/storelink.png",
+    description:
+      "Platform that lets social sellers in Ghana create their own online store in minutes, automating their current selling flow.",
+    tools: ["Next.js", "Tailwind CSS", "Supabase", "Recharts", "Paystack"],
+    link: "https://storelinkgh.com",
+  },
+  {
     name: "easel",
     imgSrc: "/assets/projects/easel.png",
     description:
@@ -16,20 +40,12 @@ export const projects = [
     link: "https://github.com/AmmDuncan/pitstop",
   },
   {
-    name: "Rotate",
-    imgSrc: "/assets/projects/withrotate.png",
+    name: "Local Dictation",
+    imgSrc: "/assets/projects/local-dictation.png",
     description:
-      "360° AI protection platform with managed detection and response spanning email, devices, data, users and applications.",
-    tools: ["React", "Next.js", "Chakra UI", "Tanstack Query", "Playwright", "Storybook", "Recharts"],
-    link: "https://withrotate.com",
-  },
-  {
-    name: "StoreLink",
-    imgSrc: "/assets/projects/storelink.png",
-    description:
-      "Platform that lets social sellers in Ghana create their own online store in minutes, automating their current selling flow.",
-    tools: ["Next.js", "Tailwind CSS", "Supabase", "Recharts", "Paystack"],
-    link: "https://storelinkgh.com",
+      "A private, on-device dictation app for macOS — vibe-coded with Claude Code. Hold ⌃Space, speak, release: Whisper transcribes and a local model cleans up, 100% offline. Nothing leaves your Mac.",
+    tools: ["Swift", "SwiftUI", "whisper.cpp", "llama.cpp", "macOS"],
+    link: "/local-dictation",
   },
   {
     name: "Finding Consensus",
