@@ -225,8 +225,8 @@ export default function LocalDictation() {
               <Kick>How it works</Kick>
               <h2>Speak → transcribe → inserted.</h2>
               <SectionDeck>
-                The overlay breathes with your voice and tells you exactly what stage it's in. This
-                is the app's real interface.
+                The overlay breathes with your voice and tells you exactly what stage it&rsquo;s in. This
+                is the app&rsquo;s real interface.
               </SectionDeck>
             </SectionHead>
           </motion.div>
@@ -248,7 +248,7 @@ export default function LocalDictation() {
         <Section>
           <motion.div {...fade()}>
             <SectionHead>
-              <Kick>What's inside</Kick>
+              <Kick>What&rsquo;s inside</Kick>
               <h2>Built to feel instant and stay out of the way.</h2>
             </SectionHead>
           </motion.div>
@@ -270,11 +270,11 @@ export default function LocalDictation() {
             <h2>The whole thing was built with Claude Code.</h2>
             <p>
               I described what I wanted in plain English and iterated — the macOS app, the on-device
-              audio pipeline, the mishearing correction, even this page. It's a real, daily-driver
+              audio pipeline, the mishearing correction, even this page. It&rsquo;s a real, daily-driver
               tool that happens to be vibe-coded end to end.
             </p>
             <p>
-              That's the point of having it here: not a polished agency build, but proof of how far
+              That&rsquo;s the point of having it here: not a polished agency build, but proof of how far
               thoughtful prompting plus taste can go.{" "}
               <a href={REPO} target="_blank" rel="noreferrer">
                 See the code →
@@ -301,7 +301,7 @@ export default function LocalDictation() {
                 </GhostLink>
               </CenterCtas>
               <InstallNote>
-                Apple Silicon · macOS 14+. It isn't notarized by Apple, so on first launch open it
+                Apple Silicon · macOS 14+. It isn&rsquo;t notarized by Apple, so on first launch open it
                 via the bundled installer, or <code>right-click → Open</code> / System Settings →
                 Open Anyway.
               </InstallNote>
