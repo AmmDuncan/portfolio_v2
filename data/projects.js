@@ -24,6 +24,14 @@ export const projects = [
     link: "https://storelinkgh.com",
   },
   {
+    name: "Local Dictation",
+    imgSrc: "/assets/projects/local-dictation.png",
+    description:
+      "A private, on-device dictation app for macOS. Hold ⌃Space, speak, release: Whisper transcribes and a local model cleans up, 100% offline. Nothing leaves your Mac.",
+    tools: ["Claude Code", "Swift", "SwiftUI", "whisper.cpp", "llama.cpp", "macOS"],
+    link: "/local-dictation",
+  },
+  {
     name: "easel",
     imgSrc: "/assets/projects/easel.png",
     description:
@@ -38,14 +46,6 @@ export const projects = [
       "An in-app review loop for AI-agent work. The agent walks your browser through every surface it touched, pinning your feedback to each step and acting on it with full context.",
     tools: ["TypeScript", "Bun", "SolidJS", "MCP", "SSE"],
     link: "https://github.com/AmmDuncan/pitstop",
-  },
-  {
-    name: "Local Dictation",
-    imgSrc: "/assets/projects/local-dictation.png",
-    description:
-      "A private, on-device dictation app for macOS. Hold ⌃Space, speak, release: Whisper transcribes and a local model cleans up, 100% offline. Nothing leaves your Mac.",
-    tools: ["Swift", "SwiftUI", "Claude Code", "whisper.cpp", "llama.cpp", "macOS"],
-    link: "/local-dictation",
   },
   {
     name: "Finding Consensus",
