@@ -44,7 +44,7 @@ export const projects = [
     imgSrc: "/assets/projects/local-dictation.png",
     description:
       "A private, on-device dictation app for macOS. Hold ⌃Space, speak, release: Whisper transcribes and a local model cleans up, 100% offline. Nothing leaves your Mac.",
-    tools: ["Swift", "SwiftUI", "whisper.cpp", "llama.cpp", "macOS"],
+    tools: ["Swift", "SwiftUI", "Claude Code", "whisper.cpp", "llama.cpp", "macOS"],
     link: "/local-dictation",
   },
   {
