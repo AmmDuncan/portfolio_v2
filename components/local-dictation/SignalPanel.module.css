@@ -32,6 +32,12 @@
 }
 .compact {
   padding: 40px 0 44px;
+  height: 100%;
+  align-items: center;
+}
+.compact .fakeText,
+.compact .fakeCursor {
+  display: none;
 }
 
 .fakeText {

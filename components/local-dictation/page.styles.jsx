@@ -286,8 +286,8 @@ export const Steps = styled.div`
 `;
 
 export const Step = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
   gap: 1.6rem;
 `;
 
