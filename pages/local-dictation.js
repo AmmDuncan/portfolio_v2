@@ -150,8 +150,8 @@ export default function LocalDictation() {
             <motion.div {...fade(0.12)}>
               <Deck>
                 A private, on-device dictation app for macOS. Hold <strong>⌃ Space</strong>, speak,
-                and release — your words land at the cursor in any app. Whisper transcribes and a
-                local model cleans up, fully offline.
+                and release — your words land at the cursor in any app. Transcribed and cleaned up
+                on-device, fully offline.
               </Deck>
             </motion.div>
             <motion.div {...fade(0.18)}>
