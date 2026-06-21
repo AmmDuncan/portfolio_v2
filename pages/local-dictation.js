@@ -19,7 +19,6 @@ import {
   Page,
   Wrap,
   Kick,
-  VibeBadge,
   Hero,
   Highlight,
   Deck,
@@ -38,7 +37,6 @@ import {
   Features,
   FeatureCard,
   FeatureIcon,
-  VibeBand,
   DownloadBand,
   CenterCtas,
   InstallNote,
@@ -125,7 +123,7 @@ export default function LocalDictation() {
         <title>Local Dictation — private, on-device dictation for macOS</title>
         <meta
           name="description"
-          content="A private, on-device dictation app for macOS. Hold ⌃Space, speak, release — your words appear at the cursor. Whisper transcribes and a local model cleans up, 100% offline. Vibe-coded with Claude Code."
+          content="A private, on-device dictation app for macOS. Hold ⌃Space, speak, release — your words appear at the cursor. Whisper transcribes and a local model cleans up, 100% offline. Nothing leaves your Mac."
         />
         <meta
           property="og:title"
@@ -133,7 +131,7 @@ export default function LocalDictation() {
         />
         <meta
           property="og:description"
-          content="Private, on-device dictation for macOS. Whisper + a local model, fully offline. Vibe-coded with Claude Code."
+          content="Private, on-device dictation for macOS. Whisper + a local model, fully offline. Nothing leaves your Mac."
         />
       </Head>
 
@@ -142,9 +140,7 @@ export default function LocalDictation() {
         <Hero>
           <div>
             <motion.div {...fade()}>
-              <Kick>
-                Local Dictation · macOS <VibeBadge>Vibe-coded with Claude Code</VibeBadge>
-              </Kick>
+              <Kick>Local Dictation · macOS</Kick>
             </motion.div>
             <motion.h1 {...fade(0.05)}>
               Talk. It types.
@@ -261,26 +257,6 @@ export default function LocalDictation() {
               </FeatureCard>
             ))}
           </Features>
-        </Section>
-
-        {/* ---------- Vibe-coded ---------- */}
-        <Section as={motion.section} {...fade()}>
-          <VibeBand>
-            <Kick>Vibe-coded, honestly</Kick>
-            <h2>The whole thing was built with Claude Code.</h2>
-            <p>
-              I described what I wanted in plain English and iterated — the macOS app, the on-device
-              audio pipeline, the mishearing correction, even this page. It&rsquo;s a real, daily-driver
-              tool that happens to be vibe-coded end to end.
-            </p>
-            <p>
-              That&rsquo;s the point of having it here: not a polished agency build, but proof of how far
-              thoughtful prompting plus taste can go.{" "}
-              <a href={REPO} target="_blank" rel="noreferrer">
-                See the code →
-              </a>
-            </p>
-          </VibeBand>
         </Section>
 
         {/* ---------- Download ---------- */}

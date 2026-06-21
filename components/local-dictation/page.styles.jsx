@@ -365,7 +365,7 @@ export const FeatureCard = styled.div`
   p {
     font-size: 1.5rem;
     line-height: 1.5;
-    opacity: 0.78;
+    opacity: 0.88;
     margin: 0;
   }
 
