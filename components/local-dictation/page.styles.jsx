@@ -395,6 +395,124 @@ export const FeatureIcon = styled.div`
   }
 `;
 
+/* ---------- It-learns band (correct once → remembered) ---------- */
+export const LearnBand = styled.div`
+  background: var(--ld-tint);
+  border: 1px solid var(--ld-tint-br);
+  border-radius: 2.4rem;
+  padding: 4.8rem;
+  display: grid;
+  gap: 3.2rem;
+
+  @media (min-width: 860px) {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 5.6rem;
+  }
+
+  h2 {
+    font-size: max(3rem, min(4.2rem, 5vw));
+    line-height: 1.1;
+    margin: 0 0 1.6rem;
+  }
+
+  p {
+    font-size: 1.8rem;
+    line-height: 1.6;
+    opacity: 0.85;
+    margin: 0;
+    max-width: 46rem;
+  }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+    background: rgba(19, 178, 135, 0.14);
+    color: var(--ld-accent);
+    padding: 0.1em 0.45em;
+    border-radius: 0.5rem;
+  }
+`;
+
+export const LearnDemo = styled.div`
+  display: grid;
+  gap: 1.2rem;
+`;
+
+export const ResultCard = styled.div`
+  background: #ffffff;
+  border: 1px solid var(--ld-card-br);
+  border-radius: 1.4rem;
+  padding: 1.8rem 2rem;
+
+  :global(body.dark) & {
+    background: #15171c;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .cap {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.55;
+  }
+
+  .q {
+    font-size: 1.7rem;
+    line-height: 1.5;
+    margin: 0.9rem 0 0;
+  }
+
+  s {
+    text-decoration-color: rgba(200, 70, 90, 0.75);
+    opacity: 0.7;
+  }
+
+  em {
+    font-style: normal;
+    font-weight: 650;
+    color: var(--ld-accent);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.3rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--ld-accent);
+    background: var(--ld-tint);
+    border: 1px solid var(--ld-tint-br);
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+
+    svg {
+      width: 1.4rem;
+      height: 1.4rem;
+    }
+  }
+`;
+
+export const LearnArrow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding-left: 0.4rem;
+  color: var(--ld-accent);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+`;
+
 /* ---------- Vibe-coded band ---------- */
 export const VibeBand = styled.div`
   border: 1px solid var(--ld-card-br);

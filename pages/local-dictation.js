@@ -12,6 +12,8 @@ import {
   FiWifiOff,
   FiUserX,
   FiCheckCircle,
+  FiCheck,
+  FiArrowDown,
 } from "react-icons/fi";
 
 import SignalPanel from "../components/local-dictation/SignalPanel";
@@ -37,6 +39,10 @@ import {
   Features,
   FeatureCard,
   FeatureIcon,
+  LearnBand,
+  LearnDemo,
+  ResultCard,
+  LearnArrow,
   DownloadBand,
   CenterCtas,
   InstallNote,
@@ -238,6 +244,46 @@ export default function LocalDictation() {
               </Step>
             ))}
           </Steps>
+        </Section>
+
+        {/* ---------- It learns your corrections ---------- */}
+        <Section>
+          <LearnBand as={motion.div} {...fade()}>
+            <div>
+              <Kick>It adapts to you</Kick>
+              <h2>Correct it once. It remembers.</h2>
+              <p>
+                Fix a dictation with <code>⌃⌥Z</code> and the swap becomes a rule — on-device,
+                private, yours. The more you talk, the more it sounds like you.
+              </p>
+            </div>
+            <LearnDemo>
+              <ResultCard>
+                <span className="cap">You said · today</span>
+                <p className="q">
+                  &ldquo;Ask <s>clot</s> to refactor this.&rdquo;
+                </p>
+                <span className="chip">
+                  <FiCheck />
+                  Taught: clot → Claude
+                </span>
+              </ResultCard>
+              <LearnArrow>
+                <FiArrowDown />
+                next time
+              </LearnArrow>
+              <ResultCard>
+                <span className="cap">You said · tomorrow</span>
+                <p className="q">
+                  &ldquo;Ask <em>Claude</em> to refactor this.&rdquo;
+                </p>
+                <span className="chip">
+                  <FiCheck />
+                  Right, automatically
+                </span>
+              </ResultCard>
+            </LearnDemo>
+          </LearnBand>
         </Section>
 
         {/* ---------- Features ---------- */}
