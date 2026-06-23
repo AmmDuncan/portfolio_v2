@@ -440,15 +440,15 @@ export const LearnDemo = styled.div`
 `;
 
 export const ResultCard = styled.div`
-  background: #ffffff;
+  /* Use the host's adaptive card token (purple-100 in light, gray-800 in dark via
+     body.dark in globals.css) so the card follows the theme. A hardcoded white +
+     styled-components :global(body.dark) override did NOT apply — it left the
+     cards glaring white on the dark band. The token adapts through plain CSS. */
+  background: var(--ld-card-bg);
   border: 1px solid var(--ld-card-br);
   border-radius: 1.4rem;
   padding: 1.8rem 2rem;
-
-  :global(body.dark) & {
-    background: #15171c;
-    border-color: rgba(255, 255, 255, 0.08);
-  }
+  box-shadow: 0 0.2rem 1.2rem -0.6rem rgba(0, 0, 0, 0.18);
 
   .cap {
     font-size: 1.2rem;
