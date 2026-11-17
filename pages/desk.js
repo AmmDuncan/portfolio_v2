@@ -1,17 +1,23 @@
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { Instrument_Sans, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { Anton, Archivo, Instrument_Sans, Instrument_Serif, JetBrains_Mono, Unbounded } from "next/font/google";
 
 const instrumentSans = Instrument_Sans({ subsets: ["latin"], display: "swap" });
 const instrumentSerif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], display: "swap" });
 const jetbrains = JetBrains_Mono({ subsets: ["latin"], display: "swap" });
+const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], display: "swap" });
+const anton = Anton({ subsets: ["latin"], weight: "400", display: "swap" });
+const unbounded = Unbounded({ subsets: ["latin"], display: "swap" });
 
 /** Type pairings under review; ?type= picks one, "a" is the default. */
 const PAIRINGS = {
   a: { display: instrumentSans, sans: instrumentSans, mono: jetbrains },
   b: { display: jetbrains, sans: instrumentSans, mono: jetbrains },
   c: { display: instrumentSerif, sans: instrumentSans, mono: jetbrains },
+  d: { display: archivo, sans: instrumentSans, mono: jetbrains },
+  e: { display: anton, sans: instrumentSans, mono: jetbrains },
+  f: { display: unbounded, sans: instrumentSans, mono: jetbrains },
 };
 
 const DeskJourney = dynamic(() => import("../components/desk/DeskJourney"), { ssr: false });

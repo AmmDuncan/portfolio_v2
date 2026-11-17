@@ -114,6 +114,23 @@ const Ui = styled.div`
     gap: 20px;
   }
 
+  [data-type="d"] & h2 {
+    font-weight: 800;
+    font-stretch: 125%;
+  }
+
+  [data-type="e"] & h2 {
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: 72px;
+    letter-spacing: 0;
+  }
+
+  [data-type="f"] & h2 {
+    font-weight: 700;
+    font-size: 48px;
+  }
+
   [data-type="c"] & h2 {
     font-weight: 400;
     font-size: 64px;

@@ -35,6 +35,39 @@ export const Root = styled.div`
     letter-spacing: -0.03em;
   }
 
+  [data-type="d"] & h1,
+  [data-type="d"] & h2 {
+    font-weight: 800;
+    font-stretch: 125%;
+    letter-spacing: -0.03em;
+  }
+
+  [data-type="d"] & h1 {
+    font-size: clamp(4rem, 5.4vw, 8rem);
+  }
+
+  [data-type="e"] & h1,
+  [data-type="e"] & h2 {
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+    line-height: 0.95;
+  }
+
+  [data-type="e"] & h1 {
+    font-size: clamp(5.6rem, 8vw, 12rem);
+  }
+
+  [data-type="f"] & h1,
+  [data-type="f"] & h2 {
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+
+  [data-type="f"] & h1 {
+    font-size: clamp(4rem, 5.2vw, 7.6rem);
+  }
+
   [data-type="c"] & h1,
   [data-type="c"] & h2 {
     font-weight: 400;
