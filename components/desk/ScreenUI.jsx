@@ -79,6 +79,7 @@ const Ui = styled.div`
 
   h2 {
     margin: 12px 0;
+    font-family: var(--font-display), sans-serif;
     font-size: 56px;
     font-weight: 600;
     letter-spacing: -0.03em;
@@ -111,6 +112,12 @@ const Ui = styled.div`
   [data-narrow] & li {
     grid: auto / 1fr;
     gap: 20px;
+  }
+
+  [data-type="c"] & h2 {
+    font-weight: 400;
+    font-size: 64px;
+    letter-spacing: -0.01em;
   }
 
   [data-narrow] & h2 {

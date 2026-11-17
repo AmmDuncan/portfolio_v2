@@ -18,9 +18,27 @@ export const Root = styled.div`
   }
 
   h1,
-  h2,
+  h2 {
+    font-family: var(--font-display), sans-serif;
+  }
+
   h3 {
     font-family: var(--font-sans), sans-serif;
+  }
+
+  [data-type="b"] & h1 {
+    font-size: clamp(4rem, 5.6vw, 8.4rem);
+    letter-spacing: -0.045em;
+  }
+
+  [data-type="b"] & h2 {
+    letter-spacing: -0.03em;
+  }
+
+  [data-type="c"] & h1,
+  [data-type="c"] & h2 {
+    font-weight: 400;
+    letter-spacing: -0.01em;
   }
 
   &[data-no-webgl] canvas {
