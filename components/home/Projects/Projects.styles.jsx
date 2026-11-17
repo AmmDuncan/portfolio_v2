@@ -219,6 +219,17 @@ const ProjectCardRoot = styled.div`
       padding: 0.4rem;
     }
 
+    .note {
+      justify-self: start;
+      margin-top: 0.8rem;
+      padding: 0.4rem 1rem;
+      border-radius: 99rem;
+      background: var(--color-project-c-bg);
+      font-size: 1.2rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
     .description {
       max-width: 48rem;
       margin-inline: 0;
