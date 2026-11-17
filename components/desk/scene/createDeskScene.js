@@ -2,8 +2,9 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
+import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 
-import { keypadDisplay, phoneScreen, shadowTexture, SCREEN_COLOR } from "./screens";
+import { keypadDisplay, phoneScreen, shadowTexture } from "./screens";
 
 const SIT_HEIGHT = 0.74;
 const STAND_HEIGHT = 1.12;
@@ -30,8 +31,9 @@ function box(w, h, d, material, radius = 0.004) {
   return mesh;
 }
 
-function screenPlane(w, h, texture) {
-  const material = new THREE.MeshBasicMaterial({ map: texture ?? null, color: texture ? "#ffffff" : SCREEN_COLOR, toneMapped: false });
+/** A see-through cut in the canvas so the DOM screen behind it shows, still hidden by anything in front. */
+function screenHole(w, h) {
+  const material = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 0, blending: THREE.NoBlending });
   return new THREE.Mesh(new THREE.PlaneGeometry(w, h), material);
 }
 
@@ -89,7 +91,7 @@ function buildMonitor(shadowTex) {
   neck.position.set(0, 0.16, -0.08);
   const panel = box(0.734, 0.424, 0.028, mat.blackPlastic, 0.006);
   panel.position.set(0, 0.34, -0.055);
-  const screen = screenPlane(0.71, 0.4);
+  const screen = screenHole(0.71, 0.4);
   screen.position.set(0, 0.34, -0.0405);
   group.add(foot, neck, panel, screen, contactShadow(shadowTex, 0.42, 0.3));
   return { group, screen, size: [0.71, 0.4] };
@@ -119,7 +121,7 @@ function buildLaptop(shadowTex) {
   lid.position.set(0, 0.12, 0);
   const bezel = box(0.348, 0.232, 0.002, mat.blackPlastic, 0.004);
   bezel.position.set(0, 0.12, 0.004);
-  const screen = screenPlane(0.33, 0.212);
+  const screen = screenHole(0.33, 0.212);
   screen.position.set(0, 0.122, 0.0055);
   hinge.add(lid, bezel, screen);
   body.add(base, keyboard, hinge);
@@ -222,9 +224,9 @@ function pointAnchor(object, offset = [0, 0, 0]) {
 }
 
 /** Builds the desk scene into a canvas. Returns controls driven by scroll. */
-export function createDeskScene(canvas, { coverSrcs = [] } = {}) {
+export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElements }) {
   RectAreaLightUniformsLib.init();
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.0;
@@ -301,17 +303,44 @@ export function createDeskScene(canvas, { coverSrcs = [] } = {}) {
     desk: [0, SIT_HEIGHT, 0],
   };
 
-  function setScreens({ work, tools }) {
-    if (work) {
-      monitor.screen.material.map = work;
-      monitor.screen.material.color.set("#ffffff");
-      monitor.screen.material.needsUpdate = true;
-    }
-    if (tools) {
-      laptop.screen.material.map = tools;
-      laptop.screen.material.color.set("#ffffff");
-      laptop.screen.material.needsUpdate = true;
-    }
+  const cssRenderer = new CSS3DRenderer();
+  cssHost.appendChild(cssRenderer.domElement);
+  const cssScene = new THREE.Scene();
+  const domScreens = [
+    { mesh: monitor.screen, size: monitor.size, element: screenElements.monitor },
+    { mesh: laptop.screen, size: laptop.size, element: screenElements.laptop },
+  ].map(({ mesh, size, element }) => {
+    const object = new CSS3DObject(element);
+    cssScene.add(object);
+    return { mesh, object, scale: size[0] / Number(element.dataset.width) };
+  });
+  const tmpScale = new THREE.Vector3();
+
+  function syncDomScreens() {
+    domScreens.forEach(({ mesh, object, scale }) => {
+      mesh.matrixWorld.decompose(object.position, object.quaternion, tmpScale);
+      object.scale.setScalar(scale);
+    });
+  }
+
+  const pickable = { work: monitor.group, tools: laptop.group, guides, side: controller, contact: phone.group };
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+
+  /** Section key of the object under a viewport point, or null. */
+  function pick(clientX, clientY, width, height) {
+    pointer.set((clientX / width) * 2 - 1, -(clientY / height) * 2 + 1);
+    raycaster.setFromCamera(pointer, camera);
+    const hit = raycaster.intersectObjects(Object.values(pickable), true)[0];
+    if (!hit) return null;
+    return Object.keys(pickable).find((key) => {
+      let node = hit.object;
+      while (node) {
+        if (node === pickable[key]) return true;
+        node = node.parent;
+      }
+      return false;
+    });
   }
 
   function setPose({ position, target }) {
@@ -332,12 +361,15 @@ export function createDeskScene(canvas, { coverSrcs = [] } = {}) {
 
   function resize(width, height) {
     renderer.setSize(width, height, false);
+    cssRenderer.setSize(width, height);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   }
 
   function render() {
     renderer.render(scene, camera);
+    syncDomScreens();
+    cssRenderer.render(cssScene, camera);
   }
 
   function dispose() {
@@ -352,9 +384,10 @@ export function createDeskScene(canvas, { coverSrcs = [] } = {}) {
     scene.environment?.dispose();
     pmrem.dispose();
     renderer.dispose();
+    cssRenderer.domElement.remove();
   }
 
   setRise(0);
   setPhoneLit(0);
-  return { anchors, camera, setScreens, setPose, setRise, setPhoneLit, resize, render, dispose, fov: camera.fov };
+  return { anchors, camera, pick, setPose, setRise, setPhoneLit, resize, render, dispose, fov: camera.fov };
 }

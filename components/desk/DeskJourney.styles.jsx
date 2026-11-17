@@ -27,6 +27,12 @@ export const Root = styled.div`
     display: none;
   }
 
+  main {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+  }
+
   .note {
     margin: 1.6rem 0 0;
     font-family: var(--font-mono), monospace;
@@ -44,13 +50,37 @@ export const Root = styled.div`
   }
 `;
 
+export const CssHost = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+`;
+
 export const Stage = styled.canvas`
   position: fixed;
   inset: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
   display: block;
-  touch-action: pan-y;
+  pointer-events: none;
+`;
+
+export const HoverTag = styled.div`
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  left: 0;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 99rem;
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  font-size: 1.3rem;
+  font-weight: 500;
+  pointer-events: none;
+  white-space: nowrap;
 `;
 
 export const Section = styled.section`
@@ -349,8 +379,9 @@ export const Nav = styled.nav`
   display: flex;
   align-items: center;
   gap: 2.4rem;
-  padding: 1.6rem clamp(2.4rem, 6vw, 9.6rem);
+  padding: 1.6rem clamp(2.4rem, 6vw, 9.6rem) 3.2rem;
   font-size: 1.4rem;
+  background: linear-gradient(to bottom, rgba(7, 8, 10, 0.92) 40%, rgba(7, 8, 10, 0));
 
   a {
     text-decoration: none;

@@ -13,7 +13,7 @@ export const projects = [
       "Storybook",
       "Recharts",
     ],
-    link: "https://withrotate.com",
+    note: "Acquired by Check Point, 2026",
   },
   {
     name: "StoreLink",

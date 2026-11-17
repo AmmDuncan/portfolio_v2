@@ -1,12 +1,14 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import Lenis from "lenis";
 
 import { DeskJourney as Journey } from "../../domains/DeskJourney";
 import { projects, sideProjects } from "../../data/projects";
 import { books } from "../../data/books";
 import { createDeskScene } from "./scene/createDeskScene";
-import { setScreenFonts, toolsScreen, workScreen } from "./scene/screens";
-import { Card, CtaRow, Hero, Nav, ProjectList, Root, Screen, Section, Stage } from "./DeskJourney.styles";
+import { setScreenFonts } from "./scene/screens";
+import { makeScreenElement, SCREEN_SIZES, ScreenUI } from "./ScreenUI";
+import { Card, CssHost, CtaRow, Hero, HoverTag, Nav, ProjectList, Root, Screen, Section, Stage } from "./DeskJourney.styles";
 
 const EMAIL = "ammielgyanyawson@gmail.com";
 const tools = projects.filter((p) => p.kind === "tool");
@@ -19,6 +21,23 @@ const SECTIONS = [
   { key: "side", label: "Side projects" },
   { key: "contact", label: "Contact" },
 ];
+const SECTION_LABEL = Object.fromEntries(SECTIONS.map(({ key, label }) => [key, label]));
+const SCREEN_COPY = {
+  work: {
+    path: "~/work",
+    label: "01 · Work",
+    title: "Products I've built",
+    intro: "For clients and for myself, from security platforms to stores for social sellers in Ghana.",
+    items: work,
+  },
+  tools: {
+    path: "~/tools",
+    label: "02 · Tools",
+    title: "Tools for building with AI",
+    intro: "Things I built because I needed them while working with coding agents.",
+    items: tools,
+  },
+};
 
 /** Shifts a pose sideways (desktop) or down (portrait) so the object clears the text card. */
 function frameBeside(position, target, aspect, amount, portraitAmount = amount * 0.5) {
@@ -35,11 +54,41 @@ function lookFrom(point, offset, distance) {
   return { position: point.map((v, i) => v + offset[i] * distance), target: point };
 }
 
-function buildTimeline(scene, els, vh, aspect) {
+/** How a device screen maps to the viewport once the camera has pushed into it. */
+function screenFit(anchor, virtual, fov, aspect, viewportWidth) {
+  const pose = Journey.screenPose(anchor, fov, aspect);
+  const distance = Math.hypot(...pose.position.map((v, i) => v - anchor.center[i]));
+  const visibleWidth = 2 * distance * Math.tan((fov * Math.PI) / 360) * aspect;
+  const shownFraction = Math.min(1, visibleWidth / anchor.width);
+  return {
+    pose,
+    virtualPerPx: virtual.width / ((anchor.width / visibleWidth) * viewportWidth),
+    columnPx: virtual.width * shownFraction * 0.9,
+  };
+}
+
+function buildTimeline(scene, els, screens, vh, vw) {
+  const aspect = vw / vh;
   const { anchors } = scene;
   const portrait = aspect < 1;
   const top = (el) => el.offsetTop;
   const bottom = (el) => el.offsetTop + el.offsetHeight;
+
+  const fits = {
+    work: screenFit(anchors.monitor, SCREEN_SIZES.monitor, scene.fov, aspect, vw),
+    tools: screenFit(anchors.laptop, SCREEN_SIZES.laptop, scene.fov, aspect, vw),
+  };
+  const hold = vh * 0.3;
+  const scrolls = {};
+  Object.entries(fits).forEach(([key, fit]) => {
+    const { element, scroller } = screens[key];
+    element.style.setProperty("--col", `${Math.round(fit.columnPx)}px`);
+    element.toggleAttribute("data-narrow", fit.columnPx < 760);
+    const viewportHeight = element.offsetHeight - 44;
+    const scrollable = Math.max(0, scroller.offsetHeight - viewportHeight * 0.9);
+    els[key].style.height = `${Math.round(hold * 2 + scrollable / fit.virtualPerPx)}px`;
+    scrolls[key] = { scroller, scrollable, start: () => top(els[key]) + hold, end: () => bottom(els[key]) - hold };
+  });
 
   const wide = portrait
     ? { position: [-0.5, 1.75, 3.5], target: [0.0, 1.02, 0] }
@@ -47,8 +96,6 @@ function buildTimeline(scene, els, vh, aspect) {
   const wideIn = portrait
     ? { position: [-0.42, 1.65, 3.0], target: [0.0, 0.98, 0] }
     : { position: [-1.1, 1.4, 1.85], target: [-0.6, 0.86, 0] };
-  const monitor = Journey.screenPose(anchors.monitor, scene.fov, aspect);
-  const laptop = Journey.screenPose(anchors.laptop, scene.fov, aspect);
   const between = { position: [-0.05, 1.3, 1.25], target: [-0.05, 0.9, -0.1] };
   const lc = anchors.laptop.center;
   const laptopOut = { position: [lc[0] + 0.1, lc[1] + 0.32, lc[2] + 0.75], target: [lc[0], lc[1] - 0.12, lc[2] + 0.15] };
@@ -72,7 +119,7 @@ function buildTimeline(scene, els, vh, aspect) {
     : frameBeside([0, 1.25, 2.9], [0, 0.98, 0], aspect, 0.16);
 
   const arrive = {
-    guides: top(els.guides) + vh * 0.35,
+    guides: top(els.guides) + vh * 0.7,
     side: top(els.side) + vh * 0.35,
     contact: top(els.contact) + vh * 0.35,
   };
@@ -80,12 +127,12 @@ function buildTimeline(scene, els, vh, aspect) {
   const keyframes = [
     k(0, wide),
     k(top(els.work) - vh * 1.3, wideIn),
-    k(top(els.work) - vh * 0.55, monitor),
-    k(bottom(els.work) - vh * 0.8, monitor),
-    k(top(els.tools) - vh * 1.1, between),
-    k(top(els.tools) - vh * 0.55, laptop),
-    k(bottom(els.tools) - vh * 0.8, laptop),
-    k(bottom(els.tools) - vh * 0.05, laptopOut),
+    k(top(els.work), fits.work.pose),
+    k(bottom(els.work), fits.work.pose),
+    k(top(els.tools) - vh * 0.7, between),
+    k(top(els.tools), fits.tools.pose),
+    k(bottom(els.tools), fits.tools.pose),
+    k(top(els.guides) + vh * 0.25, laptopOut),
     k(arrive.guides, guides),
     k(bottom(els.guides) - vh * 1.1, guides),
     k(arrive.side, controller),
@@ -96,6 +143,7 @@ function buildTimeline(scene, els, vh, aspect) {
   ];
   return {
     keyframes,
+    scrolls,
     heroFade: [vh * 0.25, vh * 0.85],
     cards: [
       { key: "guides", range: [arrive.guides - vh * 0.3, arrive.guides] },
@@ -105,41 +153,36 @@ function buildTimeline(scene, els, vh, aspect) {
     phoneLit: [top(els.contact) - vh * 0.1, top(els.contact) + vh * 0.5],
     rise: [top(els.contact) + vh * 1.6, top(els.contact) + vh * 2.5],
     jumps: {
-      work: top(els.work),
-      tools: top(els.tools),
+      top: 0,
+      work: top(els.work) + hold,
+      tools: top(els.tools) + hold,
       guides: arrive.guides,
       side: arrive.side,
       contact: arrive.contact,
     },
+    ranges: {
+      work: [top(els.work), bottom(els.work)],
+      tools: [top(els.tools), bottom(els.tools)],
+      guides: [arrive.guides, bottom(els.guides)],
+      side: [arrive.side, bottom(els.side)],
+      contact: [arrive.contact, bottom(els.contact)],
+    },
   };
 }
 
-function isInternal(href) {
-  return href.startsWith("/");
-}
-
-function ExternalOrInternal({ href, children, ...props }) {
-  const external = isInternal(href) ? {} : { target: "_blank", rel: "noopener noreferrer" };
-  return (
-    <a href={href} {...external} {...props}>
-      {children}
-    </a>
-  );
-}
-
-function ProjectRows({ items }) {
+function FallbackRows({ items }) {
   return (
     <ProjectList>
       {items.map((item) => (
         <li key={item.name}>
           <div className="meta">
             <h3>{item.name}</h3>
+            {item.note && <span className="tools">{item.note}</span>}
             <p>{item.description}</p>
-            <span className="tools">{item.tools.join(" · ")}</span>
             {item.link && (
-              <ExternalOrInternal className="open" href={item.link}>
+              <a className="open" href={item.link}>
                 Open {item.name}
-              </ExternalOrInternal>
+              </a>
             )}
           </div>
           <figure>
@@ -154,10 +197,17 @@ function ProjectRows({ items }) {
 
 export default function DeskJourney({ fonts }) {
   const canvasRef = React.useRef(null);
+  const cssHostRef = React.useRef(null);
   const heroRef = React.useRef(null);
   const heightRef = React.useRef(null);
+  const hoverRef = React.useRef(null);
   const lenisRef = React.useRef(null);
-  const jumpsRef = React.useRef({});
+  const timelineRef = React.useRef(null);
+  const scrollerRefs = { work: React.useRef(null), tools: React.useRef(null) };
+  const [screenEls] = React.useState(() => ({
+    work: makeScreenElement(SCREEN_SIZES.monitor),
+    tools: makeScreenElement(SCREEN_SIZES.laptop),
+  }));
   const [noWebGL, setNoWebGL] = React.useState(false);
   const refs = {
     work: React.useRef(null),
@@ -171,44 +221,39 @@ export default function DeskJourney({ fonts }) {
   React.useEffect(() => {
     let scene = null;
     try {
-      scene = createDeskScene(canvasRef.current, { coverSrcs: books.map((b) => b.coverSrc) });
+      scene = createDeskScene(canvasRef.current, {
+        coverSrcs: books.map((b) => b.coverSrc),
+        cssHost: cssHostRef.current,
+        screenElements: { monitor: screenEls.work, laptop: screenEls.tools },
+      });
     } catch {
       setNoWebGL(true);
+      return undefined;
     }
-    let cancelled = false;
-    let timeline = null;
-    let dirty = true;
+    setScreenFonts(fonts);
     const els = Object.fromEntries(Object.entries(refs).map(([key, ref]) => [key, ref.current]));
-
-    if (scene) {
-      setScreenFonts(fonts);
-      document.fonts.ready.then(async () => {
-        const [workTex, toolsTex] = await Promise.all([workScreen(work), toolsScreen(tools)]);
-        if (cancelled) {
-          workTex.dispose();
-          toolsTex.dispose();
-          return;
-        }
-        scene.setScreens({ work: workTex, tools: toolsTex });
-        dirty = true;
-      });
-    }
+    const screens = {
+      work: { element: screenEls.work, scroller: scrollerRefs.work.current },
+      tools: { element: screenEls.tools, scroller: scrollerRefs.tools.current },
+    };
+    let dirty = true;
+    const pointer = { x: 0, y: 0, moved: false, mouse: false };
 
     function layout() {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      if (!scene) {
-        jumpsRef.current = Object.fromEntries(Object.entries(els).map(([key, el]) => [key, el.offsetTop]));
-        return;
-      }
       scene.resize(w, h);
-      timeline = buildTimeline(scene, els, h, w / h);
-      jumpsRef.current = timeline.jumps;
+      timelineRef.current = buildTimeline(scene, els, screens, h, w);
       dirty = true;
     }
 
     function update(scrollY) {
+      const timeline = timelineRef.current;
       scene.setPose(Journey.poseAt(scrollY, timeline.keyframes));
+      Object.values(timeline.scrolls).forEach(({ scroller, scrollable, start, end }) => {
+        const offset = scrollable * Journey.progress(scrollY, start(), end());
+        scroller.style.transform = `translateY(${-offset}px)`;
+      });
       scene.setPhoneLit(Journey.progress(scrollY, ...timeline.phoneLit));
       const rise = Journey.smoothstep(Journey.progress(scrollY, ...timeline.rise));
       scene.setRise(rise);
@@ -219,6 +264,37 @@ export default function DeskJourney({ fonts }) {
       });
     }
 
+    function activeSection(scrollY) {
+      const { ranges } = timelineRef.current;
+      return Object.keys(ranges).find((key) => scrollY >= ranges[key][0] && scrollY <= ranges[key][1]);
+    }
+
+    function updateHover() {
+      const key = scene.pick(pointer.x, pointer.y, window.innerWidth, window.innerHeight);
+      const target = key && key !== activeSection(window.scrollY) ? key : null;
+      document.body.style.cursor = target ? "pointer" : "";
+      const tag = hoverRef.current;
+      tag.hidden = !target;
+      if (target) {
+        tag.textContent = `${SECTION_LABEL[target]} →`;
+        tag.style.transform = `translate(${pointer.x + 16}px, ${pointer.y + 16}px)`;
+      }
+    }
+
+    function onPointerMove(event) {
+      pointer.mouse = event.pointerType === "mouse";
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+      pointer.moved = true;
+    }
+
+    function onClick(event) {
+      if (event.target.closest("a, button, nav, .panel")) return;
+      const key = scene.pick(event.clientX, event.clientY, window.innerWidth, window.innerHeight);
+      if (!key || key === activeSection(window.scrollY)) return;
+      scrollToY(timelineRef.current.jumps[key]);
+    }
+
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const lenis = reduceMotion ? null : new Lenis({ lerp: 0.09 });
     lenisRef.current = lenis;
@@ -227,42 +303,63 @@ export default function DeskJourney({ fonts }) {
     function frame(time) {
       lenis?.raf(time);
       const y = window.scrollY;
-      if (scene && (dirty || y !== lastY)) {
+      if (dirty || y !== lastY) {
         update(y);
         scene.render();
         lastY = y;
         dirty = false;
+        pointer.moved = true;
+      }
+      if (pointer.moved && pointer.mouse) {
+        updateHover();
+        pointer.moved = false;
       }
       raf = requestAnimationFrame(frame);
     }
 
     layout();
     const resizeObserver = new ResizeObserver(layout);
-    resizeObserver.observe(document.body);
+    resizeObserver.observe(document.documentElement);
+    resizeObserver.observe(screens.work.scroller);
+    resizeObserver.observe(screens.tools.scroller);
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("click", onClick);
     raf = requestAnimationFrame(frame);
 
     return () => {
-      cancelled = true;
       cancelAnimationFrame(raf);
       resizeObserver.disconnect();
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("click", onClick);
+      document.body.style.cursor = "";
       lenis?.destroy();
-      scene?.dispose();
+      scene.dispose();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  function scrollToY(y) {
+    if (lenisRef.current) lenisRef.current.scrollTo(y, { duration: 1.8 });
+    else window.scrollTo(0, y);
+  }
+
   function jumpTo(key) {
     return (event) => {
       event.preventDefault();
-      const y = jumpsRef.current[key] ?? 0;
-      if (lenisRef.current) lenisRef.current.scrollTo(y, { duration: 1.6 });
-      else window.scrollTo(0, y);
+      const timeline = timelineRef.current;
+      scrollToY(timeline ? timeline.jumps[key] : refs[key]?.current?.offsetTop ?? 0);
     };
   }
 
   return (
     <Root data-no-webgl={noWebGL || undefined}>
+      <CssHost ref={cssHostRef} />
       <Stage ref={canvasRef} aria-hidden="true" />
+      {!noWebGL &&
+        Object.entries(SCREEN_COPY).map(([key, copy]) =>
+          createPortal(<ScreenUI {...copy} scrollerRef={scrollerRefs[key]} />, screenEls[key], key),
+        )}
+      <HoverTag ref={hoverRef} hidden aria-hidden="true" />
       <Nav aria-label="Sections">
         <a className="name" href="#top" onClick={jumpTo("top")}>
           Ammiel Yawson
@@ -286,31 +383,35 @@ export default function DeskJourney({ fonts }) {
             <span className="label">Product engineer in Accra</span>
             <h1>This is where I build.</h1>
             <p>Products for founders, tools for building with AI, and guides on how I work.</p>
-            <span className="cue">Scroll</span>
+            <span className="cue">Scroll, or click anything on the desk</span>
           </Hero>
         </Section>
 
         <Section ref={refs.work} id="work">
-          <Screen>
-            <span className="label">01 · Work</span>
-            <h2>Products I&apos;ve built</h2>
-            <p className="intro">For clients and for myself, from security platforms to stores for social sellers in Ghana.</p>
-            <ProjectRows items={work} />
-          </Screen>
+          {noWebGL && (
+            <Screen>
+              <span className="label">{SCREEN_COPY.work.label}</span>
+              <h2>{SCREEN_COPY.work.title}</h2>
+              <p className="intro">{SCREEN_COPY.work.intro}</p>
+              <FallbackRows items={work} />
+            </Screen>
+          )}
         </Section>
 
         <Section $vh={140} />
 
         <Section ref={refs.tools} id="tools">
-          <Screen>
-            <span className="label">02 · Tools</span>
-            <h2>Tools for building with AI</h2>
-            <p className="intro">Things I built because I needed them while working with coding agents.</p>
-            <ProjectRows items={tools} />
-          </Screen>
+          {noWebGL && (
+            <Screen>
+              <span className="label">{SCREEN_COPY.tools.label}</span>
+              <h2>{SCREEN_COPY.tools.title}</h2>
+              <p className="intro">{SCREEN_COPY.tools.intro}</p>
+              <FallbackRows items={tools} />
+            </Screen>
+          )}
         </Section>
 
-        <Section ref={refs.guides} id="guides" $vh={220}>
+        <Section ref={refs.guides} id="guides" $vh={260}>
           <Card ref={cardRefs.guides}>
             <div className="panel">
               <span className="label">03 · Guides</span>
