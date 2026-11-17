@@ -6,13 +6,15 @@ import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import "@fontsource/crimson-text/400.css";
+import { Fragment } from "react";
 import Script from "next/script";
 
 import BaseLayout from "../layouts/BaseLayout";
 
 function MyApp({ Component, pageProps }) {
+  const Layout = Component.bareLayout ? Fragment : BaseLayout;
   return (
-    <BaseLayout>
+    <Layout>
       <Script
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
@@ -29,7 +31,7 @@ function MyApp({ Component, pageProps }) {
           `}
       </Script>
       <Component {...pageProps} />
-    </BaseLayout>
+    </Layout>
   );
 }
 
