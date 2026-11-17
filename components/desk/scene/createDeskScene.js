@@ -5,6 +5,7 @@ import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLigh
 import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 
 import { keypadDisplay, phoneScreen, shadowTexture } from "./screens";
+import { accraNightTexture } from "./accraNight";
 
 const SIT_HEIGHT = 0.74;
 const STAND_HEIGHT = 1.12;
@@ -22,6 +23,8 @@ const mat = {
   controllerBlue: new THREE.MeshStandardMaterial({ color: "#2f6fe0", roughness: 0.45 }),
   controllerBlack: new THREE.MeshStandardMaterial({ color: "#121318", roughness: 0.55 }),
   bookEdge: new THREE.MeshStandardMaterial({ color: "#ece9e2", roughness: 0.9 }),
+  windowFrame: new THREE.MeshStandardMaterial({ color: "#d9dbdd", roughness: 0.4, metalness: 0.3 }),
+  burglarBar: new THREE.MeshStandardMaterial({ color: "#16171a", roughness: 0.5, metalness: 0.5 }),
   faceButton: new THREE.MeshStandardMaterial({ color: "#2a2d36", roughness: 0.3 }),
   lightBar: new THREE.MeshBasicMaterial({ color: "#7fb2ff", toneMapped: false }),
 };
@@ -47,17 +50,87 @@ function contactShadow(texture, w, d, opacity = 0.7) {
   return mesh;
 }
 
+const WINDOW = { x: -0.8, y: 1.33, w: 0.74, h: 0.56, wallZ: -0.42, depth: 0.14 };
+
+/** Back wall with a sliding window, burglar bars, and Accra at night far enough out to parallax. */
 function buildRoom(scene) {
-  const wall = new THREE.Mesh(new THREE.PlaneGeometry(8, 4), mat.wall);
-  wall.position.set(0, 2, -0.42);
+  const { x, y, w, h, wallZ, depth } = WINDOW;
+  const outline = new THREE.Shape([
+    new THREE.Vector2(-4, 0),
+    new THREE.Vector2(4, 0),
+    new THREE.Vector2(4, 4),
+    new THREE.Vector2(-4, 4),
+  ]);
+  outline.holes.push(
+    new THREE.Path([
+      new THREE.Vector2(x - w / 2, y - h / 2),
+      new THREE.Vector2(x + w / 2, y - h / 2),
+      new THREE.Vector2(x + w / 2, y + h / 2),
+      new THREE.Vector2(x - w / 2, y + h / 2),
+    ]),
+  );
+  const wall = new THREE.Mesh(new THREE.ShapeGeometry(outline), mat.wall);
+  wall.position.z = wallZ;
   scene.add(wall);
+
+  const reveal = [
+    [w + 0.02, 0.01, x, y - h / 2 - 0.005],
+    [w + 0.02, 0.01, x, y + h / 2 + 0.005],
+    [0.01, h, x - w / 2 - 0.005, y],
+    [0.01, h, x + w / 2 + 0.005, y],
+  ];
+  reveal.forEach(([rw, rh, rx, ry]) => {
+    const side = new THREE.Mesh(new THREE.BoxGeometry(rw, rh, depth), mat.wall);
+    side.position.set(rx, ry, wallZ - depth / 2);
+    scene.add(side);
+  });
+
+  const frameZ = wallZ - depth + 0.03;
+  const bar = (bw, bh, bx, by, bz, material, bd = 0.03) => {
+    const mesh = box(bw, bh, bd, material, 0.002);
+    mesh.position.set(bx, by, bz);
+    scene.add(mesh);
+  };
+  const t = 0.03;
+  bar(w, t, x, y - h / 2 + t / 2, frameZ, mat.windowFrame);
+  bar(w, t, x, y + h / 2 - t / 2, frameZ, mat.windowFrame);
+  bar(t, h, x - w / 2 + t / 2, y, frameZ, mat.windowFrame);
+  bar(t, h, x + w / 2 - t / 2, y, frameZ, mat.windowFrame);
+  bar(0.022, h - t, x + 0.01, y, frameZ + 0.012, mat.windowFrame);
+
+  const glass = new THREE.Mesh(
+    new THREE.PlaneGeometry(w - t, h - t),
+    new THREE.MeshStandardMaterial({ color: "#0d1220", roughness: 0.04, metalness: 0.2, transparent: true, opacity: 0.18 }),
+  );
+  glass.position.set(x, y, frameZ - 0.004);
+  scene.add(glass);
+
+  const barZ = wallZ - 0.025;
+  const count = 7;
+  for (let i = 1; i < count; i++) {
+    bar(0.009, h - 0.01, x - w / 2 + (w * i) / count, y, barZ, mat.burglarBar, 0.009);
+  }
+  [-0.18, 0.18].forEach((dy) => bar(w - 0.01, 0.012, x, y + dy * h, barZ, mat.burglarBar, 0.006));
+
+  const outside = new THREE.Mesh(
+    new THREE.PlaneGeometry(8, 4),
+    new THREE.MeshBasicMaterial({ map: accraNightTexture(), fog: false, toneMapped: false, color: "#d8dbe2" }),
+  );
+  outside.position.set(x + 0.6, y + 0.02, wallZ - 3);
+  scene.add(outside);
+
+  const moon = new THREE.RectAreaLight("#8ea4d6", 0.9, w, h);
+  moon.position.set(x, y, wallZ - 0.02);
+  moon.rotation.y = Math.PI;
+  scene.add(moon);
+
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), mat.floor);
   floor.rotation.x = -Math.PI / 2;
   scene.add(floor);
   const plate = box(0.085, 0.085, 0.012, mat.switchPlate, 0.004);
-  plate.position.set(-0.98, 1.42, -0.414);
+  plate.position.set(-1.42, 1.22, wallZ + 0.006);
   const rocker = box(0.022, 0.034, 0.012, mat.switchPlate, 0.003);
-  rocker.position.set(-0.98, 1.42, -0.405);
+  rocker.position.set(-1.42, 1.22, wallZ + 0.015);
   rocker.rotation.x = 0.12;
   scene.add(plate, rocker);
 }
