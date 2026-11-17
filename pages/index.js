@@ -2,6 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Hero from "../components/home/Hero";
 import Projects from "../components/home/Projects/Projects";
+import Books from "../components/home/Books";
 import ToolsUsed from "../components/home/ToolsUsed/ToolsUsed";
 
 export default function Home() {
@@ -39,6 +40,7 @@ export default function Home() {
       <Hero />
       <ToolsUsed />
       <Projects />
+      <Books />
     </div>
   );
 }
