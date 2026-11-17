@@ -5,7 +5,7 @@ import Lenis from "lenis";
 import { DeskJourney as Journey } from "../../domains/DeskJourney";
 import { projects, sideProjects } from "../../data/projects";
 import { books } from "../../data/books";
-import { createDeskScene } from "./scene/createDeskScene";
+import { createDeskScene, loadDeskModels } from "./scene/createDeskScene";
 import { setScreenFonts } from "./scene/screens";
 import { makeScreenElement, SCREEN_SIZES, ScreenUI } from "./ScreenUI";
 import { Card, CssHost, CtaRow, Hero, HoverTag, Nav, ProjectList, Root, Screen, Section, Stage } from "./DeskJourney.styles";
@@ -219,122 +219,140 @@ export default function DeskJourney({ fonts }) {
   const cardRefs = { guides: React.useRef(null), side: React.useRef(null), contact: React.useRef(null) };
 
   React.useEffect(() => {
-    let scene = null;
-    try {
-      scene = createDeskScene(canvasRef.current, {
-        coverSrcs: books.map((b) => b.coverSrc),
-        cssHost: cssHostRef.current,
-        screenElements: { monitor: screenEls.work, laptop: screenEls.tools },
+    let cancelled = false;
+    let stop = null;
+    loadDeskModels()
+      .then((models) => {
+        if (!cancelled) stop = startJourney(models);
+      })
+      .catch((error) => {
+        console.error(error);
+        setNoWebGL(true);
       });
-    } catch {
-      setNoWebGL(true);
-      return undefined;
-    }
-    setScreenFonts(fonts);
-    const els = Object.fromEntries(Object.entries(refs).map(([key, ref]) => [key, ref.current]));
-    const screens = {
-      work: { element: screenEls.work, scroller: scrollerRefs.work.current },
-      tools: { element: screenEls.tools, scroller: scrollerRefs.tools.current },
+    return () => {
+      cancelled = true;
+      stop?.();
     };
-    let dirty = true;
-    const pointer = { x: 0, y: 0, moved: false, mouse: false };
 
-    function layout() {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      scene.resize(w, h);
-      timelineRef.current = buildTimeline(scene, els, screens, h, w);
-      dirty = true;
-    }
-
-    function update(scrollY) {
-      const timeline = timelineRef.current;
-      scene.setPose(Journey.poseAt(scrollY, timeline.keyframes));
-      Object.values(timeline.scrolls).forEach(({ scroller, scrollable, start, end }) => {
-        const offset = scrollable * Journey.progress(scrollY, start(), end());
-        scroller.style.transform = `translateY(${-offset}px)`;
-      });
-      scene.setPhoneLit(Journey.progress(scrollY, ...timeline.phoneLit));
-      const rise = Journey.smoothstep(Journey.progress(scrollY, ...timeline.rise));
-      scene.setRise(rise);
-      heightRef.current.textContent = `Desk height ${Math.round(74 + (112 - 74) * rise)} cm`;
-      heroRef.current.style.opacity = String(1 - Journey.progress(scrollY, ...timeline.heroFade));
-      timeline.cards.forEach(({ key, range }) => {
-        cardRefs[key].current.style.opacity = String(Journey.progress(scrollY, ...range));
-      });
-    }
-
-    function activeSection(scrollY) {
-      const { ranges } = timelineRef.current;
-      return Object.keys(ranges).find((key) => scrollY >= ranges[key][0] && scrollY <= ranges[key][1]);
-    }
-
-    function updateHover() {
-      const key = scene.pick(pointer.x, pointer.y, window.innerWidth, window.innerHeight);
-      const target = key && key !== activeSection(window.scrollY) ? key : null;
-      document.body.style.cursor = target ? "pointer" : "";
-      const tag = hoverRef.current;
-      tag.hidden = !target;
-      if (target) {
-        tag.textContent = `${SECTION_LABEL[target]} →`;
-        tag.style.transform = `translate(${pointer.x + 16}px, ${pointer.y + 16}px)`;
+    function startJourney(models) {
+      let scene = null;
+      try {
+        scene = createDeskScene(canvasRef.current, {
+          coverSrcs: books.map((b) => b.coverSrc),
+          cssHost: cssHostRef.current,
+          screenElements: { monitor: screenEls.work, laptop: screenEls.tools },
+          models,
+        });
+      } catch {
+        setNoWebGL(true);
+        return null;
       }
-    }
+      setScreenFonts(fonts);
+      const els = Object.fromEntries(Object.entries(refs).map(([key, ref]) => [key, ref.current]));
+      const screens = {
+        work: { element: screenEls.work, scroller: scrollerRefs.work.current },
+        tools: { element: screenEls.tools, scroller: scrollerRefs.tools.current },
+      };
+      let dirty = true;
+      const pointer = { x: 0, y: 0, moved: false, mouse: false };
 
-    function onPointerMove(event) {
-      pointer.mouse = event.pointerType === "mouse";
-      pointer.x = event.clientX;
-      pointer.y = event.clientY;
-      pointer.moved = true;
-    }
+      function layout() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        scene.resize(w, h);
+        timelineRef.current = buildTimeline(scene, els, screens, h, w);
+        dirty = true;
+      }
 
-    function onClick(event) {
-      if (event.target.closest("a, button, nav, .panel")) return;
-      const key = scene.pick(event.clientX, event.clientY, window.innerWidth, window.innerHeight);
-      if (!key || key === activeSection(window.scrollY)) return;
-      scrollToY(timelineRef.current.jumps[key]);
-    }
+      function update(scrollY) {
+        const timeline = timelineRef.current;
+        scene.setPose(Journey.poseAt(scrollY, timeline.keyframes));
+        Object.values(timeline.scrolls).forEach(({ scroller, scrollable, start, end }) => {
+          const offset = scrollable * Journey.progress(scrollY, start(), end());
+          scroller.style.transform = `translateY(${-offset}px)`;
+        });
+        scene.setPhoneLit(Journey.progress(scrollY, ...timeline.phoneLit));
+        const rise = Journey.smoothstep(Journey.progress(scrollY, ...timeline.rise));
+        scene.setRise(rise);
+        heightRef.current.textContent = `Desk height ${Math.round(74 + (112 - 74) * rise)} cm`;
+        heroRef.current.style.opacity = String(1 - Journey.progress(scrollY, ...timeline.heroFade));
+        timeline.cards.forEach(({ key, range }) => {
+          cardRefs[key].current.style.opacity = String(Journey.progress(scrollY, ...range));
+        });
+      }
 
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const lenis = reduceMotion ? null : new Lenis({ lerp: 0.09 });
-    lenisRef.current = lenis;
-    let raf = 0;
-    let lastY = -1;
-    function frame(time) {
-      lenis?.raf(time);
-      const y = window.scrollY;
-      if (dirty || y !== lastY) {
-        update(y);
-        scene.render();
-        lastY = y;
-        dirty = false;
+      function activeSection(scrollY) {
+        const { ranges } = timelineRef.current;
+        return Object.keys(ranges).find((key) => scrollY >= ranges[key][0] && scrollY <= ranges[key][1]);
+      }
+
+      function updateHover() {
+        const key = scene.pick(pointer.x, pointer.y, window.innerWidth, window.innerHeight);
+        const target = key && key !== activeSection(window.scrollY) ? key : null;
+        document.body.style.cursor = target ? "pointer" : "";
+        const tag = hoverRef.current;
+        tag.hidden = !target;
+        if (target) {
+          tag.textContent = `${SECTION_LABEL[target]} →`;
+          tag.style.transform = `translate(${pointer.x + 16}px, ${pointer.y + 16}px)`;
+        }
+      }
+
+      function onPointerMove(event) {
+        pointer.mouse = event.pointerType === "mouse";
+        pointer.x = event.clientX;
+        pointer.y = event.clientY;
         pointer.moved = true;
       }
-      if (pointer.moved && pointer.mouse) {
-        updateHover();
-        pointer.moved = false;
+
+      function onClick(event) {
+        if (event.target.closest("a, button, nav, .panel")) return;
+        const key = scene.pick(event.clientX, event.clientY, window.innerWidth, window.innerHeight);
+        if (!key || key === activeSection(window.scrollY)) return;
+        scrollToY(timelineRef.current.jumps[key]);
       }
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const lenis = reduceMotion ? null : new Lenis({ lerp: 0.09 });
+      lenisRef.current = lenis;
+      let raf = 0;
+      let lastY = -1;
+      function frame(time) {
+        lenis?.raf(time);
+        const y = window.scrollY;
+        if (dirty || y !== lastY) {
+          update(y);
+          scene.render();
+          lastY = y;
+          dirty = false;
+          pointer.moved = true;
+        }
+        if (pointer.moved && pointer.mouse) {
+          updateHover();
+          pointer.moved = false;
+        }
+        raf = requestAnimationFrame(frame);
+      }
+
+      layout();
+      const resizeObserver = new ResizeObserver(layout);
+      resizeObserver.observe(document.documentElement);
+      resizeObserver.observe(screens.work.scroller);
+      resizeObserver.observe(screens.tools.scroller);
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("click", onClick);
       raf = requestAnimationFrame(frame);
+
+      return () => {
+        cancelAnimationFrame(raf);
+        resizeObserver.disconnect();
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("click", onClick);
+        document.body.style.cursor = "";
+        lenis?.destroy();
+        scene.dispose();
+      };
     }
-
-    layout();
-    const resizeObserver = new ResizeObserver(layout);
-    resizeObserver.observe(document.documentElement);
-    resizeObserver.observe(screens.work.scroller);
-    resizeObserver.observe(screens.tools.scroller);
-    window.addEventListener("pointermove", onPointerMove);
-    window.addEventListener("click", onClick);
-    raf = requestAnimationFrame(frame);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      resizeObserver.disconnect();
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("click", onClick);
-      document.body.style.cursor = "";
-      lenis?.destroy();
-      scene.dispose();
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

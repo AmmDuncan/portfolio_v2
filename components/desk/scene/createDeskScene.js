@@ -3,6 +3,7 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import { keypadDisplay, phoneScreen, shadowTexture } from "./screens";
 
@@ -10,6 +11,10 @@ const SIT_HEIGHT = 0.74;
 const STAND_HEIGHT = 1.12;
 const DESK = { width: 1.6, depth: 0.75, thickness: 0.035 };
 const ACCENT = new THREE.Color("#3d7fff");
+const MODEL_URLS = { monitor: "/models/g7.glb", laptop: "/models/macbook.glb", controller: "/models/dualsense.glb" };
+// Flat DOM plane sized past the curved panel's chord so the curve's edges never show a gap.
+const MONITOR_SCREEN = [0.75, 0.4];
+const LAPTOP_SCREEN = [0.35, 0.226];
 
 const mat = {
   deskTop: new THREE.MeshStandardMaterial({ color: "#131315", roughness: 0.62, dithering: true }),
@@ -19,11 +24,7 @@ const mat = {
   aluminium: new THREE.MeshStandardMaterial({ color: "#5e6166", roughness: 0.34, metalness: 0.9 }),
   blackPlastic: new THREE.MeshStandardMaterial({ color: "#0e0e10", roughness: 0.5 }),
   switchPlate: new THREE.MeshStandardMaterial({ color: "#e4e1d8", roughness: 0.7 }),
-  controllerBlue: new THREE.MeshStandardMaterial({ color: "#2f6fe0", roughness: 0.45 }),
-  controllerBlack: new THREE.MeshStandardMaterial({ color: "#121318", roughness: 0.55 }),
   bookEdge: new THREE.MeshStandardMaterial({ color: "#ece9e2", roughness: 0.9 }),
-  faceButton: new THREE.MeshStandardMaterial({ color: "#2a2d36", roughness: 0.3 }),
-  lightBar: new THREE.MeshBasicMaterial({ color: "#7fb2ff", toneMapped: false }),
 };
 
 function box(w, h, d, material, radius = 0.004) {
@@ -31,10 +32,12 @@ function box(w, h, d, material, radius = 0.004) {
   return mesh;
 }
 
-/** A see-through cut in the canvas so the DOM screen behind it shows, still hidden by anything in front. */
-function screenHole(w, h) {
+/** Turns a model's screen into a see-through cut in the canvas, so the DOM screen behind it shows. */
+function cutScreenHole(model) {
   const material = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 0, blending: THREE.NoBlending });
-  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), material);
+  model.getObjectByName("Screen").traverse((node) => {
+    if (node.isMesh) node.material = material;
+  });
 }
 
 function contactShadow(texture, w, d, opacity = 0.7) {
@@ -83,50 +86,22 @@ function buildFrame(shadowTex) {
   return { base, inner };
 }
 
-function buildMonitor(shadowTex) {
+function buildMonitor(model, shadowTex) {
   const group = new THREE.Group();
-  const foot = box(0.26, 0.012, 0.19, mat.blackPlastic, 0.005);
-  foot.position.set(0, 0.006, -0.02);
-  const neck = box(0.05, 0.3, 0.03, mat.blackPlastic, 0.008);
-  neck.position.set(0, 0.16, -0.08);
-  const panel = box(0.734, 0.424, 0.028, mat.blackPlastic, 0.006);
-  panel.position.set(0, 0.34, -0.055);
-  const screen = screenHole(0.71, 0.4);
-  screen.position.set(0, 0.34, -0.0405);
-  group.add(foot, neck, panel, screen, contactShadow(shadowTex, 0.42, 0.3));
-  return { group, screen, size: [0.71, 0.4] };
+  cutScreenHole(model);
+  const screen = model.getObjectByName("ScreenCenter");
+  group.add(model, contactShadow(shadowTex, 0.72, 0.4));
+  return { group, screen, size: MONITOR_SCREEN };
 }
 
-function buildLaptop(shadowTex) {
+function buildLaptop(model, shadowTex) {
   const group = new THREE.Group();
-  const stand = new THREE.Group();
-  [-0.13, 0.13].forEach((x) => {
-    const rail = box(0.018, 0.012, 0.26, mat.aluminium, 0.004);
-    rail.position.set(x, 0.035, 0);
-    rail.rotation.x = 0.16;
-    const post = box(0.018, 0.07, 0.018, mat.aluminium, 0.004);
-    post.position.set(x, 0.035, -0.11);
-    stand.add(rail, post);
-  });
-  const body = new THREE.Group();
-  body.position.set(0, 0.06, 0);
-  body.rotation.x = 0.16;
-  const base = box(0.356, 0.016, 0.248, mat.aluminium, 0.006);
-  const keyboard = box(0.29, 0.002, 0.11, mat.blackPlastic, 0.001);
-  keyboard.position.set(0, 0.0085, -0.02);
-  const hinge = new THREE.Group();
-  hinge.position.set(0, 0.008, -0.124);
-  hinge.rotation.x = -0.26;
-  const lid = box(0.356, 0.24, 0.008, mat.aluminium, 0.006);
-  lid.position.set(0, 0.12, 0);
-  const bezel = box(0.348, 0.232, 0.002, mat.blackPlastic, 0.004);
-  bezel.position.set(0, 0.12, 0.004);
-  const screen = screenHole(0.33, 0.212);
-  screen.position.set(0, 0.122, 0.0055);
-  hinge.add(lid, bezel, screen);
-  body.add(base, keyboard, hinge);
-  group.add(stand, body, contactShadow(shadowTex, 0.46, 0.36, 0.6));
-  return { group, screen, size: [0.33, 0.212] };
+  cutScreenHole(model);
+  const screen = new THREE.Object3D();
+  screen.position.set(0, 0.1647, -0.1595);
+  screen.rotation.x = -Math.atan2(0.247, 0.969);
+  group.add(model, screen, contactShadow(shadowTex, 0.46, 0.4, 0.6));
+  return { group, screen, size: LAPTOP_SCREEN };
 }
 
 function buildPhone(shadowTex) {
@@ -146,36 +121,9 @@ function buildPhone(shadowTex) {
   return { group, screen, screenMaterial };
 }
 
-function buildController(shadowTex) {
+function buildController(model, shadowTex) {
   const group = new THREE.Group();
-  const shell = box(0.124, 0.026, 0.058, mat.controllerBlue, 0.012);
-  shell.position.set(0, 0.03, 0);
-  const plate = box(0.07, 0.006, 0.046, mat.controllerBlack, 0.005);
-  plate.position.set(0, 0.043, 0.004);
-  const pad = box(0.046, 0.003, 0.026, mat.controllerBlack, 0.003);
-  pad.position.set(0, 0.0445, -0.012);
-  group.add(shell, plate, pad);
-  [-1, 1].forEach((side) => {
-    const grip = new THREE.Mesh(new THREE.CapsuleGeometry(0.0155, 0.04, 6, 18), mat.controllerBlue);
-    grip.position.set(side * 0.046, 0.022, 0.034);
-    grip.rotation.set(Math.PI / 2 + 0.45, 0, side * 0.28);
-    const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.0085, 0.0085, 0.01, 20), mat.controllerBlack);
-    stick.position.set(side * 0.02, 0.05, 0.018);
-    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.0075, 0.0075, 0.002, 20), mat.controllerBlue);
-    cap.position.set(side * 0.02, 0.0565, 0.018);
-    group.add(grip, stick, cap);
-  });
-  [[0, -0.008], [0, 0.008], [-0.008, 0], [0.008, 0]].forEach(([dx, dz]) => {
-    const face = new THREE.Mesh(new THREE.CylinderGeometry(0.0034, 0.0034, 0.003, 14), mat.faceButton);
-    face.position.set(0.042 + dx, 0.0445, -0.004 + dz);
-    const dpad = box(0.006, 0.003, 0.006, mat.controllerBlack, 0.0012);
-    dpad.position.set(-0.042 + dx * 0.95, 0.0445, -0.004 + dz * 0.95);
-    group.add(face, dpad);
-  });
-  const lightBar = box(0.05, 0.0015, 0.004, mat.lightBar, 0.0007);
-  lightBar.position.set(0, 0.0453, -0.026);
-  group.add(lightBar);
-  group.add(contactShadow(shadowTex, 0.2, 0.16, 0.65));
+  group.add(model, contactShadow(shadowTex, 0.24, 0.17, 0.65));
   return group;
 }
 
@@ -223,8 +171,17 @@ function pointAnchor(object, offset = [0, 0, 0]) {
   return v.add(new THREE.Vector3(...offset)).toArray();
 }
 
+/** Loads the G7, MacBook and DualSense models, keyed by the object they become. */
+export async function loadDeskModels() {
+  const loader = new GLTFLoader();
+  const entries = await Promise.all(
+    Object.entries(MODEL_URLS).map(async ([key, url]) => [key, (await loader.loadAsync(url)).scene]),
+  );
+  return Object.fromEntries(entries);
+}
+
 /** Builds the desk scene into a canvas. Returns controls driven by scroll. */
-export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElements }) {
+export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElements, models }) {
   RectAreaLightUniformsLib.init();
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -254,16 +211,16 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   deskTop.position.y = -DESK.thickness / 2;
   top.add(deskTop);
 
-  const monitor = buildMonitor(shadowTex);
+  const monitor = buildMonitor(models.monitor, shadowTex);
   monitor.group.position.set(0.34, 0, -0.16);
   monitor.group.rotation.y = -0.12;
-  const laptop = buildLaptop(shadowTex);
+  const laptop = buildLaptop(models.laptop, shadowTex);
   laptop.group.position.set(-0.4, 0, -0.04);
   laptop.group.rotation.y = 0.1;
   const phone = buildPhone(shadowTex);
   phone.group.position.set(-0.03, 0, 0.16);
   phone.group.rotation.y = 0.08;
-  const controller = buildController(shadowTex);
+  const controller = buildController(models.controller, shadowTex);
   controller.position.set(0.36, 0, 0.21);
   controller.rotation.y = -0.4;
   const guides = buildGuides(shadowTex, coverSrcs);
@@ -274,13 +231,13 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   top.add(monitor.group, laptop.group, phone.group, controller, guides, keypad.group);
 
   const biasLight = new THREE.RectAreaLight(ACCENT, 7, 0.6, 0.3);
-  biasLight.position.set(0, 0.34, -0.075);
+  biasLight.position.set(0, 0.3, -0.09);
   monitor.group.add(biasLight);
-  const monitorLight = new THREE.RectAreaLight("#dfe7ff", 8, 0.7, 0.4);
-  monitorLight.position.set(0, 0.34, -0.035);
+  const monitorLight = new THREE.RectAreaLight("#dfe7ff", 8, 0.68, 0.39);
+  monitorLight.position.set(0, 0.3, 0.075);
   monitorLight.rotation.y = Math.PI;
   monitor.group.add(monitorLight);
-  const laptopLight = new THREE.RectAreaLight("#e6ecff", 6, 0.33, 0.21);
+  const laptopLight = new THREE.RectAreaLight("#e6ecff", 6, 0.345, 0.223);
   laptop.screen.add(laptopLight);
   laptopLight.position.set(0, 0, 0.004);
   laptopLight.rotation.y = Math.PI;

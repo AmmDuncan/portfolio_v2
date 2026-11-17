@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
 export const SCREEN_SIZES = {
-  monitor: { width: 1600, height: 901 },
-  laptop: { width: 1280, height: 822 },
+  monitor: { width: 1600, height: 853 },
+  laptop: { width: 1280, height: 826 },
 };
 
 /** A detached element the 3D scene places on a device screen. */
