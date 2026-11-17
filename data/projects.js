@@ -25,6 +25,7 @@ export const projects = [
   },
   {
     name: "Local Dictation",
+    kind: "tool",
     imgSrc: "/assets/projects/local-dictation.png",
     description:
       "A private, on-device dictation app for macOS. Hold ⌃Space, speak, release: Whisper transcribes and a local model cleans up, 100% offline. Nothing leaves your Mac.",
@@ -33,6 +34,7 @@ export const projects = [
   },
   {
     name: "easel",
+    kind: "tool",
     imgSrc: "/assets/projects/easel.png",
     description:
       "A live browser tab for every AI coding session. An MCP server that lets agents push HTML — mockups, diagrams, diffs, comparisons — to a scrolling feed you keep open in split-screen.",
@@ -41,6 +43,7 @@ export const projects = [
   },
   {
     name: "Pitstop",
+    kind: "tool",
     imgSrc: "/assets/projects/pitstop.png",
     description:
       "An in-app review loop for AI-agent work. The agent walks your browser through every surface it touched, pinning your feedback to each step and acting on it with full context.",

@@ -72,42 +72,37 @@ function drawWindowChrome(ctx, w, title) {
   ctx.textAlign = "left";
 }
 
-/** Grid of project thumbnails, like a folder of work. */
-async function drawGrid(canvas, { title, heading, items, columns }) {
+/** Grid of every project thumbnail, sized so all rows and labels fit the canvas. */
+async function drawGrid(canvas, { title, items, columns }) {
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
+  const h = canvas.height;
   drawWindowChrome(ctx, w, title);
-  const pad = w * 0.05;
-  ctx.fillStyle = ACCENT;
-  ctx.font = `500 26px ${MONO}`;
-  ctx.fillText(heading.label, pad, 150);
-  ctx.fillStyle = INK;
-  ctx.font = `600 ${Math.round(w * 0.04)}px ${SANS}`;
-  ctx.fillText(heading.title, pad, 150 + w * 0.05);
+  const pad = w * 0.045;
+  const gap = w * 0.018;
+  const labelH = Math.round(w * 0.03);
+  const top = 64 + pad * 0.8;
+  const rows = Math.max(1, Math.ceil(items.length / columns));
+  const fitW = (w - pad * 2 - gap * (columns - 1)) / columns;
+  const fitH = (h - top - pad * 0.6 - rows * (labelH + gap)) / rows;
+  const cellH = Math.min(fitW * 0.62, fitH);
+  const cellW = cellH / 0.62;
+  const left = (w - (cellW * columns + gap * (columns - 1))) / 2;
   const images = await Promise.all(items.map((item) => loadImage(item.imgSrc)));
-  const gap = w * 0.02;
-  const top = 150 + w * 0.08;
-  const cellW = (w - pad * 2 - gap * (columns - 1)) / columns;
-  const cellH = cellW * 0.62;
   items.forEach((item, i) => {
-    const x = pad + (i % columns) * (cellW + gap);
-    const y = top + Math.floor(i / columns) * (cellH + 70);
-    drawCover(ctx, images[i], x, y, cellW, cellH, 14);
+    const x = left + (i % columns) * (cellW + gap);
+    const y = top + Math.floor(i / columns) * (cellH + labelH + gap);
+    drawCover(ctx, images[i], x, y, cellW, cellH, 12);
     ctx.fillStyle = INK;
-    ctx.font = `500 ${Math.round(w * 0.016)}px ${SANS}`;
-    ctx.fillText(item.name, x, y + cellH + 40);
+    ctx.font = `500 ${Math.round(labelH * 0.55)}px ${SANS}`;
+    ctx.fillText(item.name, x, y + cellH + labelH * 0.72);
   });
 }
 
 export async function workScreen(items) {
   const canvas = makeCanvas(2048, 1152);
   const texture = toTexture(canvas);
-  await drawGrid(canvas, {
-    title: "~/work",
-    heading: { label: "01 / WORK", title: "Products I've built" },
-    items: items.slice(0, 6),
-    columns: 3,
-  });
+  await drawGrid(canvas, { title: "~/work", items, columns: Math.max(3, Math.round(Math.sqrt(items.length * 1.6))) });
   texture.needsUpdate = true;
   return texture;
 }
@@ -115,12 +110,7 @@ export async function workScreen(items) {
 export async function toolsScreen(items) {
   const canvas = makeCanvas(1600, 1000);
   const texture = toTexture(canvas);
-  await drawGrid(canvas, {
-    title: "~/tools",
-    heading: { label: "02 / TOOLS", title: "Tools for building with AI" },
-    items: items.slice(0, 3),
-    columns: 3,
-  });
+  await drawGrid(canvas, { title: "~/tools", items, columns: Math.min(3, Math.max(1, items.length)) });
   texture.needsUpdate = true;
   return texture;
 }
@@ -137,10 +127,11 @@ export function phoneScreen() {
   ctx.fillStyle = INK;
   ctx.textAlign = "center";
   ctx.font = `300 150px ${SANS}`;
-  ctx.fillText("23:40", 300, 300);
+  const now = new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Africa/Accra" });
+  ctx.fillText(now, 300, 300);
   ctx.font = `500 30px ${SANS}`;
   ctx.fillStyle = "#b9c3d6";
-  ctx.fillText("Tuesday, Accra", 300, 360);
+  ctx.fillText("Accra", 300, 360);
   roundRect(ctx, 36, 520, 528, 210, 36);
   ctx.fillStyle = "rgba(255,255,255,0.14)";
   ctx.fill();
@@ -153,7 +144,7 @@ export function phoneScreen() {
   ctx.fillText("Message Ammiel", 72, 640);
   ctx.fillStyle = "#c7cfdd";
   ctx.font = `400 30px ${SANS}`;
-  ctx.fillText("Have a product to build?", 72, 690);
+  ctx.fillText("Hi Ammiel, quick question about...", 72, 690);
   return toTexture(canvas);
 }
 

@@ -23,6 +23,18 @@ export const Root = styled.div`
     font-family: var(--font-sans), sans-serif;
   }
 
+  &[data-no-webgl] canvas {
+    display: none;
+  }
+
+  .note {
+    margin: 1.6rem 0 0;
+    font-family: var(--font-mono), monospace;
+    font-size: 1.2rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+
   .label {
     font-family: var(--font-mono), monospace;
     font-size: 1.2rem;
@@ -325,5 +337,58 @@ export const CtaRow = styled.div`
     text-decoration: underline;
     text-underline-offset: 0.3em;
     text-decoration-color: var(--line);
+  }
+`;
+
+export const Nav = styled.nav`
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 2.4rem;
+  padding: 1.6rem clamp(2.4rem, 6vw, 9.6rem);
+  font-size: 1.4rem;
+
+  a {
+    text-decoration: none;
+  }
+
+  .name {
+    font-weight: 600;
+    margin-right: auto;
+  }
+
+  ul {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    color: var(--muted);
+
+    a:hover {
+      color: var(--ink);
+    }
+  }
+
+  .email {
+    padding: 0.8rem 1.6rem;
+    border: 1px solid var(--line);
+    border-radius: 99rem;
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+
+    &:hover {
+      border-color: var(--accent);
+    }
+  }
+
+  @media (max-width: 760px) {
+    ul {
+      display: none;
+    }
   }
 `;

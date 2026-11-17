@@ -6,12 +6,19 @@ import { projects, sideProjects } from "../../data/projects";
 import { books } from "../../data/books";
 import { createDeskScene } from "./scene/createDeskScene";
 import { setScreenFonts, toolsScreen, workScreen } from "./scene/screens";
-import { Card, CtaRow, Hero, ProjectList, Root, Screen, Section, Stage } from "./DeskJourney.styles";
+import { Card, CtaRow, Hero, Nav, ProjectList, Root, Screen, Section, Stage } from "./DeskJourney.styles";
 
 const EMAIL = "ammielgyanyawson@gmail.com";
-const TOOL_NAMES = ["easel", "Pitstop", "Local Dictation"];
-const tools = projects.filter((p) => TOOL_NAMES.includes(p.name));
-const work = projects.filter((p) => !TOOL_NAMES.includes(p.name) && p.name !== "Portfolio");
+const tools = projects.filter((p) => p.kind === "tool");
+const work = projects.filter((p) => p.kind !== "tool" && p.name !== "Portfolio");
+const guide = books[0];
+const SECTIONS = [
+  { key: "work", label: "Work" },
+  { key: "tools", label: "Tools" },
+  { key: "guides", label: "Guides" },
+  { key: "side", label: "Side projects" },
+  { key: "contact", label: "Contact" },
+];
 
 /** Shifts a pose sideways (desktop) or down (portrait) so the object clears the text card. */
 function frameBeside(position, target, aspect, amount, portraitAmount = amount * 0.5) {
@@ -61,33 +68,63 @@ function buildTimeline(scene, els, vh, aspect) {
   const phoneView = lookFrom(anchors.phone.center, anchors.phone.normal, portrait ? 0.5 : 0.36);
   const phone = frameBeside(phoneView.position, phoneView.target, aspect, 0.22);
   const final = portrait
-    ? { position: [0, 1.55, 3.6], target: [0, 0.95, 0] }
+    ? { position: [0.15, 1.05, 4.9], target: [0.15, 0.3, 0] }
     : frameBeside([0, 1.25, 2.9], [0, 0.98, 0], aspect, 0.16);
 
+  const arrive = {
+    guides: top(els.guides) + vh * 0.35,
+    side: top(els.side) + vh * 0.35,
+    contact: top(els.contact) + vh * 0.35,
+  };
   const k = (at, pose) => ({ at, ...pose });
   const keyframes = [
     k(0, wide),
-    k(top(els.work) - vh * 1.1, wideIn),
-    k(top(els.work) - vh * 0.2, monitor),
+    k(top(els.work) - vh * 1.3, wideIn),
+    k(top(els.work) - vh * 0.55, monitor),
     k(bottom(els.work) - vh * 0.8, monitor),
-    k(top(els.tools) - vh * 0.75, between),
-    k(top(els.tools) - vh * 0.2, laptop),
+    k(top(els.tools) - vh * 1.1, between),
+    k(top(els.tools) - vh * 0.55, laptop),
     k(bottom(els.tools) - vh * 0.8, laptop),
     k(bottom(els.tools) - vh * 0.05, laptopOut),
-    k(top(els.guides) + vh * 0.35, guides),
+    k(arrive.guides, guides),
     k(bottom(els.guides) - vh * 1.1, guides),
-    k(top(els.side) + vh * 0.35, controller),
+    k(arrive.side, controller),
     k(bottom(els.side) - vh * 1.1, controller),
-    k(top(els.contact) + vh * 0.35, phone),
+    k(arrive.contact, phone),
     k(top(els.contact) + vh * 1.0, phone),
     k(top(els.contact) + vh * 1.6, final),
   ];
   return {
     keyframes,
     heroFade: [vh * 0.25, vh * 0.85],
+    cards: [
+      { key: "guides", range: [arrive.guides - vh * 0.3, arrive.guides] },
+      { key: "side", range: [arrive.side - vh * 0.3, arrive.side] },
+      { key: "contact", range: [arrive.contact - vh * 0.3, arrive.contact] },
+    ],
     phoneLit: [top(els.contact) - vh * 0.1, top(els.contact) + vh * 0.5],
     rise: [top(els.contact) + vh * 1.6, top(els.contact) + vh * 2.5],
+    jumps: {
+      work: top(els.work),
+      tools: top(els.tools),
+      guides: arrive.guides,
+      side: arrive.side,
+      contact: arrive.contact,
+    },
   };
+}
+
+function isInternal(href) {
+  return href.startsWith("/");
+}
+
+function ExternalOrInternal({ href, children, ...props }) {
+  const external = isInternal(href) ? {} : { target: "_blank", rel: "noopener noreferrer" };
+  return (
+    <a href={href} {...external} {...props}>
+      {children}
+    </a>
+  );
 }
 
 function ProjectRows({ items }) {
@@ -100,9 +137,9 @@ function ProjectRows({ items }) {
             <p>{item.description}</p>
             <span className="tools">{item.tools.join(" · ")}</span>
             {item.link && (
-              <a className="open" href={item.link} target="_blank" rel="noopener noreferrer">
+              <ExternalOrInternal className="open" href={item.link}>
                 Open {item.name}
-              </a>
+              </ExternalOrInternal>
             )}
           </div>
           <figure>
@@ -118,6 +155,10 @@ function ProjectRows({ items }) {
 export default function DeskJourney({ fonts }) {
   const canvasRef = React.useRef(null);
   const heroRef = React.useRef(null);
+  const heightRef = React.useRef(null);
+  const lenisRef = React.useRef(null);
+  const jumpsRef = React.useRef({});
+  const [noWebGL, setNoWebGL] = React.useState(false);
   const refs = {
     work: React.useRef(null),
     tools: React.useRef(null),
@@ -125,45 +166,71 @@ export default function DeskJourney({ fonts }) {
     side: React.useRef(null),
     contact: React.useRef(null),
   };
+  const cardRefs = { guides: React.useRef(null), side: React.useRef(null), contact: React.useRef(null) };
 
   React.useEffect(() => {
-    const scene = createDeskScene(canvasRef.current, { coverSrcs: books.map((b) => b.coverSrc) });
-    setScreenFonts(fonts);
-    document.fonts.ready.then(async () => {
-      const [workTex, toolsTex] = await Promise.all([workScreen(work), toolsScreen(tools)]);
-      scene.setScreens({ work: workTex, tools: toolsTex });
-      dirty = true;
-    });
-
+    let scene = null;
+    try {
+      scene = createDeskScene(canvasRef.current, { coverSrcs: books.map((b) => b.coverSrc) });
+    } catch {
+      setNoWebGL(true);
+    }
+    let cancelled = false;
     let timeline = null;
     let dirty = true;
     const els = Object.fromEntries(Object.entries(refs).map(([key, ref]) => [key, ref.current]));
 
+    if (scene) {
+      setScreenFonts(fonts);
+      document.fonts.ready.then(async () => {
+        const [workTex, toolsTex] = await Promise.all([workScreen(work), toolsScreen(tools)]);
+        if (cancelled) {
+          workTex.dispose();
+          toolsTex.dispose();
+          return;
+        }
+        scene.setScreens({ work: workTex, tools: toolsTex });
+        dirty = true;
+      });
+    }
+
     function layout() {
       const w = window.innerWidth;
       const h = window.innerHeight;
+      if (!scene) {
+        jumpsRef.current = Object.fromEntries(Object.entries(els).map(([key, el]) => [key, el.offsetTop]));
+        return;
+      }
       scene.resize(w, h);
       timeline = buildTimeline(scene, els, h, w / h);
+      jumpsRef.current = timeline.jumps;
       dirty = true;
     }
 
     function update(scrollY) {
       scene.setPose(Journey.poseAt(scrollY, timeline.keyframes));
       scene.setPhoneLit(Journey.progress(scrollY, ...timeline.phoneLit));
-      scene.setRise(Journey.smoothstep(Journey.progress(scrollY, ...timeline.rise)));
-      heroRef.current.style.opacity = String(1 - Journey.progress(scrollY, timeline.heroFade[0], timeline.heroFade[1]));
+      const rise = Journey.smoothstep(Journey.progress(scrollY, ...timeline.rise));
+      scene.setRise(rise);
+      heightRef.current.textContent = `Desk height ${Math.round(74 + (112 - 74) * rise)} cm`;
+      heroRef.current.style.opacity = String(1 - Journey.progress(scrollY, ...timeline.heroFade));
+      timeline.cards.forEach(({ key, range }) => {
+        cardRefs[key].current.style.opacity = String(Journey.progress(scrollY, ...range));
+      });
     }
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const lenis = reduceMotion ? null : new Lenis({ lerp: 0.09 });
+    lenisRef.current = lenis;
     let raf = 0;
+    let lastY = -1;
     function frame(time) {
       lenis?.raf(time);
       const y = window.scrollY;
-      if (dirty || y !== frame.lastY) {
+      if (scene && (dirty || y !== lastY)) {
         update(y);
         scene.render();
-        frame.lastY = y;
+        lastY = y;
         dirty = false;
       }
       raf = requestAnimationFrame(frame);
@@ -175,33 +242,55 @@ export default function DeskJourney({ fonts }) {
     raf = requestAnimationFrame(frame);
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(raf);
       resizeObserver.disconnect();
       lenis?.destroy();
-      scene.dispose();
+      scene?.dispose();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const guide = books[0];
+  function jumpTo(key) {
+    return (event) => {
+      event.preventDefault();
+      const y = jumpsRef.current[key] ?? 0;
+      if (lenisRef.current) lenisRef.current.scrollTo(y, { duration: 1.6 });
+      else window.scrollTo(0, y);
+    };
+  }
 
   return (
-    <Root>
+    <Root data-no-webgl={noWebGL || undefined}>
       <Stage ref={canvasRef} aria-hidden="true" />
-      <main>
+      <Nav aria-label="Sections">
+        <a className="name" href="#top" onClick={jumpTo("top")}>
+          Ammiel Yawson
+        </a>
+        <ul>
+          {SECTIONS.map(({ key, label }) => (
+            <li key={key}>
+              <a href={`#${key}`} onClick={jumpTo(key)}>
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a className="email" href={`mailto:${EMAIL}`}>
+          Email me
+        </a>
+      </Nav>
+      <main id="top">
         <Section $vh={210}>
           <Hero ref={heroRef}>
-            <span className="label">Ammiel Yawson · Product engineer · Accra</span>
+            <span className="label">Product engineer in Accra</span>
             <h1>This is where I build.</h1>
-            <p>
-              Products for founders, tools for building with AI, and guides on how I work. Scroll
-              through the desk.
-            </p>
-            <span className="cue">Scroll ↓</span>
+            <p>Products for founders, tools for building with AI, and guides on how I work.</p>
+            <span className="cue">Scroll</span>
           </Hero>
         </Section>
 
-        <Section ref={refs.work}>
+        <Section ref={refs.work} id="work">
           <Screen>
             <span className="label">01 · Work</span>
             <h2>Products I&apos;ve built</h2>
@@ -212,7 +301,7 @@ export default function DeskJourney({ fonts }) {
 
         <Section $vh={140} />
 
-        <Section ref={refs.tools}>
+        <Section ref={refs.tools} id="tools">
           <Screen>
             <span className="label">02 · Tools</span>
             <h2>Tools for building with AI</h2>
@@ -221,36 +310,38 @@ export default function DeskJourney({ fonts }) {
           </Screen>
         </Section>
 
-        <Section ref={refs.guides} $vh={260}>
-          <Card>
+        <Section ref={refs.guides} id="guides" $vh={220}>
+          <Card ref={cardRefs.guides}>
             <div className="panel">
               <span className="label">03 · Guides</span>
-              <h2>{guide.title}</h2>
-              <p>{guide.description}</p>
-              <CtaRow>
-                <a className="primary" href={guide.link} target="_blank" rel="noopener noreferrer">
-                  Get the PDF · {guide.price.toLowerCase()}
-                </a>
-                <a className="secondary" href={guide.blogLink} target="_blank" rel="noopener noreferrer">
-                  Read it on the blog
-                </a>
-              </CtaRow>
+              <h2>{guide?.title}</h2>
+              <p>{guide?.description}</p>
+              {guide && (
+                <CtaRow>
+                  <a className="primary" href={guide.link} target="_blank" rel="noopener noreferrer">
+                    Get the PDF
+                  </a>
+                  <a className="secondary" href={guide.blogLink} target="_blank" rel="noopener noreferrer">
+                    Read it on the blog
+                  </a>
+                </CtaRow>
+              )}
+              {guide?.price && <p className="note">{guide.price}</p>}
             </div>
           </Card>
         </Section>
 
-        <Section ref={refs.side} $vh={250}>
-          <Card>
+        <Section ref={refs.side} id="side" $vh={220}>
+          <Card ref={cardRefs.side}>
             <div className="panel">
               <span className="label">04 · Side projects</span>
-              <h2>Games and small things</h2>
-              <p>Built to learn something, or just for fun.</p>
+              <h2>Side projects</h2>
+              <p>Smaller things I built to learn, or for fun.</p>
               <ul>
                 {sideProjects.map((p) => (
                   <li key={p.name}>
                     <a href={p.link} target="_blank" rel="noopener noreferrer">
-                      <span>{p.name}</span>
-                      <span aria-hidden="true">↗</span>
+                      {p.name}
                     </a>
                   </li>
                 ))}
@@ -259,12 +350,12 @@ export default function DeskJourney({ fonts }) {
           </Card>
         </Section>
 
-        <Section ref={refs.contact} $vh={360}>
-          <Card>
+        <Section ref={refs.contact} id="contact" $vh={360}>
+          <Card ref={cardRefs.contact}>
             <div className="panel">
               <span className="label">05 · Get in touch</span>
               <h2>Have a product to build?</h2>
-              <p>Tell me what you&apos;re working on. I reply within a day.</p>
+              <p>Tell me what you&apos;re working on.</p>
               <CtaRow>
                 <a className="primary" href={`mailto:${EMAIL}`}>
                   Email me
@@ -276,6 +367,9 @@ export default function DeskJourney({ fonts }) {
                   Blog
                 </a>
               </CtaRow>
+              <p className="note" ref={heightRef} aria-hidden="true">
+                Desk height 74 cm
+              </p>
             </div>
           </Card>
         </Section>

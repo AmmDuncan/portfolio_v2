@@ -17,6 +17,7 @@ export default function Desk() {
           content="Product engineer in Accra. Products for founders, tools for building with AI, and guides on how I work."
         />
         <meta name="theme-color" content="#07080a" />
+        <meta name="robots" content="noindex" />
       </Head>
       <DeskJourney fonts={{ sans: sans.style.fontFamily, mono: mono.style.fontFamily }} />
     </div>

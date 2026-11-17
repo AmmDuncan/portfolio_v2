@@ -21,6 +21,8 @@ const mat = {
   controllerBlue: new THREE.MeshStandardMaterial({ color: "#2f6fe0", roughness: 0.45 }),
   controllerBlack: new THREE.MeshStandardMaterial({ color: "#121318", roughness: 0.55 }),
   bookEdge: new THREE.MeshStandardMaterial({ color: "#ece9e2", roughness: 0.9 }),
+  faceButton: new THREE.MeshStandardMaterial({ color: "#2a2d36", roughness: 0.3 }),
+  lightBar: new THREE.MeshBasicMaterial({ color: "#7fb2ff", toneMapped: false }),
 };
 
 function box(w, h, d, material, radius = 0.004) {
@@ -157,10 +159,20 @@ function buildController(shadowTex) {
     grip.rotation.set(Math.PI / 2 + 0.45, 0, side * 0.28);
     const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.0085, 0.0085, 0.01, 20), mat.controllerBlack);
     stick.position.set(side * 0.02, 0.05, 0.018);
-    const buttons = box(0.022, 0.004, 0.022, mat.controllerBlack, 0.004);
-    buttons.position.set(side * 0.042, 0.044, -0.006);
-    group.add(grip, stick, buttons);
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.0075, 0.0075, 0.002, 20), mat.controllerBlue);
+    cap.position.set(side * 0.02, 0.0565, 0.018);
+    group.add(grip, stick, cap);
   });
+  [[0, -0.008], [0, 0.008], [-0.008, 0], [0.008, 0]].forEach(([dx, dz]) => {
+    const face = new THREE.Mesh(new THREE.CylinderGeometry(0.0034, 0.0034, 0.003, 14), mat.faceButton);
+    face.position.set(0.042 + dx, 0.0445, -0.004 + dz);
+    const dpad = box(0.006, 0.003, 0.006, mat.controllerBlack, 0.0012);
+    dpad.position.set(-0.042 + dx * 0.95, 0.0445, -0.004 + dz * 0.95);
+    group.add(face, dpad);
+  });
+  const lightBar = box(0.05, 0.0015, 0.004, mat.lightBar, 0.0007);
+  lightBar.position.set(0, 0.0453, -0.026);
+  group.add(lightBar);
   group.add(contactShadow(shadowTex, 0.2, 0.16, 0.65));
   return group;
 }
@@ -329,8 +341,17 @@ export function createDeskScene(canvas, { coverSrcs = [] } = {}) {
   }
 
   function dispose() {
-    renderer.dispose();
+    scene.traverse((object) => {
+      if (!object.isMesh) return;
+      object.geometry.dispose();
+      [object.material].flat().forEach((m) => {
+        m.map?.dispose();
+        m.dispose();
+      });
+    });
+    scene.environment?.dispose();
     pmrem.dispose();
+    renderer.dispose();
   }
 
   setRise(0);
