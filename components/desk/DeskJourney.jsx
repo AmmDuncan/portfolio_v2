@@ -438,8 +438,8 @@ export default function DeskJourney({ fonts }) {
       let lastY = -1;
       function frame(time) {
         lenis?.raf(time);
-        const y = window.scrollY;
         if (flight && flightProgress() >= 1) land();
+        const y = window.scrollY;
         if (dirty || y !== lastY || introProgress() < 1 || flight) {
           update(y);
           scene.render();
