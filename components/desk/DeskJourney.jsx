@@ -94,7 +94,8 @@ export default function DeskJourney({ fonts }) {
           screenElements: { monitor: screenEls.work, laptop: screenEls.nda },
           models,
         });
-      } catch {
+      } catch (error) {
+        console.error(error);
         setNoWebGL(true);
         return null;
       }
@@ -294,28 +295,37 @@ export default function DeskJourney({ fonts }) {
         raf = requestAnimationFrame(frame);
       }
 
-      layout();
-      canvasRef.current.dataset.on = "";
-      const resizeObserver = new ResizeObserver(layout);
-      resizeObserver.observe(document.documentElement);
-      resizeObserver.observe(screens.work.scroller);
-      resizeObserver.observe(screens.nda.scroller);
+      let resizeObserver = null;
       let resizeFrame = 0;
       const onViewportResize = () => {
         cancelAnimationFrame(resizeFrame);
         resizeFrame = requestAnimationFrame(layout);
       };
-      window.addEventListener("resize", onViewportResize);
-      window.visualViewport?.addEventListener("resize", onViewportResize);
-      window.addEventListener("pointermove", onPointerMove);
-      window.addEventListener("click", onClick);
-      screenEls.work.addEventListener("focusin", onScreenFocus);
-      screenEls.nda.addEventListener("focusin", onScreenFocus);
-      raf = requestAnimationFrame(frame);
+      try {
+        layout();
+        resizeObserver = new ResizeObserver(layout);
+        resizeObserver.observe(document.documentElement);
+        resizeObserver.observe(screens.work.scroller);
+        resizeObserver.observe(screens.nda.scroller);
+        window.addEventListener("resize", onViewportResize);
+        window.visualViewport?.addEventListener("resize", onViewportResize);
+        window.addEventListener("pointermove", onPointerMove);
+        window.addEventListener("click", onClick);
+        screenEls.work.addEventListener("focusin", onScreenFocus);
+        screenEls.nda.addEventListener("focusin", onScreenFocus);
+        canvasRef.current.dataset.on = "";
+        raf = requestAnimationFrame(frame);
+      } catch (error) {
+        console.error(error);
+        teardown();
+        setNoWebGL(true);
+        return null;
+      }
+      return teardown;
 
-      return () => {
+      function teardown() {
         cancelAnimationFrame(raf);
-        resizeObserver.disconnect();
+        resizeObserver?.disconnect();
         cancelAnimationFrame(resizeFrame);
         window.removeEventListener("resize", onViewportResize);
         window.visualViewport?.removeEventListener("resize", onViewportResize);
@@ -327,7 +337,7 @@ export default function DeskJourney({ fonts }) {
         flyRef.current = null;
         lenis?.destroy();
         scene.dispose();
-      };
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
