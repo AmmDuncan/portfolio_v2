@@ -33,8 +33,8 @@ const SCREEN_COPY = {
 const NDA_COPY = {
   label: "02 · Under NDA",
   title: "10 platforms I can't show",
-  intro: "Client work from 2023 to 2026 that I can't name or show. Frontend, plus backend where the project needed it.",
-  stack: ["Nuxt", "Vue", "TypeScript", "TanStack Query", "Tailwind CSS", "Django"],
+  intro: "Client work from 2023 to 2026 that I can't name or show.",
+  stack: ["Nuxt", "Vue", "TypeScript", "TanStack Query", "Tailwind CSS"],
   contactHref: `mailto:${EMAIL}`,
 };
 
