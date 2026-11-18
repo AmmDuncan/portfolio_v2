@@ -82,7 +82,55 @@ function activeSectionAt(y, ranges) {
   return Object.keys(ranges).find((key) => y >= ranges[key][0] && y < ranges[key][1]) ?? null;
 }
 
+/** The desk's height in cm as it rises (rise 0..1) from 74 to 112 cm. */
+function deskHeightCm(rise) {
+  return Math.round(74 + (112 - 74) * rise);
+}
+
+function framePose(y, timeline, flight, flightT, intro) {
+  if (flight) return flightPose(flight.from, flight.to, flightT);
+  const pose = poseAt(y, timeline.keyframes);
+  if (intro < 1) return blendPose(timeline.introPose, pose, easeOutCubic(intro));
+  return pose;
+}
+
+function screenOffsets(contentY, timeline) {
+  const entries = Object.entries(timeline.scrolls).map(([key, screen]) => {
+    const back = screen.reset ? smoothstep(progress(contentY, ...screen.reset)) : 0;
+    const offset = screen.scrollable * progress(contentY, screen.start, screen.end) * (1 - back);
+    return [key, { offset, arrival: progress(contentY, ...timeline.screenArrivals[key]) }];
+  });
+  return Object.fromEntries(entries);
+}
+
+/**
+ * Everything the journey shows at scroll position y, as plain values. While a flight runs the camera follows its
+ * arc, the page content is already at the flight's target, and the desk eases between the two positions.
+ */
+function frameAt(y, timeline, { flight = null, intro = 1, now = 0 } = {}) {
+  const flightT = flight ? timeProgress(flight.start, flight.duration, now) : 0;
+  const contentY = flight ? flight.y : y;
+  const travel = (value) => (flight ? lerp(value(flight.fromY), value(flight.y), smoothstep(flightT)) : value(y));
+  const rise = travel((at) => smoothstep(progress(at, ...timeline.rise)));
+  return {
+    pose: framePose(y, timeline, flight, flightT, intro),
+    power: smoothstep(progress(intro, 0.3, 0.75)),
+    active: flight ? null : activeSectionAt(contentY, timeline.ranges),
+    screens: screenOffsets(contentY, timeline),
+    phoneLit: travel((at) => progress(at, ...timeline.phoneLit)),
+    rise,
+    heightCm: deskHeightCm(rise),
+    heroOpacity: 1 - progress(contentY, ...timeline.heroFade),
+    cards: timeline.cards.map(({ key, range }) => {
+      const shown = progress(contentY, ...range);
+      return { key, shown, opacity: Math.min(1, shown * 3), inert: flight !== null || shown < 0.34 };
+    }),
+  };
+}
+
 export const DeskJourney = {
+  frameAt,
+  deskHeightCm,
   activeSectionAt,
   timeProgress,
   coverDistance,
