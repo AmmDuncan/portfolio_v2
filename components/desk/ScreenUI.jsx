@@ -293,24 +293,10 @@ const Lock = styled.div`
     font-size: 13px;
     color: var(--muted);
   }
-
-  a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 48px;
-    margin-top: 8px;
-    padding: 0 24px;
-    border-radius: 999px;
-    background: var(--accent);
-    color: #fff;
-    font-size: 16px;
-    font-weight: 600;
-    text-decoration: none;
-  }
 `;
 
 /** Laptop lock screen for client work that can't be named or shown. */
-export function LockScreen({ label, title, intro, stack, contactHref, scrollerRef }) {
+export function LockScreen({ label, title, intro, stack, scrollerRef }) {
   return (
     <Lock>
       <div className="inner" ref={scrollerRef}>
@@ -322,7 +308,6 @@ export function LockScreen({ label, title, intro, stack, contactHref, scrollerRe
         <h2>{title}</h2>
         <p>{intro}</p>
         <span className="stack">{stack.join(" · ")}</span>
-        <a href={contactHref}>Ask me about them</a>
       </div>
     </Lock>
   );

@@ -35,7 +35,6 @@ const NDA_COPY = {
   title: "10 platforms I can't show",
   intro: "Client work from 2023 to 2026 that I can't name or show.",
   stack: ["Nuxt", "Vue", "TypeScript", "TanStack Query", "Tailwind CSS"],
-  contactHref: `mailto:${EMAIL}`,
 };
 
 /** Shifts a pose sideways (desktop) or down (portrait) so the object clears the text card. */
