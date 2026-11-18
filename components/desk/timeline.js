@@ -34,19 +34,24 @@ function screenFit(anchor, fov, aspect, viewportWidth) {
     columnPx: width * Math.min(1, visibleWidth / anchor.width) * 0.9,
   };
 }
-export function buildTimeline(scene, els, screens, vh, vw) {
-  const aspect = vw / vh;
-  const { anchors } = scene;
-  const portrait = aspect < 1;
-  const top = (el) => el.offsetTop;
-  const bottom = (el) => el.offsetTop + el.offsetHeight;
+const HOLD = 0.3;
 
-  const fits = {
-    work: screenFit(anchors.monitor, scene.fov, aspect, vw),
-    nda: screenFit(anchors.laptop, scene.fov, aspect, vw),
+/** How each device screen is sized and framed for this viewport. */
+export function screenFits(scene, vw, vh) {
+  const aspect = vw / vh;
+  return {
+    work: screenFit(scene.anchors.monitor, scene.fov, aspect, vw),
+    nda: screenFit(scene.anchors.laptop, scene.fov, aspect, vw),
   };
-  const hold = vh * 0.3;
-  const scrolls = {};
+}
+
+/**
+ * Sizes each screen element to its fit and each screen's section to hold its scroll. Returns what the screens
+ * measured once sized: { [key]: { scrollable, viewportHeight } }.
+ */
+export function sizeScreens(fits, screens, sections, vh) {
+  const hold = vh * HOLD;
+  const sized = {};
   Object.entries(fits).forEach(([key, fit]) => {
     const { element, scroller } = screens[key];
     element.dataset.width = String(fit.width);
@@ -57,15 +62,26 @@ export function buildTimeline(scene, els, screens, vh, vw) {
     element.toggleAttribute("data-narrow", fit.columnPx < 760);
     const viewportHeight = fit.height - SCREEN_CHROME_PX;
     const scrollable = Math.max(0, scroller.offsetHeight - viewportHeight * 0.9);
-    els[key].style.height = `${Math.round(hold * 2 + scrollable)}px`;
-    scrolls[key] = {
-      scroller,
-      scrollable,
-      viewportHeight,
-      start: () => top(els[key]) + hold,
-      end: () => bottom(els[key]) - hold,
-    };
+    sections[key].style.height = `${Math.round(hold * 2 + scrollable)}px`;
+    sized[key] = { scrollable, viewportHeight };
   });
+  return sized;
+}
+
+/** Scroll positions (px) for every camera keyframe, screen scroll, reveal and jump. Reads the page, never writes. */
+export function buildTimeline(scene, els, fits, sized, vh, vw) {
+  const aspect = vw / vh;
+  const { anchors } = scene;
+  const portrait = aspect < 1;
+  const top = (el) => el.offsetTop;
+  const bottom = (el) => el.offsetTop + el.offsetHeight;
+  const hold = vh * HOLD;
+  const scrolls = Object.fromEntries(
+    Object.entries(sized).map(([key, size]) => [
+      key,
+      { ...size, start: top(els[key]) + hold, end: bottom(els[key]) - hold },
+    ]),
+  );
 
   const wide = portrait
     ? { position: [-0.5, 1.75, 3.5], target: [0.0, 1.02, 0] }

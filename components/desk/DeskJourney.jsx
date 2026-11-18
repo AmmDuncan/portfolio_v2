@@ -13,7 +13,7 @@ import { HOVER_LABEL, MODEL_CREDIT, NDA_COPY, SCREEN_COPY, SECTIONS } from "./de
 import { FallbackRows } from "./FallbackRows";
 import { LockScreen } from "./LockScreen";
 import { makeScreenElement, SCREEN_SIZES, ScreenUI } from "./ScreenUI";
-import { buildTimeline } from "./timeline";
+import { buildTimeline, screenFits, sizeScreens } from "./timeline";
 import { Card, CtaRow } from "./Card.styles";
 import { Screen } from "./Fallback.styles";
 import { Nav } from "./Nav.styles";
@@ -116,7 +116,9 @@ export default function DeskJourney({ fonts }) {
         const w = window.innerWidth;
         const h = window.innerHeight;
         scene.resize(w, h);
-        timelineRef.current = buildTimeline(scene, els, screens, h, w);
+        const fits = screenFits(scene, w, h);
+        const sized = sizeScreens(fits, screens, els, h);
+        timelineRef.current = buildTimeline(scene, els, fits, sized, h, w);
         dirty = true;
       }
 
@@ -139,11 +141,13 @@ export default function DeskJourney({ fonts }) {
         screenEls.nda.inert = active !== "nda";
         rootRef.current.toggleAttribute("data-on-screen", active === "work");
         Object.entries(timeline.scrolls).forEach(([key, screen]) => {
+          const { scroller } = screens[key];
           const back = screen.reset ? JourneyMath.smoothstep(JourneyMath.progress(contentY, ...screen.reset)) : 0;
-          const offset = screen.scrollable * JourneyMath.progress(contentY, screen.start(), screen.end()) * (1 - back);
-          screen.scroller.style.transform = `translateY(${-offset}px)`;
-          if (!screen.scroller.isConnected) return;
-          revealScreen(screen, offset, JourneyMath.progress(contentY, ...timeline.screenArrivals[key]));
+          const offset = screen.scrollable * JourneyMath.progress(contentY, screen.start, screen.end) * (1 - back);
+          scroller.style.transform = `translateY(${-offset}px)`;
+          if (!scroller.isConnected) return;
+          const arrival = JourneyMath.progress(contentY, ...timeline.screenArrivals[key]);
+          revealScreen({ scroller, viewportHeight: screen.viewportHeight }, offset, arrival);
         });
         scene.setPhoneLit(travel((y) => JourneyMath.progress(y, ...timeline.phoneLit)));
         const rise = travel((y) => JourneyMath.smoothstep(JourneyMath.progress(y, ...timeline.rise)));
@@ -207,7 +211,7 @@ export default function DeskJourney({ fonts }) {
         if (!row || !screen?.scrollable) return;
         const wanted = row.offsetTop + row.offsetHeight / 2 - screen.viewportHeight / 2;
         const share = Math.min(1, Math.max(0, wanted / screen.scrollable));
-        const y = screen.start() + share * (screen.end() - screen.start());
+        const y = screen.start + share * (screen.end - screen.start);
         if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
         else window.scrollTo(0, y);
         dirty = true;
