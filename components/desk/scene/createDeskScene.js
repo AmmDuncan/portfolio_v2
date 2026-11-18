@@ -20,6 +20,8 @@ const MODEL_URLS = {
 };
 const PHONE_SCREEN = [0.0712, 0.1544];
 const MONITOR_SCREEN = [0.7, 0.394];
+/** Height-adjustable stand raised so the panel clears the console lying behind it. */
+const MONITOR_LIFT = 0.06;
 const LAPTOP_SCREEN = [0.35, 0.226];
 
 const mat = {
@@ -112,6 +114,9 @@ function buildFrame(shadowTex) {
 function buildMonitor(model) {
   const group = new THREE.Group();
   cutScreenHole(model);
+  model.getObjectByName("Monitor").children.forEach((part) => {
+    if (part.name !== "Stand") part.position.y += MONITOR_LIFT;
+  });
   const screen = model.getObjectByName("ScreenCenter");
   group.add(model);
   return { group, screen, size: MONITOR_SCREEN };
@@ -301,12 +306,12 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     toneMapped: false,
   });
   const biasGlow = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.95), glowMaterial);
-  biasGlow.position.set(0.27, 0.36, -0.414);
+  biasGlow.position.set(0.27, 0.36 + MONITOR_LIFT, -0.414);
   top.add(biasGlow);
   const shadows = createContactShadows({ width: DESK.width, depth: DESK.depth, blur: 4, darkness: 2.6, opacity: 1 });
   top.add(shadows.group);
   const monitorLight = new THREE.RectAreaLight("#dfe7ff", 8, 0.68, 0.39);
-  monitorLight.position.set(0, 0.3, 0.08);
+  monitorLight.position.set(0, 0.3 + MONITOR_LIFT, 0.08);
   monitorLight.rotation.y = Math.PI;
   monitor.group.add(monitorLight);
   const laptopLight = new THREE.RectAreaLight("#e6ecff", 6, 0.345, 0.223);
