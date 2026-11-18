@@ -66,6 +66,19 @@ export const Root = styled.div`
     color: var(--muted);
   }
 
+  .credit {
+    margin: 0.8rem 0 0;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: var(--muted);
+    opacity: 0.7;
+
+    a {
+      color: inherit;
+      text-underline-offset: 0.2em;
+    }
+  }
+
   .label {
     font-family: var(--font-mono), monospace;
     font-size: 1.2rem;

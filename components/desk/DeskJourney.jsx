@@ -22,6 +22,12 @@ const SECTIONS = [
   { key: "contact", label: "Contact" },
 ];
 const INTRO_MS = 2600;
+const MODEL_CREDIT = {
+  title: "Playstation 5 Dualsense",
+  author: "AHarmlessPotato",
+  source: "https://sketchfab.com/3d-models/playstation-5-dualsense-878c1f882808477ab81c2fe86d5a3936",
+  license: "https://creativecommons.org/licenses/by/4.0/",
+};
 const BLOG_URL = "https://blog.ammielyawson.com";
 const SECTION_LABEL = Object.fromEntries(SECTIONS.map(({ key, label }) => [key, label]));
 const SCREEN_COPY = {
@@ -630,6 +636,17 @@ export default function DeskJourney({ fonts }) {
               </CtaRow>
               <p className="note" ref={heightRef} aria-hidden="true">
                 Desk height 74 cm
+              </p>
+              <p className="credit">
+                Controller model:{" "}
+                <a href={MODEL_CREDIT.source} target="_blank" rel="noopener noreferrer">
+                  {MODEL_CREDIT.title}
+                </a>{" "}
+                by {MODEL_CREDIT.author},{" "}
+                <a href={MODEL_CREDIT.license} target="_blank" rel="noopener noreferrer">
+                  CC BY 4.0
+                </a>
+                , recoloured.
               </p>
             </div>
           </Card>
