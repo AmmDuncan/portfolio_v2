@@ -60,6 +60,10 @@ export const Card = styled.div`
     &:hover {
       color: var(--accent-ink);
     }
+
+    > svg {
+      flex: none;
+    }
   }
 
   .thumb {

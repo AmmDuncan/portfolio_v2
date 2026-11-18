@@ -1,7 +1,7 @@
 import { books } from "../../data/books";
 import { sideProjects, thumbSrc } from "../../data/projects";
 import { BLOG_URL, EMAIL, GITHUB_URL } from "../../data/site";
-import { ArrowUpRight } from "./ArrowUpRight";
+import { FiExternalLink } from "react-icons/fi";
 import { CARD_COPY, MODEL_CREDIT } from "./deskContent";
 import { Card, CtaRow } from "./Card.styles";
 import { Section } from "./DeskJourney.styles";
@@ -49,7 +49,7 @@ export function DeskCards({ sectionRefs, cardRefs, heightRef }) {
                       {p.name}
                       <small>{p.summary ?? p.description}</small>
                     </span>
-                    <ArrowUpRight size={16} />
+                    <FiExternalLink size={16} aria-hidden="true" focusable="false" />
                   </a>
                 </li>
               ))}

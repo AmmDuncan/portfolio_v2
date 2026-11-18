@@ -57,7 +57,8 @@ export const Nav = styled.nav`
     }
 
     .external svg {
-      margin-left: 0.18em;
+      margin-left: 0.25em;
+      vertical-align: -0.125em;
     }
 
     a:hover {
