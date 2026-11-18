@@ -398,39 +398,53 @@ export const Nav = styled.nav`
   right: 0;
   display: flex;
   align-items: center;
-  gap: 2.4rem;
-  padding: 1.6rem clamp(2.4rem, 6vw, 9.6rem) 3.2rem;
+  gap: 1.2rem;
+  padding: 1.6rem clamp(1.6rem, 4vw, 6.4rem);
   font-size: 1.4rem;
-  background: linear-gradient(to bottom, rgba(7, 8, 10, 0.96) 60%, rgba(7, 8, 10, 0));
+  pointer-events: none;
+
+  & > * {
+    pointer-events: auto;
+    border: 1px solid var(--line);
+    border-radius: 99rem;
+    background: rgba(10, 12, 16, 0.72);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
 
   a {
     text-decoration: none;
   }
 
   .name {
+    padding: 0.8rem 1.6rem;
     font-weight: 600;
     margin-right: auto;
   }
 
   ul {
     display: flex;
-    gap: 2rem;
+    gap: 0.4rem;
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0.4rem;
     color: var(--muted);
+
+    a {
+      display: block;
+      padding: 0.4rem 1.2rem;
+      border-radius: 99rem;
+      transition: color 160ms ease-out, background 160ms ease-out;
+    }
 
     a:hover {
       color: var(--ink);
+      background: rgba(255, 255, 255, 0.06);
     }
   }
 
   .email {
     padding: 0.8rem 1.6rem;
-    border: 1px solid var(--line);
-    border-radius: 99rem;
-    background: var(--glass);
-    backdrop-filter: blur(10px);
 
     &:hover {
       border-color: var(--accent);
