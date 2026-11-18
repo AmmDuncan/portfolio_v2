@@ -4,7 +4,7 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 
 import { DeskJourney as JourneyMath } from "../../../domains/DeskJourney";
-import { ACCENT } from "../theme";
+import { ACCENT, BG } from "../theme";
 import { carbonFibre, keypadDisplay, resolveFonts, shadowTexture, wallGlow } from "./canvasTextures";
 import { createContactShadows } from "./contactShadows";
 import { createDomScreens } from "./domScreens";
@@ -14,6 +14,16 @@ const SIT_HEIGHT = 0.74;
 const STAND_HEIGHT = 1.12;
 const DESK = { width: 1.6, depth: 0.75, thickness: 0.035 };
 const ACCENT_COLOR = new THREE.Color(ACCENT);
+const TEXTURE_SLOTS = [
+  "map",
+  "normalMap",
+  "roughnessMap",
+  "metalnessMap",
+  "emissiveMap",
+  "aoMap",
+  "bumpMap",
+  "alphaMap",
+];
 const PHONE_SCREEN = [0.0712, 0.1544];
 const MONITOR_SCREEN = [0.7, 0.394];
 /** Height-adjustable stand raised so the panel clears the console lying behind it. */
@@ -208,8 +218,8 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#07080a");
-  scene.fog = new THREE.Fog("#07080a", 3.2, 7);
+  scene.background = new THREE.Color(BG);
+  scene.fog = new THREE.Fog(BG, 3.2, 7);
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.environmentIntensity = 0.12;
@@ -360,15 +370,16 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     scene.traverse((object) => {
       if (!object.isMesh) return;
       object.geometry.dispose();
-      [object.material].flat().forEach((m) => {
-        m.map?.dispose();
-        m.dispose();
+      [object.material].flat().forEach((material) => {
+        TEXTURE_SLOTS.forEach((slot) => material[slot]?.dispose());
+        material.dispose();
       });
     });
     shadows.dispose();
     scene.environment?.dispose();
     pmrem.dispose();
     renderer.dispose();
+    renderer.forceContextLoss();
     domScreens.dispose();
   }
 

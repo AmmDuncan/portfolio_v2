@@ -23,7 +23,6 @@ export default function Desk() {
         <title>Ammiel Yawson · Product engineer</title>
         <meta name="description" content={`${TAGLINE}. Products for founders and teams, and guides on how I work.`} />
         <meta name="theme-color" content="#07080a" />
-        <meta name="robots" content="noindex" />
       </Head>
       <DeskJourney fonts={fonts} />
     </div>

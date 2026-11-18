@@ -1,5 +1,7 @@
 import styled from "styled-components";
 
+import { EASE_OUT } from "./theme";
+
 export const Nav = styled.nav`
   position: fixed;
   z-index: 10;
@@ -50,6 +52,14 @@ export const Nav = styled.nav`
       transition: color 160ms ease-out, background 160ms ease-out;
     }
 
+    .external {
+      line-height: 20px;
+    }
+
+    .external svg {
+      margin-left: 0.18em;
+    }
+
     a:hover {
       color: var(--ink);
       background: rgba(255, 255, 255, 0.06);
@@ -98,7 +108,7 @@ export const Nav = styled.nav`
       opacity: 0;
       transform: translateY(-4px) scale(0.98);
       visibility: hidden;
-      transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1), transform 180ms cubic-bezier(0.23, 1, 0.32, 1),
+      transition: opacity 180ms ${EASE_OUT}, transform 180ms ${EASE_OUT},
         visibility 0s 180ms;
 
       a {

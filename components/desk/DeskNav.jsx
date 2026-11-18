@@ -2,7 +2,9 @@ import React from "react";
 
 import { LogoPurple } from "../../assets";
 import { BLOG_URL, EMAIL } from "../../data/site";
+import { ArrowUpRight } from "./ArrowUpRight";
 import { SECTIONS } from "./deskContent";
+import { linkProps } from "./linkProps";
 import { Nav } from "./Nav.styles";
 
 /** Top bar: name, the section links (a Sections menu on phones) and the email link. */
@@ -62,8 +64,9 @@ export function DeskNav({ onJump }) {
           </li>
         ))}
         <li>
-          <a href={BLOG_URL} target="_blank" rel="noopener noreferrer">
-            Blog ↗
+          <a className="external" href={BLOG_URL} {...linkProps(BLOG_URL)}>
+            Blog
+            <ArrowUpRight />
           </a>
         </li>
       </ul>

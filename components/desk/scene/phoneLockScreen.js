@@ -1,4 +1,4 @@
-import { ACCENT_RGB } from "../theme";
+import { ACCENT_INK_RGB, ACCENT_RGB, LINE } from "../theme";
 import { makeCanvas, roundRect, toTexture } from "./canvasTextures";
 
 const INK = "#e8ebf0";
@@ -14,7 +14,7 @@ function paintWallpaper(ctx, w, h) {
   [
     [430, 300, 460, `rgba(${ACCENT_RGB}, 0.6)`],
     [90, 880, 420, "rgba(96, 72, 230, 0.32)"],
-    [520, 1180, 320, "rgba(145, 116, 220, 0.2)"],
+    [520, 1180, 320, `rgba(${ACCENT_INK_RGB}, 0.2)`],
   ].forEach(([x, y, r, color]) => {
     const glow = ctx.createRadialGradient(x, y, 0, x, y, r);
     glow.addColorStop(0, color);
@@ -63,7 +63,7 @@ function paintClock(ctx, w, now, fonts) {
 
 function paintWidgets(ctx, fonts) {
   roundRect(ctx, 72, 410, 300, 110, 30);
-  ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+  ctx.fillStyle = LINE;
   ctx.fill();
   ctx.fillStyle = "#ffd36b";
   ctx.beginPath();
@@ -121,7 +121,7 @@ function paintNotifications(ctx, arrive, fonts) {
   ctx.fillStyle = "rgba(255, 255, 255, 0.18)";
   ctx.fill();
   ctx.lineWidth = 2;
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+  ctx.strokeStyle = LINE;
   ctx.stroke();
   paintMessagesIcon(ctx, 60, 822, 64);
   ctx.textAlign = "left";

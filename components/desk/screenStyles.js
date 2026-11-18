@@ -1,23 +1,21 @@
 import styled from "styled-components";
 
-import { ACCENT_INK, ACCENT_RGB } from "./theme";
+import { ACCENT_INK, ACCENT_RGB, INK, LINE, MUTED, SCREEN_BG } from "./theme";
 
 /** Height of the window bar at the top of a device screen. */
 export const SCREEN_CHROME_PX = 44;
 
 export const Ui = styled.div`
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  --ink: #eef0f4;
-  --muted: #9aa3b2;
+  --ink: ${INK};
+  --muted: ${MUTED};
   --accent: ${ACCENT_INK};
-  --line: rgba(255, 255, 255, 0.12);
+  --line: ${LINE};
   width: 100%;
   height: 100%;
   display: grid;
   grid: ${SCREEN_CHROME_PX}px 1fr / 1fr;
   overflow: hidden;
-  background: #0b0d12;
+  background: ${SCREEN_BG};
   color: var(--ink);
   font-family: var(--font-sans), sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -186,15 +184,14 @@ export const Ui = styled.div`
 `;
 
 export const Lock = styled.div`
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ink: #eef0f4;
-  --muted: #9aa3b2;
+  --ink: ${INK};
+  --muted: ${MUTED};
   --accent: ${ACCENT_INK};
   width: 100%;
   height: 100%;
   display: grid;
   place-items: center;
-  background: radial-gradient(120% 90% at 50% 0%, #251a42 0%, #0b0d12 62%);
+  background: radial-gradient(120% 90% at 50% 0%, #251a42 0%, ${SCREEN_BG} 62%);
   color: var(--ink);
   font-family: var(--font-sans), sans-serif;
   text-align: center;

@@ -1,6 +1,6 @@
-import styled, { keyframes } from "styled-components";
+import styled, { createGlobalStyle, keyframes } from "styled-components";
 
-import { ACCENT, ACCENT_INK } from "./theme";
+import { ACCENT, ACCENT_INK, BG, EASE_OUT, INK, LINE, MUTED, SCREEN_BG } from "./theme";
 
 const rise = keyframes`
   from {
@@ -15,16 +15,24 @@ const fade = keyframes`
   }
 `;
 
+/** Dark page background on /desk only, so iOS rubber-band overscroll never shows the site's light body colour. */
+export const DeskPageBackground = createGlobalStyle`
+  html,
+  html body {
+    background: ${BG};
+  }
+`;
+
 export const Root = styled.div`
-  --ink: #eef0f4;
-  --muted: #9aa3b2;
+  --ink: ${INK};
+  --muted: ${MUTED};
   --accent: ${ACCENT};
   --accent-ink: ${ACCENT_INK};
-  --line: rgba(255, 255, 255, 0.12);
+  --line: ${LINE};
   --glass: rgba(10, 12, 16, 0.72);
   position: relative;
   color: var(--ink);
-  background: #07080a;
+  background: ${BG};
   font-family: var(--font-sans), sans-serif;
 
   a {
@@ -48,10 +56,10 @@ export const Root = styled.div`
     z-index: 2;
     inset: 0 0 auto;
     height: 12rem;
-    background: linear-gradient(#0b0d12 35%, rgba(11, 13, 18, 0));
+    background: linear-gradient(${SCREEN_BG} 35%, rgba(11, 13, 18, 0));
     pointer-events: none;
     opacity: 0;
-    transition: opacity 300ms cubic-bezier(0.23, 1, 0.32, 1);
+    transition: opacity 300ms ${EASE_OUT};
   }
 
   &[data-on-screen]::before {
@@ -149,7 +157,7 @@ export const Root = styled.div`
     position: relative;
     z-index: 2;
     pointer-events: none;
-    transition: opacity 300ms cubic-bezier(0.23, 1, 0.32, 1);
+    transition: opacity 300ms ${EASE_OUT};
   }
 
   &[data-flying] main {
@@ -306,7 +314,7 @@ export const Hero = styled.div`
       height: 2px;
       margin-top: 1.2rem;
       border-radius: 1px;
-      background: rgba(255, 255, 255, 0.12);
+      background: ${LINE};
       overflow: hidden;
     }
 
@@ -317,7 +325,7 @@ export const Hero = styled.div`
       background: var(--accent-ink);
       transform: scaleX(var(--loaded));
       transform-origin: left;
-      transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
+      transition: transform 300ms ${EASE_OUT};
     }
 
     @media (prefers-reduced-motion: reduce) {

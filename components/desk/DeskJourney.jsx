@@ -9,7 +9,7 @@ import { ScreenUI } from "./ScreenUI";
 import "./Card.styles";
 import { Screen } from "./Fallback.styles";
 import "./Nav.styles";
-import { CssHost, Hero, HoverTag, Root, Section, Stage } from "./DeskJourney.styles";
+import { CssHost, DeskPageBackground, Hero, HoverTag, Root, Section, Stage } from "./DeskJourney.styles";
 import { DeskCards } from "./DeskCards";
 import { DeskNav } from "./DeskNav";
 import { useDeskJourney, useJourneyRefs } from "./useDeskJourney";
@@ -27,6 +27,7 @@ export default function DeskJourney({ fonts }) {
 
   return (
     <Root ref={refs.root} data-no-webgl={unavailable || undefined}>
+      <DeskPageBackground />
       <CssHost ref={refs.cssHost} />
       <Stage ref={refs.canvas} aria-hidden="true" />
       {!unavailable && createPortal(<ScreenUI {...WORK_COPY} scrollerRef={scrollerRefs.work} />, screenEls.work)}

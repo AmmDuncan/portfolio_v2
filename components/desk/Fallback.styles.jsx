@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const SCREEN_BG = "#0b0d12";
+import { SCREEN_BG } from "./theme";
 
 export const Screen = styled.div`
   position: relative;
@@ -81,11 +81,17 @@ export const ProjectList = styled.ol`
     text-wrap: pretty;
   }
 
-  .tools {
+  .tools,
+  .year,
+  .meta .note {
     font-family: var(--font-mono), monospace;
     font-size: 1.2rem;
     letter-spacing: 0.06em;
     color: var(--muted);
+  }
+
+  .meta .note {
+    margin: 0;
   }
 
   .open {
@@ -95,6 +101,10 @@ export const ProjectList = styled.ol`
     text-decoration: underline;
     text-underline-offset: 0.3em;
     text-decoration-color: var(--accent);
+  }
+
+  .shot {
+    height: 100%;
   }
 
   figure {
