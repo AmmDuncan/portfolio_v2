@@ -299,3 +299,23 @@ export function carbonFibre(cells = 8, size = 512) {
   });
   return { map, bumpMap };
 }
+
+/** Soft round glow with a little noise in it, so a dark gradient doesn't band into rings. */
+export function wallGlow(size = 512) {
+  const canvas = makeCanvas(size, size);
+  const ctx = canvas.getContext("2d");
+  const glow = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  glow.addColorStop(0, "rgba(255, 255, 255, 1)");
+  glow.addColorStop(0.35, "rgba(255, 255, 255, 0.45)");
+  glow.addColorStop(0.7, "rgba(255, 255, 255, 0.1)");
+  glow.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, size, size);
+  const image = ctx.getImageData(0, 0, size, size);
+  for (let i = 0; i < image.data.length; i += 4) {
+    const noise = (Math.random() - 0.5) * 6;
+    image.data[i + 3] = Math.max(0, Math.min(255, image.data[i + 3] + noise));
+  }
+  ctx.putImageData(image, 0, 0);
+  return toTexture(canvas);
+}

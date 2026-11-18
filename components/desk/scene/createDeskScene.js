@@ -5,7 +5,8 @@ import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLigh
 import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
-import { carbonFibre, keypadDisplay, phoneScreen, shadowTexture } from "./screens";
+import { createContactShadows } from "./contactShadows";
+import { carbonFibre, keypadDisplay, phoneScreen, shadowTexture, wallGlow } from "./screens";
 
 const SIT_HEIGHT = 0.74;
 const STAND_HEIGHT = 1.12;
@@ -107,25 +108,25 @@ function buildFrame(shadowTex) {
   return { base, inner };
 }
 
-function buildMonitor(model, shadowTex) {
+function buildMonitor(model) {
   const group = new THREE.Group();
   cutScreenHole(model);
   const screen = model.getObjectByName("ScreenCenter");
-  group.add(model, contactShadow(shadowTex, 0.42, 0.36));
+  group.add(model);
   return { group, screen, size: MONITOR_SCREEN };
 }
 
-function buildLaptop(model, shadowTex) {
+function buildLaptop(model) {
   const group = new THREE.Group();
   cutScreenHole(model);
   const screen = new THREE.Object3D();
   screen.position.set(0, 0.1647, -0.1595);
   screen.rotation.x = -Math.atan2(0.247, 0.969);
-  group.add(model, screen, contactShadow(shadowTex, 0.46, 0.4, 0.6));
+  group.add(model, screen);
   return { group, screen, size: LAPTOP_SCREEN };
 }
 
-function buildPhone(model, shadowTex) {
+function buildPhone(model) {
   const group = new THREE.Group();
   const standBase = box(0.08, 0.008, 0.07, mat.aluminium, 0.003);
   standBase.position.set(0, 0.004, 0);
@@ -139,17 +140,17 @@ function buildPhone(model, shadowTex) {
   });
   const screen = model.getObjectByName("ScreenCenter");
   tilt.add(model);
-  group.add(standBase, tilt, contactShadow(shadowTex, 0.14, 0.12, 0.6));
+  group.add(standBase, tilt);
   return { group, screen, screenMaterial, lockScreen };
 }
 
-function buildController(model, shadowTex) {
+function buildController(model) {
   const group = new THREE.Group();
-  group.add(model, contactShadow(shadowTex, 0.24, 0.17, 0.65));
+  group.add(model);
   return group;
 }
 
-function buildGuides(shadowTex, covers) {
+function buildGuides(covers) {
   const group = new THREE.Group();
   const loader = new THREE.TextureLoader();
   covers.forEach((src, i) => {
@@ -164,7 +165,6 @@ function buildGuides(shadowTex, covers) {
     book.rotation.y = i * 0.05;
     group.add(book);
   });
-  group.add(contactShadow(shadowTex, 0.36, 0.24, 0.6));
   return group;
 }
 
@@ -233,28 +233,38 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   deskTop.position.y = -DESK.thickness / 2;
   top.add(deskTop);
 
-  const monitor = buildMonitor(models.monitor, shadowTex);
+  const monitor = buildMonitor(models.monitor);
   monitor.group.position.set(0.34, 0, -0.16);
   monitor.group.rotation.y = -0.12;
-  const laptop = buildLaptop(models.laptop, shadowTex);
+  const laptop = buildLaptop(models.laptop);
   laptop.group.position.set(-0.4, 0, -0.04);
   laptop.group.rotation.y = 0.1;
-  const phone = buildPhone(models.phone, shadowTex);
+  const phone = buildPhone(models.phone);
   phone.group.position.set(-0.03, 0, 0.16);
   phone.group.rotation.y = 0.08;
-  const controller = buildController(models.controller, shadowTex);
+  const controller = buildController(models.controller);
   controller.position.set(0.36, 0, 0.21);
   controller.rotation.y = -0.4;
-  const guides = buildGuides(shadowTex, coverSrcs);
+  const guides = buildGuides(coverSrcs);
   guides.position.set(-0.6, 0, 0.25);
   guides.rotation.y = 0.18;
   const keypad = buildKeypad();
   keypad.group.position.set(0.6, -0.022, DESK.depth / 2 + 0.008);
   top.add(monitor.group, laptop.group, phone.group, controller, guides, keypad.group);
 
-  const biasLight = new THREE.RectAreaLight(ACCENT, 7, 0.6, 0.3);
-  biasLight.position.set(0, 0.3, -0.02);
-  monitor.group.add(biasLight);
+  const glowMaterial = new THREE.MeshBasicMaterial({
+    map: wallGlow(),
+    color: ACCENT,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    toneMapped: false,
+  });
+  const biasGlow = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.95), glowMaterial);
+  biasGlow.position.set(0.34, 0.36, -0.414);
+  top.add(biasGlow);
+  const shadows = createContactShadows({ width: DESK.width, depth: DESK.depth, blur: 4, darkness: 2.6, opacity: 1 });
+  top.add(shadows.group);
   const monitorLight = new THREE.RectAreaLight("#dfe7ff", 8, 0.68, 0.39);
   monitorLight.position.set(0, 0.3, 0.08);
   monitorLight.rotation.y = Math.PI;
@@ -333,13 +343,14 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     keypad.display.set(height * 100);
   }
 
-  const screenLights = [biasLight, monitorLight, laptopLight].map((light) => [light, light.intensity]);
+  const screenLights = [monitorLight, laptopLight].map((light) => [light, light.intensity]);
 
   /** Screens and their glow, from off (0) to fully on (1). */
   function setPower(t) {
     screenLights.forEach(([light, full]) => {
       light.intensity = full * t;
     });
+    glowMaterial.opacity = t;
   }
 
   function setPhoneLit(t) {
@@ -371,6 +382,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
         m.dispose();
       });
     });
+    shadows.dispose();
     scene.environment?.dispose();
     pmrem.dispose();
     renderer.dispose();
@@ -379,5 +391,6 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
 
   setRise(0);
   setPhoneLit(0);
+  shadows.bake(renderer, scene);
   return { anchors, camera, pick, setPose, setPower, setRise, setPhoneLit, resize, render, dispose, fov: camera.fov };
 }
