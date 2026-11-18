@@ -5,6 +5,7 @@ import { Button } from "../../common";
 import PhoneIcon from "./icons/PhoneIcon";
 import SuitcaseIcon from "./icons/SuitcaseIcon";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 function Hero() {
@@ -41,6 +42,16 @@ function Hero() {
           >
             Fullstack Web Developer-Frontend Heavy, User Interface Designer, Writer sometimes.
           </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 1, type: "spring", delay: 0.3, mass: 1.5 }}
+          >
+            <Link className="desk-link" href="/desk">
+              Step into my desk →
+            </Link>
+          </motion.div>
         </section>
         <section className="decor">
           <HeroDecor />

@@ -17,6 +17,15 @@ const HeroRoot = styled.div`
     font-weight: 300;
   }
 
+  .desk-link {
+    display: inline-block;
+    margin-top: 1.6rem;
+    color: var(--color-primary);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+
   @media (max-width: 450px) {
     h1 {
       margin-block: 10.4rem 2.4rem;
