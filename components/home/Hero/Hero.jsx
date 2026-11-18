@@ -7,7 +7,7 @@ import SuitcaseIcon from "./icons/SuitcaseIcon";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { EMAIL } from "../../../data/site";
+import { EMAIL, TAGLINE } from "../../../data/site";
 
 function Hero() {
   const router = useRouter();
@@ -41,7 +41,7 @@ function Hero() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 1, type: "spring", delay: 0.2, mass: 1.5 }}
           >
-            Product engineer in Accra.
+            {TAGLINE}.
           </motion.p>
 
           <motion.div

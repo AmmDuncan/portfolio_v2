@@ -1,12 +1,13 @@
 import { books } from "../../data/books";
 import { sideProjects, thumbSrc } from "../../data/projects";
 import { BLOG_URL, EMAIL, GITHUB_URL } from "../../data/site";
-import { MODEL_CREDIT } from "./deskContent";
+import { CARD_COPY, MODEL_CREDIT } from "./deskContent";
 import { Card, CtaRow } from "./Card.styles";
 import { Section } from "./DeskJourney.styles";
 
 const guide = books[0];
 const external = { target: "_blank", rel: "noopener noreferrer" };
+const { guides: GUIDES, side: SIDE, contact: CONTACT } = CARD_COPY;
 
 /** The text cards beside the desk objects: the guide, side projects and contact. */
 export function DeskCards({ sectionRefs, cardRefs, heightRef }) {
@@ -15,16 +16,16 @@ export function DeskCards({ sectionRefs, cardRefs, heightRef }) {
       <Section ref={sectionRefs.guides} id="guides" $vh={220}>
         <Card ref={cardRefs.guides}>
           <div className="panel">
-            <span className="label">03 · Guides</span>
+            <span className="label">{GUIDES.label}</span>
             <h2>{guide.title}</h2>
             <p>{guide.description}</p>
             {guide.price && <p className="note price">{guide.price}</p>}
             <CtaRow>
               <a className="primary" href={guide.link} {...external}>
-                Get the PDF
+                {GUIDES.primary}
               </a>
               <a className="secondary" href={guide.blogLink} {...external}>
-                Read it on the blog
+                {GUIDES.secondary}
               </a>
             </CtaRow>
           </div>
@@ -34,9 +35,9 @@ export function DeskCards({ sectionRefs, cardRefs, heightRef }) {
       <Section ref={sectionRefs.side} id="side" $vh={170}>
         <Card ref={cardRefs.side}>
           <div className="panel">
-            <span className="label">04 · Side projects</span>
-            <h2>Side projects</h2>
-            <p>Smaller things I built to learn, or for fun.</p>
+            <span className="label">{SIDE.label}</span>
+            <h2>{SIDE.title}</h2>
+            <p>{SIDE.intro}</p>
             <ul>
               {sideProjects.map((p) => (
                 <li key={p.name}>
@@ -59,33 +60,33 @@ export function DeskCards({ sectionRefs, cardRefs, heightRef }) {
       <Section ref={sectionRefs.contact} id="contact" $vh={300}>
         <Card ref={cardRefs.contact}>
           <div className="panel">
-            <span className="label">05 · Contact</span>
-            <h2>Have a product to build?</h2>
-            <p>Tell me what you&apos;re working on.</p>
+            <span className="label">{CONTACT.label}</span>
+            <h2>{CONTACT.title}</h2>
+            <p>{CONTACT.intro}</p>
             <CtaRow>
               <a className="primary" href={`mailto:${EMAIL}`}>
-                Email me
+                {CONTACT.email}
               </a>
               <a className="secondary" href={GITHUB_URL} {...external}>
-                GitHub
+                {CONTACT.github}
               </a>
               <a className="secondary" href={BLOG_URL} {...external}>
-                Blog
+                {CONTACT.blog}
               </a>
             </CtaRow>
             <p className="note" ref={heightRef} aria-hidden="true">
               Desk height 74 cm
             </p>
             <p className="credit">
-              Controller model:{" "}
+              {MODEL_CREDIT.lead}{" "}
               <a href={MODEL_CREDIT.source} {...external}>
                 {MODEL_CREDIT.title}
               </a>{" "}
               by {MODEL_CREDIT.author},{" "}
               <a href={MODEL_CREDIT.license} {...external}>
-                CC BY 4.0
+                {MODEL_CREDIT.licenseName}
               </a>
-              , recoloured.
+              , {MODEL_CREDIT.note}.
             </p>
           </div>
         </Card>
