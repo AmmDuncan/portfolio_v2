@@ -44,6 +44,7 @@ export const projects = [
   },
   {
     name: "Finding Consensus",
+    year: "2024",
     imgSrc: "/assets/projects/findingconsensus.png",
     description:
       "Platform that aggregates and visualizes expert opinions on AI policy questions to help find consensus.",
