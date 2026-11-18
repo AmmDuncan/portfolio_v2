@@ -1,0 +1,92 @@
+import { describe, expect, it } from "vitest";
+
+import { DeskJourney } from "./DeskJourney";
+
+const pose = (at, x) => ({ at, position: [x, 0, 0], target: [0, 0, x] });
+
+describe("poseAt", () => {
+  const keyframes = [pose(0, 0), pose(100, 10), pose(200, 20)];
+
+  it("returns null with no keyframes", () => {
+    expect(DeskJourney.poseAt(50, [])).toBeNull();
+  });
+
+  it("holds the first pose before the first keyframe and the last pose after the last", () => {
+    expect(DeskJourney.poseAt(-40, keyframes)).toBe(keyframes[0]);
+    expect(DeskJourney.poseAt(900, keyframes)).toBe(keyframes[2]);
+  });
+
+  it("lands exactly on a keyframe at its scroll position", () => {
+    expect(DeskJourney.poseAt(100, keyframes).position).toEqual([10, 0, 0]);
+  });
+
+  it("is half way at the midpoint (smoothstep is symmetric)", () => {
+    expect(DeskJourney.poseAt(50, keyframes)).toEqual({ position: [5, 0, 0], target: [0, 0, 5] });
+  });
+
+  it("eases: a quarter of the way in moves less than a quarter of the distance", () => {
+    expect(DeskJourney.poseAt(125, keyframes).position[0]).toBeCloseTo(11.5625);
+  });
+});
+
+describe("progress", () => {
+  it("maps a range to 0..1 and clamps outside it", () => {
+    expect(DeskJourney.progress(50, 0, 100)).toBe(0.5);
+    expect(DeskJourney.progress(-10, 0, 100)).toBe(0);
+    expect(DeskJourney.progress(140, 0, 100)).toBe(1);
+  });
+
+  it("treats an empty or reversed range as a step at its end", () => {
+    expect(DeskJourney.progress(99, 100, 100)).toBe(0);
+    expect(DeskJourney.progress(100, 100, 100)).toBe(1);
+    expect(DeskJourney.progress(60, 100, 50)).toBe(1);
+    expect(DeskJourney.progress(40, 100, 50)).toBe(0);
+  });
+});
+
+describe("stagger", () => {
+  it("starts a single item straight away and finishes it at 1 - spread", () => {
+    expect(DeskJourney.stagger(0, 0, 1)).toBe(0);
+    expect(DeskJourney.stagger(0.55, 0, 1)).toBe(1);
+  });
+
+  it("holds the last of three items back until the spread has passed", () => {
+    expect(DeskJourney.stagger(0.45, 2, 3)).toBe(0);
+    expect(DeskJourney.stagger(1, 2, 3)).toBe(1);
+    expect(DeskJourney.stagger(0.45, 0, 3)).toBeCloseTo(0.8182, 4);
+  });
+});
+
+describe("flightDuration", () => {
+  it("never goes under 800 ms or over 1600 ms", () => {
+    expect(DeskJourney.flightDuration(0)).toBe(800);
+    expect(DeskJourney.flightDuration(1)).toBe(1150);
+    expect(DeskJourney.flightDuration(10)).toBe(1600);
+  });
+});
+
+describe("flightPose", () => {
+  const from = { position: [0, 0, 0], target: [0, 0, -1] };
+  const to = { position: [4, 0, 0], target: [4, 0, -1] };
+
+  it("starts at the first pose and ends at the second", () => {
+    expect(DeskJourney.flightPose(from, to, 0)).toEqual(from);
+    const end = DeskJourney.flightPose(from, to, 1);
+    end.position.forEach((v, i) => expect(v).toBeCloseTo(to.position[i]));
+    expect(end.target).toEqual(to.target);
+  });
+
+  it("lifts up and back by a quarter of the distance at the midpoint", () => {
+    expect(DeskJourney.flightPose(from, to, 0.5).position).toEqual([2, 1, 1]);
+  });
+});
+
+describe("screenPose", () => {
+  it("backs off along the screen normal to 90% of the distance that fills the view", () => {
+    expect(DeskJourney.coverDistance(2, 1, 90, 2)).toBeCloseTo(0.5);
+    const screen = { center: [0, 0, 0], normal: [0, 0, 1], width: 2, height: 1 };
+    const { position, target } = DeskJourney.screenPose(screen, 90, 2);
+    position.forEach((v, i) => expect(v).toBeCloseTo([0, 0, 0.45][i]));
+    expect(target).toEqual([0, 0, 0]);
+  });
+});
