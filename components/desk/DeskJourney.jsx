@@ -213,8 +213,7 @@ export default function DeskJourney({ fonts }) {
       }
 
       function activeSection(scrollY) {
-        const { ranges } = timelineRef.current;
-        return Object.keys(ranges).find((key) => scrollY >= ranges[key][0] && scrollY <= ranges[key][1]);
+        return JourneyMath.activeSectionAt(scrollY, timelineRef.current.ranges);
       }
 
       function updateHover() {

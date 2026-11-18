@@ -96,9 +96,9 @@ export function buildTimeline(scene, els, screens, vh, vw) {
     : frameBeside([0, 1.25, 2.9], [0, 0.98, 0], aspect, 0.16);
 
   const arrive = {
-    guides: top(els.guides) + vh * 0.7,
-    side: top(els.side) - vh * 0.15,
-    contact: top(els.contact) - vh * 0.15,
+    guides: Math.round(top(els.guides) + vh * 0.7),
+    side: Math.round(top(els.side) - vh * 0.15),
+    contact: Math.round(top(els.contact) - vh * 0.15),
   };
   scrolls.work.reset = [arrive.guides, arrive.side];
   const introPose = { position: wide.position.map((v, i) => v + (v - wide.target[i]) * 0.35), target: wide.target };
@@ -147,9 +147,9 @@ export function buildTimeline(scene, els, screens, vh, vw) {
     ranges: {
       work: [top(els.work), bottom(els.work)],
       nda: [top(els.nda), bottom(els.nda)],
-      guides: [arrive.guides, bottom(els.guides)],
-      side: [arrive.side, bottom(els.side)],
-      contact: [arrive.contact, bottom(els.contact)],
+      guides: [arrive.guides, arrive.side],
+      side: [arrive.side, arrive.contact],
+      contact: [arrive.contact, Infinity],
     },
   };
 }

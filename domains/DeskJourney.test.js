@@ -90,3 +90,33 @@ describe("screenPose", () => {
     expect(target).toEqual([0, 0, 0]);
   });
 });
+
+describe("activeSectionAt", () => {
+  const ranges = { work: [100, 200], guides: [300, 400], side: [400, 500], contact: [500, Infinity] };
+
+  it("is null with no ranges", () => {
+    expect(DeskJourney.activeSectionAt(150, {})).toBeNull();
+  });
+
+  it("returns work exactly at its start (100) and null one px before (99)", () => {
+    expect(DeskJourney.activeSectionAt(100, ranges)).toBe("work");
+    expect(DeskJourney.activeSectionAt(99, ranges)).toBeNull();
+  });
+
+  it("returns null exactly at work's end (200) and in the gap before guides (299)", () => {
+    expect(DeskJourney.activeSectionAt(199, ranges)).toBe("work");
+    expect(DeskJourney.activeSectionAt(200, ranges)).toBeNull();
+    expect(DeskJourney.activeSectionAt(299, ranges)).toBeNull();
+  });
+
+  it("returns side, not guides, exactly at the shared boundary 400 (the old overlap case)", () => {
+    expect(DeskJourney.activeSectionAt(399, ranges)).toBe("guides");
+    expect(DeskJourney.activeSectionAt(400, ranges)).toBe("side");
+  });
+
+  it("returns contact from 500 onward and side at 499", () => {
+    expect(DeskJourney.activeSectionAt(499, ranges)).toBe("side");
+    expect(DeskJourney.activeSectionAt(500, ranges)).toBe("contact");
+    expect(DeskJourney.activeSectionAt(1e9, ranges)).toBe("contact");
+  });
+});
