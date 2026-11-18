@@ -1,3 +1,4 @@
+import { deskShotSrc } from "../../data/projects";
 import { linkProps } from "./linkProps";
 
 /** One project: details on the left, screenshot on the right. The parent list owns the li and its styling. */
@@ -21,7 +22,12 @@ export function ProjectRow({ item, lazyImage = false }) {
       <figure>
         <div className="shot">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={item.imgSrc} alt={`${item.name} screenshot`} loading={lazyImage ? "lazy" : undefined} />
+          <img
+            src={deskShotSrc(item.imgSrc)}
+            alt={`${item.name} screenshot`}
+            loading={lazyImage ? "lazy" : undefined}
+            decoding="async"
+          />
         </div>
       </figure>
     </>

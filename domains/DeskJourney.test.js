@@ -202,3 +202,16 @@ describe("frameAt", () => {
     expect(frame).toMatchObject({ phoneLit: 0.5, rise: 0.25, heightCm: 84 });
   });
 });
+
+describe("nextPixelRatio", () => {
+  it("keeps the ratio while frames keep up (22 ms or less)", () => {
+    expect(DeskJourney.nextPixelRatio(2, 16.7)).toBe(2);
+    expect(DeskJourney.nextPixelRatio(2, 22)).toBe(2);
+  });
+
+  it("steps down 0.25 when frames are slow, and never below 1", () => {
+    expect(DeskJourney.nextPixelRatio(2, 30)).toBe(1.75);
+    expect(DeskJourney.nextPixelRatio(1.1, 30)).toBe(1);
+    expect(DeskJourney.nextPixelRatio(1, 40)).toBe(1);
+  });
+});

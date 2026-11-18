@@ -28,6 +28,23 @@ export function createJourney({ scene, dom, screenEls, reduceMotion }) {
   let dirty = true;
   let lastY = -1;
   let raf = 0;
+  const frameTimes = [];
+  let lastRenderAt = 0;
+
+  /** Drops the 3D render resolution a step when rendering can't keep up (slow phone GPUs); DOM text stays sharp. */
+  function adaptResolution(now) {
+    if (introAt(now) < 1) return;
+    const gap = now - lastRenderAt;
+    lastRenderAt = now;
+    if (gap > 100) return;
+    frameTimes.push(gap);
+    if (frameTimes.length < 30) return;
+    const average = frameTimes.reduce((sum, t) => sum + t, 0) / frameTimes.length;
+    frameTimes.length = 0;
+    const current = scene.pixelRatio();
+    const next = JourneyMath.nextPixelRatio(current, average);
+    if (next !== current) scene.setPixelRatio(next);
+  }
   let resizeFrame = 0;
   let resizeObserver = null;
 
@@ -102,6 +119,7 @@ export function createJourney({ scene, dom, screenEls, reduceMotion }) {
       flight.remember(next.pose);
       applyFrame(next, view);
       scene.render();
+      adaptResolution(now);
       lastY = y;
       dirty = false;
       if (!flight.current) focus.flush();

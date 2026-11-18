@@ -128,7 +128,17 @@ function frameAt(y, timeline, { flight = null, intro = 1, now = 0 } = {}) {
   };
 }
 
+/**
+ * Render resolution after a run of frames: one step lower when the average frame took longer than `slowMs`,
+ * never below `floor`. It only ever goes down, so it can't oscillate.
+ */
+function nextPixelRatio(current, averageFrameMs, { floor = 1, step = 0.25, slowMs = 22 } = {}) {
+  if (averageFrameMs <= slowMs) return current;
+  return Math.max(floor, current - step);
+}
+
 export const DeskJourney = {
+  nextPixelRatio,
   frameAt,
   deskHeightCm,
   activeSectionAt,

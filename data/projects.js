@@ -104,6 +104,9 @@ export const projects = [
   },
 ];
 
+/** Screenshot sized for the desk's screens: 1600px WebP instead of the full-size original. */
+export const deskShotSrc = (imgSrc) => imgSrc.replace("/projects/", "/projects/desk/").replace(/\.(png|jpe?g)$/, ".webp");
+
 export const thumbSrc = (imgSrc) => imgSrc.replace("/projects/", "/projects/thumbs/").replace(/\.png$/, ".webp");
 
 export const sideProjects = [

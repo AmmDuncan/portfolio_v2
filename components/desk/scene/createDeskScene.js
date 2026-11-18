@@ -361,6 +361,10 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     camera.updateProjectionMatrix();
   }
 
+  function setPixelRatio(ratio) {
+    renderer.setPixelRatio(ratio);
+  }
+
   function render() {
     renderer.render(scene, camera);
     domScreens.sync();
@@ -395,6 +399,8 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     setRise,
     setPhoneLit,
     resize,
+    setPixelRatio,
+    pixelRatio: () => renderer.getPixelRatio(),
     render,
     dispose,
     fov: camera.fov,
