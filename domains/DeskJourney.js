@@ -61,6 +61,12 @@ function flightPose(from, to, t) {
   return { position: [x, y + lift, z + lift], target: lerpVec(from.target, to.target, eased) };
 }
 
+/** Progress (0..1) of item `index` of `count` entering as a group, each starting a little after the last. */
+function stagger(t, index, count, spread = 0.45) {
+  const start = count > 1 ? (index / (count - 1)) * spread : 0;
+  return clamp01((t - start) / (1 - spread));
+}
+
 /** Flight time in ms for a camera move of this many metres. */
 function flightDuration(distance) {
   return Math.min(1600, Math.max(800, 800 + distance * 350));
@@ -76,5 +82,6 @@ export const DeskJourney = {
   blendPose,
   flightPose,
   flightDuration,
+  stagger,
   lerp,
 };

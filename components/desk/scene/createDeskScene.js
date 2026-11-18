@@ -10,7 +10,7 @@ import { keypadDisplay, phoneScreen, shadowTexture } from "./screens";
 const SIT_HEIGHT = 0.74;
 const STAND_HEIGHT = 1.12;
 const DESK = { width: 1.6, depth: 0.75, thickness: 0.035 };
-const ACCENT = new THREE.Color("#3d7fff");
+const ACCENT = new THREE.Color("#734dd5");
 const MODEL_URLS = {
   monitor: "/models/g7.glb",
   laptop: "/models/macbook.glb",

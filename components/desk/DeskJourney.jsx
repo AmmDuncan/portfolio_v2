@@ -55,6 +55,21 @@ function thumbOf(imgSrc) {
   return imgSrc.replace("/projects/", "/projects/thumbs/").replace(/\.png$/, ".webp");
 }
 
+const FIGURE_ENTRY = { rise: 60, scale: 0.06, blur: 8 };
+const entryState = new WeakMap();
+
+/** Places an element part way (t, 0..1) through its entrance: it rises, settles and comes into focus. */
+function enter(el, t, { rise = 24, scale = 0, blur = 0 }, fadeOnly) {
+  const eased = Journey.easeOutCubic(t);
+  if (entryState.get(el) === eased) return;
+  entryState.set(el, eased);
+  el.style.opacity = String(eased);
+  if (fadeOnly) return;
+  const done = eased === 1;
+  el.style.transform = done ? "" : `translateY(${(1 - eased) * rise}px) scale(${1 - scale * (1 - eased)})`;
+  if (blur) el.style.filter = done ? "" : `blur(${(1 - eased) * blur}px)`;
+}
+
 /** The same view pushed a little closer, so a held shot still moves while you scroll. */
 function driftIn(pose, amount = 0.1) {
   return { position: pose.position.map((v, i) => v + (pose.target[i] - v) * amount), target: pose.target };
@@ -104,7 +119,7 @@ function buildTimeline(scene, els, screens, vh, vw) {
     scrolls[key] = {
       scroller,
       scrollable,
-      revealLine: viewportHeight * 0.85,
+      viewportHeight,
       start: () => top(els[key]) + hold,
       end: () => bottom(els[key]) - hold,
     };
@@ -166,7 +181,10 @@ function buildTimeline(scene, els, screens, vh, vw) {
     keyframes,
     introPose,
     scrolls,
-    ndaReveal: top(els.nda) - vh * 0.3,
+    screenArrivals: {
+      work: [top(els.work) - vh * 0.45, top(els.work)],
+      nda: [top(els.nda) - vh * 0.4, top(els.nda)],
+    },
     heroFade: [vh * 0.25, vh * 0.85],
     cards: [
       { key: "guides", range: [arrive.guides - vh * 0.3, arrive.guides] },
@@ -307,15 +325,12 @@ export default function DeskJourney({ fonts }) {
         const contentY = flight ? flight.y : scrollY;
         const travel = (value) =>
           flight ? Journey.lerp(value(flight.fromY), value(flight.y), Journey.smoothstep(flightProgress())) : value(scrollY);
-        Object.values(timeline.scrolls).forEach(({ scroller, scrollable, revealLine, start, end }) => {
-          const offset = scrollable * Journey.progress(contentY, start(), end());
-          scroller.style.transform = `translateY(${-offset}px)`;
-          if (!scroller.isConnected) return;
-          scroller.querySelectorAll("[data-reveal]:not([data-in])").forEach((row) => {
-            if (row.offsetTop - offset < revealLine) row.toggleAttribute("data-in", true);
-          });
+        Object.entries(timeline.scrolls).forEach(([key, screen]) => {
+          const offset = screen.scrollable * Journey.progress(contentY, screen.start(), screen.end());
+          screen.scroller.style.transform = `translateY(${-offset}px)`;
+          if (!screen.scroller.isConnected) return;
+          revealScreen(screen, offset, Journey.progress(contentY, ...timeline.screenArrivals[key]));
         });
-        if (contentY > timeline.ndaReveal && screens.nda.scroller.isConnected) screens.nda.scroller.toggleAttribute("data-in", true);
         scene.setPhoneLit(travel((y) => Journey.progress(y, ...timeline.phoneLit)));
         const rise = travel((y) => Journey.smoothstep(Journey.progress(y, ...timeline.rise)));
         scene.setRise(rise);
@@ -323,8 +338,30 @@ export default function DeskJourney({ fonts }) {
         heroRef.current.style.opacity = String(1 - Journey.progress(contentY, ...timeline.heroFade));
         timeline.cards.forEach(({ key, range }) => {
           const shown = Journey.progress(contentY, ...range);
-          cardRefs[key].current.style.opacity = String(shown);
-          if (shown > 0.3) cardRefs[key].current.toggleAttribute("data-in", true);
+          const card = cardRefs[key].current;
+          card.style.opacity = String(Math.min(1, shown * 3));
+          const parts = [...card.querySelectorAll(".panel > :not(ul), .panel li")];
+          parts.forEach((el, i) => enter(el, Journey.stagger(shown, i, parts.length, 0.5), { rise: 16 }, reduceMotion));
+        });
+      }
+
+      /** Scroll-scrubbed entrance for a device screen: heading as the camera arrives, then each row as it rises into view. */
+      function revealScreen({ scroller, viewportHeight }, offset, arrival) {
+        const head = [...scroller.children].filter((el) => el.tagName !== "OL");
+        head.forEach((el, i) => enter(el, Journey.stagger(arrival, i, head.length), { rise: 24 }, reduceMotion));
+        const glow = scroller.parentElement.querySelector(".glow");
+        if (glow) glow.style.opacity = String(1 - arrival * 0.85);
+        const rowsOpen = Journey.progress(arrival, 0.5, 1);
+        scroller.querySelectorAll("[data-reveal]").forEach((row) => {
+          const top = row.offsetTop - offset;
+          const t = Math.min(rowsOpen, Journey.progress(viewportHeight - top, 0, viewportHeight * 0.45));
+          const parts = [row.querySelector("figure"), ...row.querySelector(".meta").children];
+          parts.forEach((el, i) =>
+            enter(el, Journey.stagger(t, i, parts.length), i === 0 ? FIGURE_ENTRY : { rise: 24 }, reduceMotion),
+          );
+          if (reduceMotion) return;
+          const drift = (top + row.offsetHeight / 2 - viewportHeight / 2) * -0.05;
+          row.querySelector("img").style.transform = `translateY(${Math.max(-24, Math.min(24, drift))}px)`;
         });
       }
 
@@ -412,7 +449,6 @@ export default function DeskJourney({ fonts }) {
 
       layout();
       canvasRef.current.dataset.on = "";
-      rootRef.current.dataset.live = "";
       const resizeObserver = new ResizeObserver(layout);
       resizeObserver.observe(document.documentElement);
       resizeObserver.observe(screens.work.scroller);

@@ -19,7 +19,7 @@ const Ui = styled.div`
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ink: #eef0f4;
   --muted: #9aa3b2;
-  --accent: #3d7fff;
+  --accent: #9174dc;
   --line: rgba(255, 255, 255, 0.12);
   width: 100%;
   height: 100%;
@@ -61,7 +61,17 @@ const Ui = styled.div`
   }
 
   .viewport {
+    position: relative;
     overflow: hidden;
+  }
+
+  .glow {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(80% 70% at 72% 18%, rgba(115, 77, 213, 0.55), transparent 70%),
+      radial-gradient(60% 60% at 12% 92%, rgba(145, 116, 220, 0.25), transparent 70%);
+    pointer-events: none;
   }
 
   .scroller {
@@ -111,62 +121,9 @@ const Ui = styled.div`
     align-items: center;
   }
 
-  li[data-reveal] .meta > * {
-    opacity: 0;
-    transform: translateY(8px);
-    transition:
-      opacity 300ms var(--ease-out),
-      transform 300ms var(--ease-out);
-  }
-
-  li[data-reveal] figure {
-    clip-path: inset(0 0 100% 0);
-    transition: clip-path 600ms var(--ease-in-out) 100ms;
-  }
-
-  li[data-in] .meta > * {
-    opacity: 1;
-    transform: none;
-  }
-
-  li[data-in] figure {
-    clip-path: inset(0);
-  }
-
-  li[data-in] .meta > *:nth-child(2) {
-    transition-delay: 50ms;
-  }
-
-  li[data-in] .meta > *:nth-child(3) {
-    transition-delay: 100ms;
-  }
-
-  li[data-in] .meta > *:nth-child(4) {
-    transition-delay: 150ms;
-  }
-
-  li[data-in] .meta > *:nth-child(5) {
-    transition-delay: 200ms;
-  }
-
-  li[data-in] .meta > *:nth-child(6) {
-    transition-delay: 250ms;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    li[data-reveal] .meta > * {
-      transform: none;
-    }
-
-    li[data-reveal] figure {
-      clip-path: none;
-      opacity: 0;
-      transition: opacity 200ms ease;
-    }
-
-    li[data-in] figure {
-      opacity: 1;
-    }
+  .shot {
+    position: relative;
+    height: 100%;
   }
 
   [data-narrow] & li {
@@ -194,8 +151,8 @@ const Ui = styled.div`
   .note {
     padding: 4px 10px;
     border-radius: 99px;
-    background: rgba(61, 127, 255, 0.16);
-    color: #a9c6ff;
+    background: rgba(115, 77, 213, 0.22);
+    color: #c9baf3;
     font-size: 13px;
     font-weight: 500;
   }
@@ -239,8 +196,10 @@ const Ui = styled.div`
     background: #151820;
 
     img {
+      position: absolute;
+      top: -6%;
       width: 100%;
-      height: 100%;
+      height: 112%;
       object-fit: cover;
       object-position: top left;
       display: block;
@@ -259,16 +218,21 @@ export function ScreenUI({ path, label, title, intro, items, scrollerRef }) {
         <span>{path}</span>
       </div>
       <div className="viewport">
+        <div className="glow" aria-hidden="true" />
         <div className="scroller" ref={scrollerRef}>
           <span className="label">{label}</span>
-          <h2>{title}</h2>
+          <h2>
+            <span>{title}</span>
+          </h2>
           <p className="intro">{intro}</p>
           <ol>
             {items.map((item) => (
               <li key={item.name} data-reveal>
                 <div className="meta">
                   {item.year && <span className="year">{item.year}</span>}
-                  <h3>{item.name}</h3>
+                  <h3>
+                    <span>{item.name}</span>
+                  </h3>
                   {item.note && <span className="note">{item.note}</span>}
                   <p>{item.description}</p>
                   <span className="tools">{item.tools.join(" · ")}</span>
@@ -279,8 +243,10 @@ export function ScreenUI({ path, label, title, intro, items, scrollerRef }) {
                   )}
                 </div>
                 <figure>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.imgSrc} alt={`${item.name} screenshot`} />
+                  <div className="shot">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={item.imgSrc} alt={`${item.name} screenshot`} />
+                  </div>
                 </figure>
               </li>
             ))}
@@ -295,12 +261,12 @@ const Lock = styled.div`
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ink: #eef0f4;
   --muted: #9aa3b2;
-  --accent: #3d7fff;
+  --accent: #9174dc;
   width: 100%;
   height: 100%;
   display: grid;
   place-items: center;
-  background: radial-gradient(120% 90% at 50% 0%, #1a2440 0%, #0b0d12 62%);
+  background: radial-gradient(120% 90% at 50% 0%, #251a42 0%, #0b0d12 62%);
   color: var(--ink);
   font-family: var(--font-sans), sans-serif;
   text-align: center;
@@ -313,40 +279,6 @@ const Lock = styled.div`
     max-width: min(760px, var(--col, 88%));
   }
 
-  .inner > :not(svg) {
-    opacity: 0;
-    transform: translateY(8px);
-    transition:
-      opacity 300ms var(--ease-out),
-      transform 300ms var(--ease-out);
-  }
-
-  .inner[data-in] > * {
-    opacity: 1;
-    transform: none;
-  }
-
-  .inner[data-in] > *:nth-child(2) {
-    transition-delay: 60ms;
-  }
-
-  .inner[data-in] > *:nth-child(3) {
-    transition-delay: 120ms;
-  }
-
-  .inner[data-in] > *:nth-child(4) {
-    transition-delay: 180ms;
-  }
-
-  .inner[data-in] > *:nth-child(5) {
-    transition-delay: 240ms;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .inner > :not(svg) {
-      transform: none;
-    }
-  }
 
   svg {
     width: 44px;

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 const INK = "#e8ebf0";
-const ACCENT = "#3d7fff";
+const ACCENT = "#9174dc";
 let SANS = "'Helvetica Neue', Arial, sans-serif";
 let MONO = "Menlo, monospace";
 let DISPLAY = SANS;
@@ -36,14 +36,14 @@ const ACCRA = "Africa/Accra";
 
 function paintWallpaper(ctx, w, h) {
   const base = ctx.createLinearGradient(0, 0, 0, h);
-  base.addColorStop(0, "#0a1633");
+  base.addColorStop(0, "#1a1236");
   base.addColorStop(1, "#02040a");
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, w, h);
   [
-    [430, 300, 460, "rgba(61, 127, 255, 0.55)"],
+    [430, 300, 460, "rgba(115, 77, 213, 0.6)"],
     [90, 880, 420, "rgba(96, 72, 230, 0.32)"],
-    [520, 1180, 320, "rgba(40, 190, 255, 0.18)"],
+    [520, 1180, 320, "rgba(145, 116, 220, 0.2)"],
   ].forEach(([x, y, r, color]) => {
     const glow = ctx.createRadialGradient(x, y, 0, x, y, r);
     glow.addColorStop(0, color);
@@ -229,7 +229,7 @@ export function keypadDisplay() {
     shown = value;
     ctx.fillStyle = "#050607";
     ctx.fillRect(0, 0, 256, 96);
-    ctx.fillStyle = "#7fb2ff";
+    ctx.fillStyle = "#b9a6ee";
     ctx.font = `600 64px ${MONO}`;
     ctx.textAlign = "center";
     ctx.fillText(value, 128, 72);
