@@ -4,13 +4,14 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
+import { ACCENT } from "../theme";
 import { createContactShadows } from "./contactShadows";
 import { carbonFibre, keypadDisplay, phoneScreen, shadowTexture, wallGlow } from "./screens";
 
 const SIT_HEIGHT = 0.74;
 const STAND_HEIGHT = 1.12;
 const DESK = { width: 1.6, depth: 0.75, thickness: 0.035 };
-const ACCENT = new THREE.Color("#734dd5");
+const ACCENT_COLOR = new THREE.Color(ACCENT);
 const MODEL_URLS = {
   monitor: "/models/g7.glb",
   laptop: "/models/macbook.glb",
@@ -299,7 +300,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
 
   const glowMaterial = new THREE.MeshBasicMaterial({
     map: wallGlow(),
-    color: ACCENT,
+    color: ACCENT_COLOR,
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
@@ -318,7 +319,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   laptop.screen.add(laptopLight);
   laptopLight.position.set(0, 0, 0.004);
   laptopLight.rotation.y = Math.PI;
-  const phoneLight = new THREE.RectAreaLight(ACCENT, 0, ...PHONE_SCREEN);
+  const phoneLight = new THREE.RectAreaLight(ACCENT_COLOR, 0, ...PHONE_SCREEN);
   phone.screen.add(phoneLight);
   phoneLight.position.set(0, 0, 0.003);
   phoneLight.rotation.y = Math.PI;

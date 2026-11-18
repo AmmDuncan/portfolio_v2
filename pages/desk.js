@@ -9,11 +9,12 @@ const unbounded = Unbounded({ subsets: ["latin"], display: "swap" });
 const DeskJourney = dynamic(() => import("../components/desk/DeskJourney"), { ssr: false });
 
 export default function Desk() {
-  const fontVars = {
-    "--font-display": unbounded.style.fontFamily,
-    "--font-sans": instrumentSans.style.fontFamily,
-    "--font-mono": jetbrains.style.fontFamily,
+  const fonts = {
+    sans: instrumentSans.style.fontFamily,
+    mono: jetbrains.style.fontFamily,
+    display: unbounded.style.fontFamily,
   };
+  const fontVars = { "--font-display": fonts.display, "--font-sans": fonts.sans, "--font-mono": fonts.mono };
   return (
     <div style={fontVars}>
       <Head>
@@ -25,13 +26,7 @@ export default function Desk() {
         <meta name="theme-color" content="#07080a" />
         <meta name="robots" content="noindex" />
       </Head>
-      <DeskJourney
-        fonts={{
-          sans: instrumentSans.style.fontFamily,
-          mono: jetbrains.style.fontFamily,
-          display: unbounded.style.fontFamily,
-        }}
-      />
+      <DeskJourney fonts={fonts} />
     </div>
   );
 }

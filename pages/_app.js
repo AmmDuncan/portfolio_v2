@@ -12,6 +12,7 @@ import Script from "next/script";
 import BaseLayout from "../layouts/BaseLayout";
 
 function MyApp({ Component, pageProps }) {
+  // Pages opt out of the shared layout with Page.bareLayout = true.
   const Layout = Component.bareLayout ? Fragment : BaseLayout;
   return (
     <Layout>

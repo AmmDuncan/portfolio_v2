@@ -2,77 +2,31 @@ import React from "react";
 import { createPortal } from "react-dom";
 import Lenis from "lenis";
 
-import { DeskJourney as Journey } from "../../domains/DeskJourney";
+import { DeskJourney as JourneyMath } from "../../domains/DeskJourney";
 import { LogoPurple } from "../../assets";
-import { projects, sideProjects } from "../../data/projects";
+import { sideProjects, thumbSrc } from "../../data/projects";
 import { books } from "../../data/books";
+import { BLOG_URL, EMAIL, GITHUB_URL } from "../../data/site";
 import { createDeskScene, loadDeskModels } from "./scene/createDeskScene";
 import { setScreenFonts } from "./scene/screens";
-import { LockScreen, makeScreenElement, SCREEN_SIZES, ScreenUI } from "./ScreenUI";
-import { Card, CssHost, CtaRow, Hero, HoverTag, Nav, ProjectList, Root, Screen, Section, Stage } from "./DeskJourney.styles";
-
-const EMAIL = "ammielgyanyawson@gmail.com";
-const work = projects.filter((p) => p.name !== "Portfolio");
+import { HOVER_LABEL, MODEL_CREDIT, NDA_COPY, SCREEN_COPY, SECTIONS } from "./deskContent";
+import { FallbackRows } from "./FallbackRows";
+import { LockScreen } from "./LockScreen";
+import { makeScreenElement, SCREEN_SIZES, ScreenUI } from "./ScreenUI";
+import { buildTimeline } from "./timeline";
+import { Card, CtaRow } from "./Card.styles";
+import { Screen } from "./Fallback.styles";
+import { Nav } from "./Nav.styles";
+import { CssHost, Hero, HoverTag, Root, Section, Stage } from "./DeskJourney.styles";
 const guide = books[0];
-const SECTIONS = [
-  { key: "work", label: "Work" },
-  { key: "nda", label: "Under NDA" },
-  { key: "guides", label: "Guides" },
-  { key: "side", label: "Side projects" },
-  { key: "contact", label: "Contact" },
-];
 const INTRO_MS = 2600;
-const MODEL_CREDIT = {
-  title: "Playstation 5 Dualsense",
-  author: "AHarmlessPotato",
-  source: "https://sketchfab.com/3d-models/playstation-5-dualsense-878c1f882808477ab81c2fe86d5a3936",
-  license: "https://creativecommons.org/licenses/by/4.0/",
-};
-const BLOG_URL = "https://blog.ammielyawson.com";
-const HOVER_LABEL = {
-  work: "See my work",
-  nda: "Work under NDA",
-  guides: "Read the guide",
-  side: "See side projects",
-  contact: "Get in touch",
-};
-const SCREEN_COPY = {
-  work: {
-    path: "~/work",
-    label: "01 · Work",
-    title: "Products I've built",
-    intro: "For clients and for myself, from security platforms to stores for social sellers in Ghana.",
-    items: work,
-  },
-};
-const NDA_COPY = {
-  label: "02 · Under NDA",
-  title: "6 platforms under NDA",
-  intro: "Client work, 2023-2026. I can't name the clients or show the screens.",
-  stack: ["Nuxt", "Vue", "TypeScript", "TanStack Query", "Tailwind CSS"],
-};
-
-/** Shifts a pose sideways (desktop) or down (portrait) so the object clears the text card. */
-function frameBeside(position, target, aspect, amount, portraitAmount = amount * 0.5) {
-  const d = Math.hypot(...position.map((v, i) => v - target[i]));
-  if (aspect >= 1) {
-    const dx = -amount * d;
-    return { position: [position[0] + dx, position[1], position[2]], target: [target[0] + dx, target[1], target[2]] };
-  }
-  const dy = -portraitAmount * d;
-  return { position: [position[0], position[1] + dy, position[2]], target: [target[0], target[1] + dy, target[2]] };
-}
-
-function thumbOf(imgSrc) {
-  return imgSrc.replace("/projects/", "/projects/thumbs/").replace(/\.png$/, ".webp");
-}
 
 const FIGURE_ENTRY = { rise: 60, scale: 0.06, blur: 8 };
 const entryState = new WeakMap();
 
 /** Places an element part way (t, 0..1) through its entrance: it rises, settles and comes into focus. */
-function enter(el, t, { rise = 24, scale = 0, blur = 0 }, fadeOnly) {
-  const eased = Journey.easeOutCubic(t);
+function enter(el, t, { rise = 24, scale = 0, blur = 0, fadeOnly = false }) {
+  const eased = JourneyMath.easeOutCubic(t);
   if (entryState.get(el) === eased) return;
   entryState.set(el, eased);
   el.style.opacity = String(eased);
@@ -80,175 +34,6 @@ function enter(el, t, { rise = 24, scale = 0, blur = 0 }, fadeOnly) {
   const done = eased === 1;
   el.style.transform = done ? "" : `translateY(${(1 - eased) * rise}px) scale(${1 - scale * (1 - eased)})`;
   if (blur) el.style.filter = done ? "" : `blur(${(1 - eased) * blur}px)`;
-}
-
-/** The same view pushed a little closer, so a held shot still moves while you scroll. */
-function driftIn(pose, amount = 0.1) {
-  return { position: pose.position.map((v, i) => v + (pose.target[i] - v) * amount), target: pose.target };
-}
-
-function lookFrom(point, offset, distance) {
-  return { position: point.map((v, i) => v + offset[i] * distance), target: point };
-}
-
-/** Sizes a device screen so one CSS pixel lands on one viewport pixel once the camera has pushed in, keeping text crisp. */
-function screenFit(anchor, fov, aspect, viewportWidth) {
-  const pose = Journey.screenPose(anchor, fov, aspect);
-  const distance = Math.hypot(...pose.position.map((v, i) => v - anchor.center[i]));
-  const visibleWidth = 2 * distance * Math.tan((fov * Math.PI) / 360) * aspect;
-  const width = Math.round((anchor.width / visibleWidth) * viewportWidth);
-  return {
-    pose,
-    width,
-    height: Math.round(width * (anchor.height / anchor.width)),
-    columnPx: width * Math.min(1, visibleWidth / anchor.width) * 0.9,
-  };
-}
-
-function buildTimeline(scene, els, screens, vh, vw) {
-  const aspect = vw / vh;
-  const { anchors } = scene;
-  const portrait = aspect < 1;
-  const top = (el) => el.offsetTop;
-  const bottom = (el) => el.offsetTop + el.offsetHeight;
-
-  const fits = {
-    work: screenFit(anchors.monitor, scene.fov, aspect, vw),
-    nda: screenFit(anchors.laptop, scene.fov, aspect, vw),
-  };
-  const hold = vh * 0.3;
-  const scrolls = {};
-  Object.entries(fits).forEach(([key, fit]) => {
-    const { element, scroller } = screens[key];
-    element.dataset.width = String(fit.width);
-    element.dataset.height = String(fit.height);
-    element.style.width = `${fit.width}px`;
-    element.style.height = `${fit.height}px`;
-    element.style.setProperty("--col", `${Math.round(fit.columnPx)}px`);
-    element.toggleAttribute("data-narrow", fit.columnPx < 760);
-    const viewportHeight = fit.height - 44;
-    const scrollable = Math.max(0, scroller.offsetHeight - viewportHeight * 0.9);
-    els[key].style.height = `${Math.round(hold * 2 + scrollable)}px`;
-    scrolls[key] = {
-      scroller,
-      scrollable,
-      viewportHeight,
-      start: () => top(els[key]) + hold,
-      end: () => bottom(els[key]) - hold,
-    };
-  });
-
-  const wide = portrait
-    ? { position: [-0.5, 1.75, 3.5], target: [0.0, 1.02, 0] }
-    : { position: [-1.28, 1.5, 2.1], target: [-0.62, 0.86, 0] };
-  const wideIn = portrait
-    ? { position: [-0.42, 1.65, 3.0], target: [0.0, 0.98, 0] }
-    : { position: [-1.1, 1.4, 1.85], target: [-0.6, 0.86, 0] };
-  const between = { position: [-0.05, 1.3, 1.25], target: [-0.05, 0.9, -0.1] };
-  const lc = anchors.laptop.center;
-  const laptopOut = { position: [lc[0] + 0.1, lc[1] + 0.32, lc[2] + 0.75], target: [lc[0], lc[1] - 0.12, lc[2] + 0.15] };
-  const guides = frameBeside(
-    lookFrom(anchors.guides, [0.15, 0.85, 0.62], portrait ? 0.95 : 0.5).position,
-    anchors.guides,
-    aspect,
-    0.22,
-  );
-  const controller = frameBeside(
-    lookFrom(anchors.controller, [-0.25, 0.8, 0.62], portrait ? 0.85 : 0.6).position,
-    anchors.controller,
-    aspect,
-    0.24,
-    0.28,
-  );
-  const phoneView = lookFrom(anchors.phone.center, anchors.phone.normal, portrait ? 0.5 : 0.36);
-  const phone = frameBeside(phoneView.position, phoneView.target, aspect, 0.22);
-  const final = portrait
-    ? { position: [0.15, 1.05, 4.9], target: [0.15, 0.3, 0] }
-    : frameBeside([0, 1.25, 2.9], [0, 0.98, 0], aspect, 0.16);
-
-  const arrive = {
-    guides: top(els.guides) + vh * 0.7,
-    side: top(els.side) - vh * 0.15,
-    contact: top(els.contact) - vh * 0.15,
-  };
-  scrolls.work.reset = [arrive.guides, arrive.side];
-  const introPose = { position: wide.position.map((v, i) => v + (v - wide.target[i]) * 0.35), target: wide.target };
-  const k = (at, pose) => ({ at, ...pose });
-  const keyframes = [
-    k(0, wide),
-    k(top(els.work) - vh * 1.3, wideIn),
-    k(top(els.work), fits.work.pose),
-    k(bottom(els.work), fits.work.pose),
-    k(top(els.nda) - vh * 0.7, between),
-    k(top(els.nda), fits.nda.pose),
-    k(bottom(els.nda), driftIn(fits.nda.pose, 0.04)),
-    k(top(els.guides) + vh * 0.25, laptopOut),
-    k(arrive.guides, guides),
-    k(bottom(els.guides) - vh * 0.95, driftIn(guides)),
-    k(arrive.side, controller),
-    k(bottom(els.side) - vh * 0.95, driftIn(controller)),
-    k(arrive.contact, phone),
-    k(top(els.contact) + vh * 0.8, driftIn(phone)),
-    k(top(els.contact) + vh * 1.3, final),
-  ];
-  return {
-    keyframes,
-    introPose,
-    scrolls,
-    screenArrivals: {
-      work: [top(els.work) - vh * 0.45, top(els.work)],
-      nda: [top(els.nda) - vh * 0.4, top(els.nda)],
-    },
-    heroFade: [vh * 0.25, vh * 0.85],
-    cards: [
-      { key: "guides", range: [arrive.guides - vh * 0.3, arrive.guides] },
-      { key: "side", range: [arrive.side - vh * 0.5, arrive.side - vh * 0.1] },
-      { key: "contact", range: [arrive.contact - vh * 0.5, arrive.contact - vh * 0.1] },
-    ],
-    phoneLit: [top(els.contact) - vh * 0.45, top(els.contact) + vh * 0.05],
-    rise: [top(els.contact) + vh * 1.3, top(els.contact) + vh * 2.0],
-    jumps: {
-      top: 0,
-      work: top(els.work) + hold,
-      nda: top(els.nda) + hold,
-      guides: arrive.guides,
-      side: arrive.side,
-      contact: arrive.contact,
-    },
-    ranges: {
-      work: [top(els.work), bottom(els.work)],
-      nda: [top(els.nda), bottom(els.nda)],
-      guides: [arrive.guides, bottom(els.guides)],
-      side: [arrive.side, bottom(els.side)],
-      contact: [arrive.contact, bottom(els.contact)],
-    },
-  };
-}
-
-function FallbackRows({ items }) {
-  return (
-    <ProjectList>
-      {items.map((item) => (
-        <li key={item.name}>
-          <div className="meta">
-            {item.year && <span className="tools">{item.year}</span>}
-            <h3>{item.name}</h3>
-            {item.note && <span className="tools">{item.note}</span>}
-            <p>{item.description}</p>
-            {item.link && (
-              <a className="open" href={item.link}>
-                Open {item.name}
-              </a>
-            )}
-          </div>
-          <figure>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={item.imgSrc} alt={`${item.name} screenshot`} loading="lazy" />
-          </figure>
-        </li>
-      ))}
-    </ProjectList>
-  );
 }
 
 export default function DeskJourney({ fonts }) {
@@ -337,60 +122,67 @@ export default function DeskJourney({ fonts }) {
       function update(scrollY) {
         const timeline = timelineRef.current;
         const intro = introProgress();
-        let pose = Journey.poseAt(scrollY, timeline.keyframes);
-        if (flight) pose = Journey.flightPose(flight.from, flight.to, flightProgress());
-        else if (intro < 1) pose = Journey.blendPose(timeline.introPose, pose, Journey.easeOutCubic(intro));
+        let pose = JourneyMath.poseAt(scrollY, timeline.keyframes);
+        if (flight) pose = JourneyMath.flightPose(flight.from, flight.to, flightProgress());
+        else if (intro < 1) pose = JourneyMath.blendPose(timeline.introPose, pose, JourneyMath.easeOutCubic(intro));
         scene.setPose(pose);
         lastPose = pose;
-        const power = Journey.smoothstep(Journey.progress(intro, 0.3, 0.75));
+        const power = JourneyMath.smoothstep(JourneyMath.progress(intro, 0.3, 0.75));
         scene.setPower(power);
         cssHostRef.current.style.opacity = String(power);
         const contentY = flight ? flight.y : scrollY;
         const travel = (value) =>
-          flight ? Journey.lerp(value(flight.fromY), value(flight.y), Journey.smoothstep(flightProgress())) : value(scrollY);
+          flight ? JourneyMath.lerp(value(flight.fromY), value(flight.y), JourneyMath.smoothstep(flightProgress())) : value(scrollY);
         const active = flight ? null : activeSection(contentY);
         screenEls.work.inert = active !== "work";
         screenEls.nda.inert = active !== "nda";
         rootRef.current.toggleAttribute("data-on-screen", active === "work");
         Object.entries(timeline.scrolls).forEach(([key, screen]) => {
-          const back = screen.reset ? Journey.smoothstep(Journey.progress(contentY, ...screen.reset)) : 0;
-          const offset = screen.scrollable * Journey.progress(contentY, screen.start(), screen.end()) * (1 - back);
+          const back = screen.reset ? JourneyMath.smoothstep(JourneyMath.progress(contentY, ...screen.reset)) : 0;
+          const offset = screen.scrollable * JourneyMath.progress(contentY, screen.start(), screen.end()) * (1 - back);
           screen.scroller.style.transform = `translateY(${-offset}px)`;
           if (!screen.scroller.isConnected) return;
-          revealScreen(screen, offset, Journey.progress(contentY, ...timeline.screenArrivals[key]));
+          revealScreen(screen, offset, JourneyMath.progress(contentY, ...timeline.screenArrivals[key]));
         });
-        scene.setPhoneLit(travel((y) => Journey.progress(y, ...timeline.phoneLit)));
-        const rise = travel((y) => Journey.smoothstep(Journey.progress(y, ...timeline.rise)));
+        scene.setPhoneLit(travel((y) => JourneyMath.progress(y, ...timeline.phoneLit)));
+        const rise = travel((y) => JourneyMath.smoothstep(JourneyMath.progress(y, ...timeline.rise)));
         scene.setRise(rise);
         heightRef.current.textContent = `Desk height ${Math.round(74 + (112 - 74) * rise)} cm`;
-        heroRef.current.style.opacity = String(1 - Journey.progress(contentY, ...timeline.heroFade));
+        heroRef.current.style.opacity = String(1 - JourneyMath.progress(contentY, ...timeline.heroFade));
         timeline.cards.forEach(({ key, range }) => {
-          const shown = Journey.progress(contentY, ...range);
+          const shown = JourneyMath.progress(contentY, ...range);
           const card = cardRefs[key].current;
           card.style.opacity = String(Math.min(1, shown * 3));
           card.inert = flight !== null || shown < 0.34;
           const parts = [...card.querySelectorAll(".panel > :not(ul), .panel li")];
-          parts.forEach((el, i) => enter(el, Journey.stagger(shown, i, parts.length, 0.5), { rise: 16 }, reduceMotion));
+          parts.forEach((el, i) =>
+            enter(el, JourneyMath.stagger(shown, i, parts.length, 0.5), { rise: 16, fadeOnly: reduceMotion }),
+          );
         });
       }
 
       /** Scroll-scrubbed entrance for a device screen: heading as the camera arrives, then each row as it rises into view. */
       function revealScreen({ scroller, viewportHeight }, offset, arrival) {
         const head = [...scroller.children].filter((el) => el.tagName !== "OL");
-        head.forEach((el, i) => enter(el, Journey.stagger(arrival, i, head.length), { rise: 24 }, reduceMotion));
+        head.forEach((el, i) =>
+          enter(el, JourneyMath.stagger(arrival, i, head.length), { rise: 24, fadeOnly: reduceMotion }),
+        );
         const glow = scroller.parentElement.querySelector(".glow");
         if (glow) glow.style.opacity = String(1 - arrival * 0.85);
-        const rowsOpen = Journey.progress(arrival, 0.5, 1);
+        const rowsOpen = JourneyMath.progress(arrival, 0.5, 1);
         scroller.querySelectorAll("[data-reveal]").forEach((row) => {
           const top = row.offsetTop - offset;
-          const t = Math.min(rowsOpen, Journey.progress(viewportHeight - top, 0, viewportHeight * 0.45));
+          const t = Math.min(rowsOpen, JourneyMath.progress(viewportHeight - top, 0, viewportHeight * 0.45));
           const parts = [row.querySelector("figure"), ...row.querySelector(".meta").children];
           parts.forEach((el, i) =>
-            enter(el, Journey.stagger(t, i, parts.length), i === 0 ? FIGURE_ENTRY : { rise: 24 }, reduceMotion),
+            enter(
+              el,
+              JourneyMath.stagger(t, i, parts.length),
+              i === 0 ? { ...FIGURE_ENTRY, fadeOnly: reduceMotion } : { rise: 24, fadeOnly: reduceMotion },
+            ),
           );
-          const focus = 1 - Journey.progress(Math.abs(top + row.offsetHeight / 2 - viewportHeight / 2), 0, viewportHeight * 0.6);
-          row.querySelector("img").style.filter = `brightness(${0.72 + 0.28 * focus})`;
-          parts[0].style.boxShadow = `0 ${24 * focus}px ${64 * focus}px rgba(115, 77, 213, ${0.28 * focus})`;
+          const focus = 1 - JourneyMath.progress(Math.abs(top + row.offsetHeight / 2 - viewportHeight / 2), 0, viewportHeight * 0.6);
+          row.style.setProperty("--focus", String(focus));
         });
       }
 
@@ -460,9 +252,9 @@ export default function DeskJourney({ fonts }) {
           dirty = true;
           return;
         }
-        const to = Journey.poseAt(y, timelineRef.current.keyframes);
+        const to = JourneyMath.poseAt(y, timelineRef.current.keyframes);
         const distance = Math.hypot(...to.position.map((v, i) => v - lastPose.position[i]));
-        const duration = Journey.flightDuration(distance);
+        const duration = JourneyMath.flightDuration(distance);
         flight = { from: lastPose, to, y, fromY: window.scrollY, start: performance.now(), duration };
         lenis.stop();
         rootRef.current.toggleAttribute("data-flying", true);
@@ -631,7 +423,7 @@ export default function DeskJourney({ fonts }) {
               <span className="label">{SCREEN_COPY.work.label}</span>
               <h2>{SCREEN_COPY.work.title}</h2>
               <p className="intro">{SCREEN_COPY.work.intro}</p>
-              <FallbackRows items={work} />
+              <FallbackRows items={SCREEN_COPY.work.items} />
           </Screen>
         </Section>
 
@@ -678,7 +470,7 @@ export default function DeskJourney({ fonts }) {
                   <li key={p.name}>
                     <a href={p.link} target="_blank" rel="noopener noreferrer">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="thumb" src={thumbOf(p.imgSrc)} alt="" width={60} height={38} loading="lazy" />
+                      <img className="thumb" src={thumbSrc(p.imgSrc)} alt="" width={60} height={38} loading="lazy" />
                       <span className="name">
                         {p.name}
                         <small>{p.summary ?? p.description}</small>
@@ -702,7 +494,7 @@ export default function DeskJourney({ fonts }) {
                 <a className="primary" href={`mailto:${EMAIL}`}>
                   Email me
                 </a>
-                <a className="secondary" href="https://github.com/AmmDuncan" target="_blank" rel="noopener noreferrer">
+                <a className="secondary" href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
                   GitHub
                 </a>
                 <a className="secondary" href={BLOG_URL} target="_blank" rel="noopener noreferrer">

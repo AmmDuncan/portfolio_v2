@@ -1,7 +1,8 @@
 import * as THREE from "three";
 
+import { ACCENT_RGB } from "../theme";
+
 const INK = "#e8ebf0";
-const ACCENT = "#9174dc";
 let SANS = "'Helvetica Neue', Arial, sans-serif";
 let MONO = "Menlo, monospace";
 let DISPLAY = SANS;
@@ -41,7 +42,7 @@ function paintWallpaper(ctx, w, h) {
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, w, h);
   [
-    [430, 300, 460, "rgba(115, 77, 213, 0.6)"],
+    [430, 300, 460, `rgba(${ACCENT_RGB}, 0.6)`],
     [90, 880, 420, "rgba(96, 72, 230, 0.32)"],
     [520, 1180, 320, "rgba(145, 116, 220, 0.2)"],
   ].forEach(([x, y, r, color]) => {

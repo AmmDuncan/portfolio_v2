@@ -100,8 +100,11 @@ export const projects = [
     imgSrc: "/assets/projects/portfolio.png",
     description: "The site you're currently scrolling.",
     tools: ["React", "Next.js", "Figma", "styled-components"],
+    desk: false,
   },
 ];
+
+export const thumbSrc = (imgSrc) => imgSrc.replace("/projects/", "/projects/thumbs/").replace(/\.png$/, ".webp");
 
 export const sideProjects = [
   {

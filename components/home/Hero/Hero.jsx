@@ -7,6 +7,7 @@ import SuitcaseIcon from "./icons/SuitcaseIcon";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { EMAIL } from "../../../data/site";
 
 function Hero() {
   const router = useRouter();
@@ -16,7 +17,7 @@ function Hero() {
   }
 
   function mailMe() {
-    router.push("mailto:ammielgyanyawson@gmail.com");
+    router.push(`mailto:${EMAIL}`);
   }
 
   // const sharedProps = {
