@@ -55,7 +55,7 @@ function ProjectList({ projects }) {
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", mass: 1.75, delay: 0.45, damping: 13 }}
     >
-      {projects.map(({ name, imgSrc: src, description, tools, link }, index) => (
+      {projects.map(({ name, imgSrc: src, description, tools, link, note }, index) => (
         <ProjectCardRoot key={name} className="on-projects">
           <div className="image-root">
             <div className="image-container">
@@ -70,6 +70,7 @@ function ProjectList({ projects }) {
                   <FiExternalLink />
               </Link>
             )}
+            {note && <span className="note">{note}</span>}
             <p className="description">{description}</p>
             <p className="tools-header">Tools used:</p>
             <ul className="tools">
