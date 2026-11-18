@@ -325,6 +325,86 @@ export const Card = styled.div`
   padding-inline: clamp(2.4rem, 6vw, 9.6rem);
   pointer-events: none;
 
+  [data-live] & .panel > * {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 300ms cubic-bezier(0.23, 1, 0.32, 1),
+      transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  [data-live] & .panel li {
+    opacity: 0;
+    transition: opacity 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  [data-live] &[data-in] .panel > *,
+  [data-live] &[data-in] .panel li {
+    opacity: 1;
+    transform: none;
+  }
+
+  &[data-in] .panel > *:nth-child(2) {
+    transition-delay: 50ms;
+  }
+
+  &[data-in] .panel > *:nth-child(3) {
+    transition-delay: 100ms;
+  }
+
+  &[data-in] .panel > *:nth-child(4) {
+    transition-delay: 150ms;
+  }
+
+  &[data-in] .panel > *:nth-child(5) {
+    transition-delay: 200ms;
+  }
+
+  &[data-in] .panel > *:nth-child(6) {
+    transition-delay: 250ms;
+  }
+  &[data-in] .panel li:nth-child(2) {
+    transition-delay: 185ms;
+  }
+
+  &[data-in] .panel li:nth-child(3) {
+    transition-delay: 220ms;
+  }
+
+  &[data-in] .panel li:nth-child(4) {
+    transition-delay: 255ms;
+  }
+
+  &[data-in] .panel li:nth-child(5) {
+    transition-delay: 290ms;
+  }
+
+  &[data-in] .panel li:nth-child(6) {
+    transition-delay: 325ms;
+  }
+
+  &[data-in] .panel li:nth-child(7) {
+    transition-delay: 360ms;
+  }
+
+  &[data-in] .panel li:nth-child(8) {
+    transition-delay: 395ms;
+  }
+
+  &[data-in] .panel li:nth-child(9) {
+    transition-delay: 430ms;
+  }
+
+  &[data-in] .panel li:nth-child(10) {
+    transition-delay: 465ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-live] & .panel > * {
+      transform: none;
+    }
+  }
+
   .panel {
     pointer-events: auto;
     width: min(44rem, 100%);

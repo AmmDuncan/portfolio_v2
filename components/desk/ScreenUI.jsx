@@ -15,6 +15,8 @@ export function makeScreenElement({ width, height }) {
 }
 
 const Ui = styled.div`
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ink: #eef0f4;
   --muted: #9aa3b2;
   --accent: #3d7fff;
@@ -65,6 +67,7 @@ const Ui = styled.div`
   .scroller {
     width: var(--col, 88%);
     margin-inline: auto;
+    position: relative;
     padding-block: 120px;
   }
 
@@ -106,6 +109,64 @@ const Ui = styled.div`
     grid: auto / 5fr 7fr;
     gap: 48px;
     align-items: center;
+  }
+
+  li[data-reveal] .meta > * {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 300ms var(--ease-out),
+      transform 300ms var(--ease-out);
+  }
+
+  li[data-reveal] figure {
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 600ms var(--ease-in-out) 100ms;
+  }
+
+  li[data-in] .meta > * {
+    opacity: 1;
+    transform: none;
+  }
+
+  li[data-in] figure {
+    clip-path: inset(0);
+  }
+
+  li[data-in] .meta > *:nth-child(2) {
+    transition-delay: 50ms;
+  }
+
+  li[data-in] .meta > *:nth-child(3) {
+    transition-delay: 100ms;
+  }
+
+  li[data-in] .meta > *:nth-child(4) {
+    transition-delay: 150ms;
+  }
+
+  li[data-in] .meta > *:nth-child(5) {
+    transition-delay: 200ms;
+  }
+
+  li[data-in] .meta > *:nth-child(6) {
+    transition-delay: 250ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    li[data-reveal] .meta > * {
+      transform: none;
+    }
+
+    li[data-reveal] figure {
+      clip-path: none;
+      opacity: 0;
+      transition: opacity 200ms ease;
+    }
+
+    li[data-in] figure {
+      opacity: 1;
+    }
   }
 
   [data-narrow] & li {
@@ -204,7 +265,7 @@ export function ScreenUI({ path, label, title, intro, items, scrollerRef }) {
           <p className="intro">{intro}</p>
           <ol>
             {items.map((item) => (
-              <li key={item.name}>
+              <li key={item.name} data-reveal>
                 <div className="meta">
                   {item.year && <span className="year">{item.year}</span>}
                   <h3>{item.name}</h3>
@@ -231,6 +292,7 @@ export function ScreenUI({ path, label, title, intro, items, scrollerRef }) {
 }
 
 const Lock = styled.div`
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ink: #eef0f4;
   --muted: #9aa3b2;
   --accent: #3d7fff;
@@ -249,6 +311,41 @@ const Lock = styled.div`
     justify-items: center;
     gap: 16px;
     max-width: min(760px, var(--col, 88%));
+  }
+
+  .inner > :not(svg) {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 300ms var(--ease-out),
+      transform 300ms var(--ease-out);
+  }
+
+  .inner[data-in] > * {
+    opacity: 1;
+    transform: none;
+  }
+
+  .inner[data-in] > *:nth-child(2) {
+    transition-delay: 60ms;
+  }
+
+  .inner[data-in] > *:nth-child(3) {
+    transition-delay: 120ms;
+  }
+
+  .inner[data-in] > *:nth-child(4) {
+    transition-delay: 180ms;
+  }
+
+  .inner[data-in] > *:nth-child(5) {
+    transition-delay: 240ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .inner > :not(svg) {
+      transform: none;
+    }
   }
 
   svg {

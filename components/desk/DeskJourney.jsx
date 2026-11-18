@@ -101,7 +101,13 @@ function buildTimeline(scene, els, screens, vh, vw) {
     const viewportHeight = fit.height - 44;
     const scrollable = Math.max(0, scroller.offsetHeight - viewportHeight * 0.9);
     els[key].style.height = `${Math.round(hold * 2 + scrollable)}px`;
-    scrolls[key] = { scroller, scrollable, start: () => top(els[key]) + hold, end: () => bottom(els[key]) - hold };
+    scrolls[key] = {
+      scroller,
+      scrollable,
+      revealLine: viewportHeight * 0.85,
+      start: () => top(els[key]) + hold,
+      end: () => bottom(els[key]) - hold,
+    };
   });
 
   const wide = portrait
@@ -160,6 +166,7 @@ function buildTimeline(scene, els, screens, vh, vw) {
     keyframes,
     introPose,
     scrolls,
+    ndaReveal: top(els.nda) - vh * 0.3,
     heroFade: [vh * 0.25, vh * 0.85],
     cards: [
       { key: "guides", range: [arrive.guides - vh * 0.3, arrive.guides] },
@@ -213,6 +220,7 @@ function FallbackRows({ items }) {
 }
 
 export default function DeskJourney({ fonts }) {
+  const rootRef = React.useRef(null);
   const canvasRef = React.useRef(null);
   const cssHostRef = React.useRef(null);
   const heroRef = React.useRef(null);
@@ -293,17 +301,24 @@ export default function DeskJourney({ fonts }) {
         const power = Journey.smoothstep(Journey.progress(intro, 0.3, 0.75));
         scene.setPower(power);
         cssHostRef.current.style.opacity = String(power);
-        Object.values(timeline.scrolls).forEach(({ scroller, scrollable, start, end }) => {
+        Object.values(timeline.scrolls).forEach(({ scroller, scrollable, revealLine, start, end }) => {
           const offset = scrollable * Journey.progress(scrollY, start(), end());
           scroller.style.transform = `translateY(${-offset}px)`;
+          if (!scroller.isConnected) return;
+          scroller.querySelectorAll("[data-reveal]:not([data-in])").forEach((row) => {
+            if (row.offsetTop - offset < revealLine) row.toggleAttribute("data-in", true);
+          });
         });
+        if (scrollY > timeline.ndaReveal && screens.nda.scroller.isConnected) screens.nda.scroller.toggleAttribute("data-in", true);
         scene.setPhoneLit(Journey.progress(scrollY, ...timeline.phoneLit));
         const rise = Journey.smoothstep(Journey.progress(scrollY, ...timeline.rise));
         scene.setRise(rise);
         heightRef.current.textContent = `Desk height ${Math.round(74 + (112 - 74) * rise)} cm`;
         heroRef.current.style.opacity = String(1 - Journey.progress(scrollY, ...timeline.heroFade));
         timeline.cards.forEach(({ key, range }) => {
-          cardRefs[key].current.style.opacity = String(Journey.progress(scrollY, ...range));
+          const shown = Journey.progress(scrollY, ...range);
+          cardRefs[key].current.style.opacity = String(shown);
+          if (shown > 0.3) cardRefs[key].current.toggleAttribute("data-in", true);
         });
       }
 
@@ -361,6 +376,7 @@ export default function DeskJourney({ fonts }) {
 
       layout();
       canvasRef.current.dataset.on = "";
+      rootRef.current.dataset.live = "";
       const resizeObserver = new ResizeObserver(layout);
       resizeObserver.observe(document.documentElement);
       resizeObserver.observe(screens.work.scroller);
@@ -396,7 +412,7 @@ export default function DeskJourney({ fonts }) {
   }
 
   return (
-    <Root data-no-webgl={noWebGL || undefined}>
+    <Root ref={rootRef} data-no-webgl={noWebGL || undefined}>
       <CssHost ref={cssHostRef} />
       <Stage ref={canvasRef} aria-hidden="true" />
       {!noWebGL && createPortal(<ScreenUI {...SCREEN_COPY.work} scrollerRef={scrollerRefs.work} />, screenEls.work)}
