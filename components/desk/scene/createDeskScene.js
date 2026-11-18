@@ -28,6 +28,7 @@ const mat = {
   floor: new THREE.MeshStandardMaterial({ color: "#1d1c1b", roughness: 0.9, dithering: true }),
   aluminium: new THREE.MeshStandardMaterial({ color: "#5e6166", roughness: 0.34, metalness: 0.9 }),
   blackPlastic: new THREE.MeshStandardMaterial({ color: "#0e0e10", roughness: 0.5 }),
+  standMetal: new THREE.MeshStandardMaterial({ color: "#2a2b2f", roughness: 0.38, metalness: 0.75 }),
   switchPlate: new THREE.MeshStandardMaterial({ color: "#e4e1d8", roughness: 0.7 }),
   bookEdge: new THREE.MeshStandardMaterial({ color: "#ece9e2", roughness: 0.9 }),
 };
@@ -128,18 +129,22 @@ function buildLaptop(model) {
 
 function buildPhone(model) {
   const group = new THREE.Group();
-  const standBase = box(0.08, 0.008, 0.07, mat.aluminium, 0.003);
-  standBase.position.set(0, 0.004, 0);
+  const standBase = box(0.075, 0.007, 0.075, mat.standMetal, 0.003);
+  standBase.position.set(0, 0.0035, -0.008);
   const tilt = new THREE.Group();
-  tilt.position.set(0, 0.008, -0.004);
+  tilt.position.set(0, 0.007, 0.004);
   tilt.rotation.x = -0.3;
+  const lip = box(0.07, 0.006, 0.005, mat.standMetal, 0.002);
+  lip.position.set(0, 0.003, 0.0066);
+  const backrest = box(0.05, 0.11, 0.005, mat.standMetal, 0.002);
+  backrest.position.set(0, 0.055, -0.0106);
   const lockScreen = phoneScreen();
   const screenMaterial = new THREE.MeshBasicMaterial({ map: lockScreen.texture, color: "#000000", toneMapped: false });
   model.getObjectByName("Screen").traverse((node) => {
     if (node.isMesh) node.material = screenMaterial;
   });
   const screen = model.getObjectByName("ScreenCenter");
-  tilt.add(model);
+  tilt.add(model, lip, backrest);
   group.add(standBase, tilt);
   return { group, screen, screenMaterial, lockScreen };
 }
@@ -240,7 +245,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   laptop.group.position.set(-0.4, 0, -0.04);
   laptop.group.rotation.y = 0.1;
   const phone = buildPhone(models.phone);
-  phone.group.position.set(-0.03, 0, 0.16);
+  phone.group.position.set(-0.15, 0, 0.15);
   phone.group.rotation.y = 0.08;
   const controller = buildController(models.controller);
   controller.position.set(0.36, 0, 0.21);
