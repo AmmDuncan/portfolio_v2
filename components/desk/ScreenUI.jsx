@@ -68,9 +68,7 @@ const Ui = styled.div`
   .glow {
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(80% 70% at 72% 18%, rgba(115, 77, 213, 0.55), transparent 70%),
-      radial-gradient(60% 60% at 12% 92%, rgba(145, 116, 220, 0.25), transparent 70%);
+    background: linear-gradient(165deg, rgba(115, 77, 213, 0.26), rgba(115, 77, 213, 0.1) 55%, rgba(115, 77, 213, 0.04));
     pointer-events: none;
   }
 
