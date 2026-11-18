@@ -122,6 +122,22 @@ body.dark:after {
   opacity: 0.05;
 }
 
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    background: #fff !important;
+  }
+
+  body:after {
+    display: none;
+  }
+}
+
 html,
 body {
   padding: 0;

@@ -1,0 +1,11 @@
+export const BG = "#07080a";
+export const SCREEN_BG = "#0b0d12";
+export const INK = "#eef0f4";
+export const MUTED = "#9aa3b2";
+export const LINE = "rgba(255, 255, 255, 0.12)";
+export const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
+export const ACCENT = "#734dd5";
+export const ACCENT_INK = "#9174dc";
+export const ACCENT_HOVER = "#8462dd";
+export const ACCENT_RGB = "115, 77, 213";
+export const ACCENT_INK_RGB = "145, 116, 220";

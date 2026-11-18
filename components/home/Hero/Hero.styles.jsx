@@ -17,6 +17,31 @@ const HeroRoot = styled.div`
     font-weight: 300;
   }
 
+  .desk-link {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 2.4rem;
+    padding: 1rem 1.8rem;
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    color: var(--color-primary);
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 160ms ease-out, transform 160ms ease-out;
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+
+    @media (min-width: 768px) {
+      font-size: 1.8rem;
+    }
+  }
+
   @media (max-width: 450px) {
     h1 {
       margin-block: 10.4rem 2.4rem;

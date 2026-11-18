@@ -5,7 +5,9 @@ import { Button } from "../../common";
 import PhoneIcon from "./icons/PhoneIcon";
 import SuitcaseIcon from "./icons/SuitcaseIcon";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { motion } from "framer-motion";
+import { EMAIL, TAGLINE } from "../../../data/site";
 
 function Hero() {
   const router = useRouter();
@@ -15,7 +17,7 @@ function Hero() {
   }
 
   function mailMe() {
-    router.push("mailto:ammielgyanyawson@gmail.com");
+    router.push(`mailto:${EMAIL}`);
   }
 
   // const sharedProps = {
@@ -39,8 +41,18 @@ function Hero() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 1, type: "spring", delay: 0.2, mass: 1.5 }}
           >
-            Fullstack Web Developer-Frontend Heavy, User Interface Designer, Writer sometimes.
+            {TAGLINE}.
           </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 1, type: "spring", delay: 0.3, mass: 1.5 }}
+          >
+            <Link className="desk-link" href="/desk">
+              Step into my desk →
+            </Link>
+          </motion.div>
         </section>
         <section className="decor">
           <HeroDecor />

@@ -1,6 +1,7 @@
 export const projects = [
   {
     name: "Rotate",
+    year: "2024–2026",
     imgSrc: "/assets/projects/withrotate.png",
     description:
       "360° AI protection platform with managed detection and response spanning email, devices, data, users and applications.",
@@ -13,10 +14,11 @@ export const projects = [
       "Storybook",
       "Recharts",
     ],
-    link: "https://withrotate.com",
+    note: "Acquired by Check Point, 2026",
   },
   {
     name: "StoreLink",
+    year: "2026",
     imgSrc: "/assets/projects/storelink.png",
     description:
       "Platform that lets social sellers in Ghana create their own online store in minutes, automating their current selling flow.",
@@ -24,7 +26,16 @@ export const projects = [
     link: "https://storelinkgh.com",
   },
   {
+    name: "Harmony",
+    year: "2023–2026",
+    imgSrc: "/assets/projects/harmony.png",
+    description:
+      "Restaurant management platform: point of sale, kitchen display, reservations, tables, menus with branch pricing and stock, and sales reports, plus a mobile menu and bill for guests.",
+    tools: ["Nuxt", "Vue", "TypeScript", "Nuxt UI", "Tailwind CSS", "TanStack Query"],
+  },
+  {
     name: "Local Dictation",
+    year: "2026",
     imgSrc: "/assets/projects/local-dictation.png",
     description:
       "A private, on-device dictation app for macOS. Hold ⌃Space, speak, release: Whisper transcribes and a local model cleans up, 100% offline. Nothing leaves your Mac.",
@@ -32,23 +43,8 @@ export const projects = [
     link: "/local-dictation",
   },
   {
-    name: "easel",
-    imgSrc: "/assets/projects/easel.png",
-    description:
-      "A live browser tab for every AI coding session. An MCP server that lets agents push HTML — mockups, diagrams, diffs, comparisons — to a scrolling feed you keep open in split-screen.",
-    tools: ["TypeScript", "Node.js", "MCP"],
-    link: "https://github.com/AmmDuncan/easel",
-  },
-  {
-    name: "Pitstop",
-    imgSrc: "/assets/projects/pitstop.png",
-    description:
-      "An in-app review loop for AI-agent work. The agent walks your browser through every surface it touched, pinning your feedback to each step and acting on it with full context.",
-    tools: ["TypeScript", "Bun", "SolidJS", "MCP", "SSE"],
-    link: "https://github.com/AmmDuncan/pitstop",
-  },
-  {
     name: "Finding Consensus",
+    year: "2024",
     imgSrc: "/assets/projects/findingconsensus.png",
     description:
       "Platform that aggregates and visualizes expert opinions on AI policy questions to help find consensus.",
@@ -56,10 +52,21 @@ export const projects = [
     link: "https://findingconsensus.ai",
   },
   {
+    name: "Viewpoints.xyz",
+    year: "2024",
+    imgSrc: "/assets/projects/viewpoints.png",
+    description:
+      "Polling platform for meetings, events and communities that shows where a group agrees. I built poll creation, live-updating results and the results view.",
+    tools: ["Next.js", "React", "Tailwind CSS", "Clerk", "Kysely"],
+    note: "Frontend contributor",
+    link: "https://viewpoints.xyz",
+  },
+  {
     name: "SeedFi",
+    year: "2023",
     imgSrc: "/assets/projects/seedfi.jpeg",
     description:
-      "SeedFi provides simplified digital lending. Apply online, get quick approval, and access funds for your needs. No more hassle!",
+      "Digital lending: apply online, get approved fast and receive funds.",
     tools: ["React", "Tailwind CSS", "Jest", "Sass"],
     link: "https://theseedfi.com/",
   },
@@ -72,6 +79,7 @@ export const projects = [
   // },
   {
     name: "Kwerty.io",
+    year: "2021–2022",
     imgSrc: "/assets/projects/kwerty.png",
     description:
       "Public data bank that uses various visualization methods to simplify data for easy digestion by users.",
@@ -80,9 +88,10 @@ export const projects = [
   },
   {
     name: "HRMs by Enyata",
+    year: "2021–2024",
     imgSrc: "/assets/projects/hrms.png",
     description:
-      "Software to manage Human Resource in a company from Hiring, to Assessments, to Employee managament.",
+      "HR software covering hiring, assessments and employee management.",
     tools: ["React", "Chakra-ui", "Emotion", "React-Hook-Forms"],
   },
   // { name: "Pomout", imgSrc: "/assets/projects/pomout.png" },
@@ -91,12 +100,39 @@ export const projects = [
     imgSrc: "/assets/projects/portfolio.png",
     description: "The site you're currently scrolling.",
     tools: ["React", "Next.js", "Figma", "styled-components"],
+    desk: false,
   },
 ];
 
+/** Screenshot sized for the desk's screens: 1600px WebP instead of the full-size original. */
+export const deskShotSrc = (imgSrc) => imgSrc.replace("/projects/", "/projects/desk/").replace(/\.(png|jpe?g)$/, ".webp");
+
+export const thumbSrc = (imgSrc) => imgSrc.replace("/projects/", "/projects/thumbs/").replace(/\.png$/, ".webp");
+
 export const sideProjects = [
   {
+    name: "easel",
+    summary: "Live HTML feed for AI sessions",
+    year: "2026",
+    imgSrc: "/assets/projects/easel.png",
+    description:
+      "A live browser tab for every AI coding session. An MCP server that lets agents push HTML — mockups, diagrams, diffs, comparisons — to a scrolling feed you keep open in split-screen.",
+    tools: ["TypeScript", "Node.js", "MCP"],
+    link: "https://github.com/AmmDuncan/easel",
+  },
+  {
+    name: "Pitstop",
+    summary: "Review loop for AI-agent work",
+    year: "2026",
+    imgSrc: "/assets/projects/pitstop.png",
+    description:
+      "An in-app review loop for AI-agent work. The agent walks your browser through every surface it touched, pinning your feedback to each step and acting on it with full context.",
+    tools: ["TypeScript", "Bun", "SolidJS", "MCP", "SSE"],
+    link: "https://github.com/AmmDuncan/pitstop",
+  },
+  {
     name: "Dev in Details",
+    summary: "Site for a digital agency",
     imgSrc: "/assets/projects/devindets.png",
     description: "Marketing website for a Digital Agency.",
     tools: ["React", "Next.js", "Sass", "Figma"],
@@ -104,6 +140,7 @@ export const sideProjects = [
   },
   {
     name: "Hangman",
+    summary: "Word game in Next.js",
     imgSrc: "/assets/projects/hangman.png",
     description: "A hangman game built with Next.js and Tailwind CSS",
     tools: ["Next.js", "React", "Tailwind CSS"],
@@ -111,6 +148,7 @@ export const sideProjects = [
   },
   {
     name: "Connect Four",
+    summary: "Frontend Mentor game in Vue",
     imgSrc: "/assets/projects/connect-four.png",
     description: "My implementation of the connect four game design on FrontendMentor.io",
     tools: ["Vue", "Pinia", "Vue-Router"],
@@ -118,6 +156,7 @@ export const sideProjects = [
   },
   {
     name: "Pomout - Pomodoro Timer",
+    summary: "Pomodoro timer to avoid burnout",
     imgSrc: "/assets/projects/pomout.png",
     description:
       "Productivity web application to help you work in short bursts to avoid burning out.",
@@ -126,6 +165,7 @@ export const sideProjects = [
   },
   {
     name: "Snake Game",
+    summary: "Retro snake, keys or touch",
     imgSrc: "/assets/projects/snake.png",
     description:
       "My version of retro snake game. Use arrow keys to move the snake about. On mobile, press toggle controls button to show on-screen controls.",
@@ -135,6 +175,7 @@ export const sideProjects = [
   // { name: "Pomout", imgSrc: "/assets/projects/pomout.png" },
   {
     name: "Rock, Paper, Scissors",
+    summary: "Frontend Mentor challenge",
     imgSrc: "/assets/projects/rock-paper-scissors.png",
     description: "Rock paper scissors challenge from FrontendMentor.io.",
     tools: ["Vue", "Sass"],
@@ -142,6 +183,7 @@ export const sideProjects = [
   },
   {
     name: "Movie Search App",
+    summary: "Vue app I built to teach a class",
     imgSrc: "/assets/projects/movie-app.png",
     description: "Designed and developed to teach a class on single page apps with Vuejs",
     tools: ["Vue", "Vue Router", "Vuex", "Figma", "CSS"],
@@ -149,6 +191,7 @@ export const sideProjects = [
   },
   {
     name: "Countries App",
+    summary: "Country search in Vue",
     imgSrc: "/assets/projects/countries-app.png",
     description: "Country search app challenge from FrontendMentor.io.",
     tools: ["Vue", "Vue Router", "Vuex", "CSS"],

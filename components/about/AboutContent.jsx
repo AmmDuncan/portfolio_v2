@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { BLOG_URL } from "../../data/site";
 
 const AboutContentRoot = styled.div`
   margin-bottom: 8rem;
@@ -63,7 +64,7 @@ function AboutContent() {
       >
         I sometimes write about things I find interesting and things I believe will be useful to
         others and myself in the future; at least as a reference. You can view my posts{" "}
-        <Link href="https://blog.ammielyawson.com" target="_blank">here</Link>
+        <Link href={BLOG_URL} target="_blank">here</Link>
         .
       </motion.p>
     </AboutContentRoot>
