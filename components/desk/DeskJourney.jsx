@@ -109,7 +109,7 @@ export default function DeskJourney({ fonts }) {
       let flight = null;
       let lastPose = null;
       let pendingFocus = null;
-      const flightProgress = () => Math.min(1, (performance.now() - flight.start) / flight.duration);
+      const flightProgress = () => JourneyMath.timeProgress(flight.start, flight.duration, performance.now());
 
       function layout() {
         const w = window.innerWidth;
@@ -240,21 +240,24 @@ export default function DeskJourney({ fonts }) {
         if (event.target.closest("a, button, nav, .panel")) return;
         const key = scene.pick(event.clientX, event.clientY, window.innerWidth, window.innerHeight);
         if (!key || key === activeSection(window.scrollY)) return;
+        if (flight && timelineRef.current.jumps[key] === flight.y) return;
         flyTo(timelineRef.current.jumps[key], key);
       }
 
-      /** Flies the camera straight to the pose at scroll position y, then moves the page there. */
+      /** Flies the camera to the pose at scroll position y (retargeting from the pose on screen mid-flight). */
       function flyTo(y, focusKey = null) {
         pendingFocus = focusKey;
-        if (!lenis || !lastPose || flight) {
+        if (!lenis || !lastPose) {
           window.scrollTo(0, y);
           dirty = true;
           return;
         }
+        if (flight && flight.y === y) return;
         const to = JourneyMath.poseAt(y, timelineRef.current.keyframes);
         const distance = Math.hypot(...to.position.map((v, i) => v - lastPose.position[i]));
         const duration = JourneyMath.flightDuration(distance);
-        flight = { from: lastPose, to, y, fromY: window.scrollY, start: performance.now(), duration };
+        const fromY = flight ? flight.y : window.scrollY;
+        flight = { from: lastPose, to, y, fromY, start: performance.now(), duration };
         lenis.stop();
         rootRef.current.toggleAttribute("data-flying", true);
         hoverRef.current.hidden = true;

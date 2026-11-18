@@ -120,3 +120,16 @@ describe("activeSectionAt", () => {
     expect(DeskJourney.activeSectionAt(1e9, ranges)).toBe("contact");
   });
 });
+
+describe("timeProgress", () => {
+  it("is 0 at the start time (1000) and 0, not negative, before it (999)", () => {
+    expect(DeskJourney.timeProgress(1000, 800, 1000)).toBe(0);
+    expect(DeskJourney.timeProgress(1000, 800, 999)).toBe(0);
+  });
+
+  it("is 0.5 half way (1400) and 1 exactly at the end (1800) and after it (5000)", () => {
+    expect(DeskJourney.timeProgress(1000, 800, 1400)).toBe(0.5);
+    expect(DeskJourney.timeProgress(1000, 800, 1800)).toBe(1);
+    expect(DeskJourney.timeProgress(1000, 800, 5000)).toBe(1);
+  });
+});

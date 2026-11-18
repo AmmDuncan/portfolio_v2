@@ -72,6 +72,11 @@ function flightDuration(distance) {
   return Math.min(1600, Math.max(800, 800 + distance * 350));
 }
 
+/** 0..1 share of `duration` ms that has passed since `start`. */
+function timeProgress(start, duration, now) {
+  return clamp01((now - start) / duration);
+}
+
 /** Key of the section whose half-open [start, end) scroll range holds y, or null between sections. */
 function activeSectionAt(y, ranges) {
   return Object.keys(ranges).find((key) => y >= ranges[key][0] && y < ranges[key][1]) ?? null;
@@ -79,6 +84,7 @@ function activeSectionAt(y, ranges) {
 
 export const DeskJourney = {
   activeSectionAt,
+  timeProgress,
   coverDistance,
   screenPose,
   poseAt,
