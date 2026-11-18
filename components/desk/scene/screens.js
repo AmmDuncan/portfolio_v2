@@ -32,7 +32,7 @@ function roundRect(ctx, x, y, w, h, r) {
 
 /** Phone lock screen with a message notification. */
 export function phoneScreen() {
-  const canvas = makeCanvas(600, 1240);
+  const canvas = makeCanvas(600, 1300);
   const ctx = canvas.getContext("2d");
   const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
   g.addColorStop(0, "#0d1f45");

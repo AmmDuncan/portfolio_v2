@@ -11,7 +11,13 @@ const SIT_HEIGHT = 0.74;
 const STAND_HEIGHT = 1.12;
 const DESK = { width: 1.6, depth: 0.75, thickness: 0.035 };
 const ACCENT = new THREE.Color("#3d7fff");
-const MODEL_URLS = { monitor: "/models/g7.glb", laptop: "/models/macbook.glb", controller: "/models/dualsense.glb" };
+const MODEL_URLS = {
+  monitor: "/models/g7.glb",
+  laptop: "/models/macbook.glb",
+  controller: "/models/dualsense.glb",
+  phone: "/models/iphone.glb",
+};
+const PHONE_SCREEN = [0.0712, 0.1544];
 const MONITOR_SCREEN = [0.7, 0.394];
 const LAPTOP_SCREEN = [0.35, 0.226];
 
@@ -103,19 +109,19 @@ function buildLaptop(model, shadowTex) {
   return { group, screen, size: LAPTOP_SCREEN };
 }
 
-function buildPhone(shadowTex) {
+function buildPhone(model, shadowTex) {
   const group = new THREE.Group();
   const standBase = box(0.08, 0.008, 0.07, mat.aluminium, 0.003);
   standBase.position.set(0, 0.004, 0);
   const tilt = new THREE.Group();
-  tilt.position.set(0, 0.012, -0.012);
+  tilt.position.set(0, 0.008, -0.004);
   tilt.rotation.x = -0.3;
-  const body = box(0.076, 0.158, 0.008, mat.blackPlastic, 0.008);
-  body.position.set(0, 0.079, 0);
   const screenMaterial = new THREE.MeshBasicMaterial({ map: phoneScreen(), color: "#000000", toneMapped: false });
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.15), screenMaterial);
-  screen.position.set(0, 0.079, 0.0042);
-  tilt.add(body, screen);
+  model.getObjectByName("Screen").traverse((node) => {
+    if (node.isMesh) node.material = screenMaterial;
+  });
+  const screen = model.getObjectByName("ScreenCenter");
+  tilt.add(model);
   group.add(standBase, tilt, contactShadow(shadowTex, 0.14, 0.12, 0.6));
   return { group, screen, screenMaterial };
 }
@@ -170,7 +176,7 @@ function pointAnchor(object, offset = [0, 0, 0]) {
   return v.add(new THREE.Vector3(...offset)).toArray();
 }
 
-/** Loads the G7, MacBook and DualSense models, keyed by the object they become. */
+/** Loads the G7, MacBook, DualSense and iPhone models, keyed by the object they become. */
 export async function loadDeskModels() {
   const loader = new GLTFLoader();
   const entries = await Promise.all(
@@ -216,7 +222,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   const laptop = buildLaptop(models.laptop, shadowTex);
   laptop.group.position.set(-0.4, 0, -0.04);
   laptop.group.rotation.y = 0.1;
-  const phone = buildPhone(shadowTex);
+  const phone = buildPhone(models.phone, shadowTex);
   phone.group.position.set(-0.03, 0, 0.16);
   phone.group.rotation.y = 0.08;
   const controller = buildController(models.controller, shadowTex);
@@ -240,7 +246,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   laptop.screen.add(laptopLight);
   laptopLight.position.set(0, 0, 0.004);
   laptopLight.rotation.y = Math.PI;
-  const phoneLight = new THREE.RectAreaLight(ACCENT, 0, 0.07, 0.15);
+  const phoneLight = new THREE.RectAreaLight(ACCENT, 0, ...PHONE_SCREEN);
   phone.screen.add(phoneLight);
   phoneLight.position.set(0, 0, 0.003);
   phoneLight.rotation.y = Math.PI;
@@ -253,7 +259,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   const anchors = {
     monitor: screenAnchor(monitor.screen, monitor.size),
     laptop: screenAnchor(laptop.screen, laptop.size),
-    phone: screenAnchor(phone.screen, [0.07, 0.15]),
+    phone: screenAnchor(phone.screen, PHONE_SCREEN),
     guides: pointAnchor(guides, [0, 0.01, 0]),
     controller: pointAnchor(controller, [0, 0.025, 0]),
     desk: [0, SIT_HEIGHT, 0],
