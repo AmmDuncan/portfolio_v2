@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
-import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import { createContactShadows } from "./contactShadows";
@@ -220,6 +219,25 @@ export async function loadDeskModels(onProgress = () => {}) {
   return Object.fromEntries(entries);
 }
 
+/** CSS matrix3d that maps a width x height element onto a screen-space quad (top-left, top-right, bottom-right, bottom-left). */
+function quadMatrix(width, height, [p0, p1, p2, p3]) {
+  const dx1 = p1.x - p2.x;
+  const dx2 = p3.x - p2.x;
+  const dx3 = p0.x - p1.x + p2.x - p3.x;
+  const dy1 = p1.y - p2.y;
+  const dy2 = p3.y - p2.y;
+  const dy3 = p0.y - p1.y + p2.y - p3.y;
+  const det = dx1 * dy2 - dx2 * dy1;
+  const g = (dx3 * dy2 - dx2 * dy3) / det;
+  const h = (dx1 * dy3 - dx3 * dy1) / det;
+  const a = p1.x - p0.x + g * p1.x;
+  const b = p3.x - p0.x + h * p3.x;
+  const d = p1.y - p0.y + g * p1.y;
+  const e = p3.y - p0.y + h * p3.y;
+  const m = [a / width, d / width, 0, g / width, b / height, e / height, 0, h / height, 0, 0, 1, 0, p0.x, p0.y, 0, 1];
+  return `matrix3d(${m.join(",")})`;
+}
+
 /** Builds the desk scene into a canvas. Returns controls driven by scroll. */
 export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElements, models }) {
   RectAreaLightUniformsLib.init();
@@ -310,26 +328,42 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     desk: [0, SIT_HEIGHT, 0],
   };
 
-  const cssRenderer = new CSS3DRenderer();
-  cssHost.appendChild(cssRenderer.domElement);
-  const cssScene = new THREE.Scene();
   const domScreens = [
     { mesh: monitor.screen, size: monitor.size, element: screenElements.monitor },
     { mesh: laptop.screen, size: laptop.size, element: screenElements.laptop },
   ].map(({ mesh, size, element }) => {
-    const object = new CSS3DObject(element);
-    cssScene.add(object);
-    return { mesh, object, size, element };
+    Object.assign(element.style, { position: "absolute", left: "0", top: "0", transformOrigin: "0 0", pointerEvents: "auto" });
+    cssHost.appendChild(element);
+    return { mesh, size, element, corners: [0, 1, 2, 3].map(() => new THREE.Vector3()) };
   });
+  const viewport = { width: 1, height: 1 };
+  const tmpPosition = new THREE.Vector3();
+  const tmpQuaternion = new THREE.Quaternion();
   const tmpScale = new THREE.Vector3();
+  const screenMatrix = new THREE.Matrix4();
+  const unitScale = new THREE.Vector3(1, 1, 1);
+  const cornerSigns = [[-1, 1], [1, 1], [1, -1], [-1, -1]];
 
+  /** Pins each DOM screen onto its mesh by projecting the corners and warping the element with one matrix3d (no CSS 3D context, which WebKit misplaces). */
   function syncDomScreens() {
-    domScreens.forEach(({ mesh, object, size, element }) => {
-      mesh.matrixWorld.decompose(object.position, object.quaternion, tmpScale);
-      object.scale.setScalar(size[0] / Number(element.dataset.width));
+    domScreens.forEach(({ mesh, size, element, corners }) => {
+      const width = Number(element.dataset.width);
+      const height = Number(element.dataset.height);
+      const halfWidth = size[0] / 2;
+      const halfHeight = (size[0] * height) / width / 2;
+      mesh.matrixWorld.decompose(tmpPosition, tmpQuaternion, tmpScale);
+      screenMatrix.compose(tmpPosition, tmpQuaternion, unitScale);
+      const visible = corners.every((corner, i) => {
+        corner.set(cornerSigns[i][0] * halfWidth, cornerSigns[i][1] * halfHeight, 0).applyMatrix4(screenMatrix);
+        const inFront = corner.clone().applyMatrix4(camera.matrixWorldInverse).z < -camera.near;
+        corner.project(camera);
+        corner.set(((corner.x + 1) / 2) * viewport.width, ((1 - corner.y) / 2) * viewport.height, 0);
+        return inFront;
+      });
+      element.style.visibility = visible ? "" : "hidden";
+      if (visible) element.style.transform = quadMatrix(width, height, corners);
     });
   }
-
   const pickable = { work: monitor.group, nda: laptop.group, guides, side: controller, contact: phone.group };
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -380,7 +414,8 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
 
   function resize(width, height) {
     renderer.setSize(width, height, false);
-    cssRenderer.setSize(width, height);
+    viewport.width = width;
+    viewport.height = height;
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   }
@@ -388,7 +423,6 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   function render() {
     renderer.render(scene, camera);
     syncDomScreens();
-    cssRenderer.render(cssScene, camera);
   }
 
   function dispose() {
@@ -404,7 +438,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     scene.environment?.dispose();
     pmrem.dispose();
     renderer.dispose();
-    cssRenderer.domElement.remove();
+    domScreens.forEach(({ element }) => element.remove());
   }
 
   setRise(0);

@@ -9,6 +9,7 @@ export const SCREEN_SIZES = {
 export function makeScreenElement({ width, height }) {
   const element = document.createElement("div");
   element.dataset.width = String(width);
+  element.dataset.height = String(height);
   element.style.width = `${width}px`;
   element.style.height = `${height}px`;
   return element;
