@@ -66,7 +66,7 @@ export const projects = [
     year: "2023",
     imgSrc: "/assets/projects/seedfi.jpeg",
     description:
-      "SeedFi provides simplified digital lending. Apply online, get quick approval, and access funds for your needs. No more hassle!",
+      "Digital lending: apply online, get approved fast and receive funds.",
     tools: ["React", "Tailwind CSS", "Jest", "Sass"],
     link: "https://theseedfi.com/",
   },
@@ -91,7 +91,7 @@ export const projects = [
     year: "2021–2024",
     imgSrc: "/assets/projects/hrms.png",
     description:
-      "Software to manage Human Resource in a company from Hiring, to Assessments, to Employee managament.",
+      "HR software covering hiring, assessments and employee management.",
     tools: ["React", "Chakra-ui", "Emotion", "React-Hook-Forms"],
   },
   // { name: "Pomout", imgSrc: "/assets/projects/pomout.png" },
@@ -106,6 +106,7 @@ export const projects = [
 export const sideProjects = [
   {
     name: "easel",
+    summary: "Live HTML feed for AI sessions",
     year: "2026",
     imgSrc: "/assets/projects/easel.png",
     description:
@@ -115,6 +116,7 @@ export const sideProjects = [
   },
   {
     name: "Pitstop",
+    summary: "Review loop for AI-agent work",
     year: "2026",
     imgSrc: "/assets/projects/pitstop.png",
     description:
@@ -124,6 +126,7 @@ export const sideProjects = [
   },
   {
     name: "Dev in Details",
+    summary: "Site for a digital agency",
     imgSrc: "/assets/projects/devindets.png",
     description: "Marketing website for a Digital Agency.",
     tools: ["React", "Next.js", "Sass", "Figma"],
@@ -131,6 +134,7 @@ export const sideProjects = [
   },
   {
     name: "Hangman",
+    summary: "Word game in Next.js",
     imgSrc: "/assets/projects/hangman.png",
     description: "A hangman game built with Next.js and Tailwind CSS",
     tools: ["Next.js", "React", "Tailwind CSS"],
@@ -138,6 +142,7 @@ export const sideProjects = [
   },
   {
     name: "Connect Four",
+    summary: "Frontend Mentor game in Vue",
     imgSrc: "/assets/projects/connect-four.png",
     description: "My implementation of the connect four game design on FrontendMentor.io",
     tools: ["Vue", "Pinia", "Vue-Router"],
@@ -145,6 +150,7 @@ export const sideProjects = [
   },
   {
     name: "Pomout - Pomodoro Timer",
+    summary: "Pomodoro timer to avoid burnout",
     imgSrc: "/assets/projects/pomout.png",
     description:
       "Productivity web application to help you work in short bursts to avoid burning out.",
@@ -153,6 +159,7 @@ export const sideProjects = [
   },
   {
     name: "Snake Game",
+    summary: "Retro snake, keys or touch",
     imgSrc: "/assets/projects/snake.png",
     description:
       "My version of retro snake game. Use arrow keys to move the snake about. On mobile, press toggle controls button to show on-screen controls.",
@@ -162,6 +169,7 @@ export const sideProjects = [
   // { name: "Pomout", imgSrc: "/assets/projects/pomout.png" },
   {
     name: "Rock, Paper, Scissors",
+    summary: "Frontend Mentor challenge",
     imgSrc: "/assets/projects/rock-paper-scissors.png",
     description: "Rock paper scissors challenge from FrontendMentor.io.",
     tools: ["Vue", "Sass"],
@@ -169,6 +177,7 @@ export const sideProjects = [
   },
   {
     name: "Movie Search App",
+    summary: "Vue app I built to teach a class",
     imgSrc: "/assets/projects/movie-app.png",
     description: "Designed and developed to teach a class on single page apps with Vuejs",
     tools: ["Vue", "Vue Router", "Vuex", "Figma", "CSS"],
@@ -176,6 +185,7 @@ export const sideProjects = [
   },
   {
     name: "Countries App",
+    summary: "Country search in Vue",
     imgSrc: "/assets/projects/countries-app.png",
     description: "Country search app challenge from FrontendMentor.io.",
     tools: ["Vue", "Vue Router", "Vuex", "CSS"],

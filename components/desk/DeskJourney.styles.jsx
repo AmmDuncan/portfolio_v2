@@ -42,8 +42,39 @@ export const Root = styled.div`
     font-family: var(--font-sans), sans-serif;
   }
 
+  &::before {
+    content: "";
+    position: fixed;
+    z-index: 2;
+    inset: 0 0 auto;
+    height: 12rem;
+    background: linear-gradient(#0b0d12 35%, rgba(11, 13, 18, 0));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  &[data-on-screen]::before {
+    opacity: 1;
+  }
+
   &[data-no-webgl] canvas {
     display: none;
+  }
+
+  &[data-no-webgl] section {
+    height: auto;
+    padding-block: 4.8rem;
+  }
+
+  &[data-no-webgl] section:not(:first-child) > * {
+    position: static;
+    height: auto;
+  }
+
+  &[data-no-webgl] section:first-child {
+    height: 100vh;
+    padding-block: 0;
   }
 
   main {
@@ -68,10 +99,9 @@ export const Root = styled.div`
 
   .credit {
     margin: 0.8rem 0 0;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     line-height: 1.5;
     color: var(--muted);
-    opacity: 0.7;
 
     a {
       color: inherit;
@@ -382,6 +412,10 @@ export const Card = styled.div`
     -webkit-backdrop-filter: blur(14px);
   }
 
+  .note.price {
+    margin: -0.8rem 0 2rem;
+  }
+
   h2 {
     margin: 1.2rem 0 1.2rem;
     font-size: clamp(3rem, 3vw, 4.4rem);
@@ -508,6 +542,9 @@ export const CtaRow = styled.div`
   }
 
   .secondary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 4.4rem;
     font-size: 1.6rem;
     text-decoration: underline;
     text-underline-offset: 0.3em;

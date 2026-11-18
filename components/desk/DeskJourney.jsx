@@ -29,7 +29,13 @@ const MODEL_CREDIT = {
   license: "https://creativecommons.org/licenses/by/4.0/",
 };
 const BLOG_URL = "https://blog.ammielyawson.com";
-const SECTION_LABEL = Object.fromEntries(SECTIONS.map(({ key, label }) => [key, label]));
+const HOVER_LABEL = {
+  work: "See my work",
+  nda: "Work under NDA",
+  guides: "Read the guide",
+  side: "See side projects",
+  contact: "Get in touch",
+};
 const SCREEN_COPY = {
   work: {
     path: "~/work",
@@ -310,6 +316,11 @@ export default function DeskJourney({ fonts }) {
       };
       let dirty = true;
       const pointer = { x: 0, y: 0, moved: false, mouse: false };
+      const lenis = reduceMotion ? null : new Lenis({ lerp: 0.09 });
+      let flight = null;
+      let lastPose = null;
+      let pendingFocus = null;
+      const flightProgress = () => Math.min(1, (performance.now() - flight.start) / flight.duration);
 
       function layout() {
         const w = window.innerWidth;
@@ -333,6 +344,10 @@ export default function DeskJourney({ fonts }) {
         const contentY = flight ? flight.y : scrollY;
         const travel = (value) =>
           flight ? Journey.lerp(value(flight.fromY), value(flight.y), Journey.smoothstep(flightProgress())) : value(scrollY);
+        const active = flight ? null : activeSection(contentY);
+        screenEls.work.inert = active !== "work";
+        screenEls.nda.inert = active !== "nda";
+        rootRef.current.toggleAttribute("data-on-screen", active === "work");
         Object.entries(timeline.scrolls).forEach(([key, screen]) => {
           const offset = screen.scrollable * Journey.progress(contentY, screen.start(), screen.end());
           screen.scroller.style.transform = `translateY(${-offset}px)`;
@@ -348,6 +363,7 @@ export default function DeskJourney({ fonts }) {
           const shown = Journey.progress(contentY, ...range);
           const card = cardRefs[key].current;
           card.style.opacity = String(Math.min(1, shown * 3));
+          card.inert = flight !== null || shown < 0.34;
           const parts = [...card.querySelectorAll(".panel > :not(ul), .panel li")];
           parts.forEach((el, i) => enter(el, Journey.stagger(shown, i, parts.length, 0.5), { rise: 16 }, reduceMotion));
         });
@@ -373,6 +389,32 @@ export default function DeskJourney({ fonts }) {
         });
       }
 
+      /** After a jump, moves keyboard focus to the section's heading so the next Tab lands inside it. */
+      function focusSection(key) {
+        pendingFocus = null;
+        const container = key in screenEls ? screenEls[key] : cardRefs[key]?.current;
+        const heading = container?.querySelector("h2");
+        if (!heading) return;
+        heading.tabIndex = -1;
+        heading.focus({ preventScroll: true });
+      }
+
+      /** Keyboard focus inside a screen scrolls the page until the focused row sits mid-screen, where it is revealed. */
+      function onScreenFocus(event) {
+        const key = event.currentTarget === screenEls.work ? "work" : "nda";
+        const viewport = event.target.closest(".viewport");
+        if (viewport) requestAnimationFrame(() => (viewport.scrollTop = 0));
+        const row = event.target.closest("[data-reveal]");
+        const screen = timelineRef.current?.scrolls[key];
+        if (!row || !screen?.scrollable) return;
+        const wanted = row.offsetTop + row.offsetHeight / 2 - screen.viewportHeight / 2;
+        const share = Math.min(1, Math.max(0, wanted / screen.scrollable));
+        const y = screen.start() + share * (screen.end() - screen.start());
+        if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+        else window.scrollTo(0, y);
+        dirty = true;
+      }
+
       function activeSection(scrollY) {
         const { ranges } = timelineRef.current;
         return Object.keys(ranges).find((key) => scrollY >= ranges[key][0] && scrollY <= ranges[key][1]);
@@ -386,7 +428,7 @@ export default function DeskJourney({ fonts }) {
         const tag = hoverRef.current;
         tag.hidden = !target;
         if (target) {
-          tag.textContent = `${SECTION_LABEL[target]} →`;
+          tag.textContent = `${HOVER_LABEL[target]} →`;
           tag.style.transform = `translate(${pointer.x + 16}px, ${pointer.y + 16}px)`;
         }
       }
@@ -402,18 +444,15 @@ export default function DeskJourney({ fonts }) {
         if (event.target.closest("a, button, nav, .panel")) return;
         const key = scene.pick(event.clientX, event.clientY, window.innerWidth, window.innerHeight);
         if (!key || key === activeSection(window.scrollY)) return;
-        flyTo(timelineRef.current.jumps[key]);
+        flyTo(timelineRef.current.jumps[key], key);
       }
 
-      const lenis = reduceMotion ? null : new Lenis({ lerp: 0.09 });
-      let flight = null;
-      let lastPose = null;
-      const flightProgress = () => Math.min(1, (performance.now() - flight.start) / flight.duration);
-
       /** Flies the camera straight to the pose at scroll position y, then moves the page there. */
-      function flyTo(y) {
+      function flyTo(y, focusKey = null) {
+        pendingFocus = focusKey;
         if (!lenis || !lastPose || flight) {
           window.scrollTo(0, y);
+          dirty = true;
           return;
         }
         const to = Journey.poseAt(y, timelineRef.current.keyframes);
@@ -447,6 +486,7 @@ export default function DeskJourney({ fonts }) {
           lastY = y;
           dirty = false;
           pointer.moved = true;
+          if (pendingFocus && !flight) focusSection(pendingFocus);
         }
         if (pointer.moved && pointer.mouse && !flight) {
           updateHover();
@@ -470,6 +510,8 @@ export default function DeskJourney({ fonts }) {
       window.visualViewport?.addEventListener("resize", onViewportResize);
       window.addEventListener("pointermove", onPointerMove);
       window.addEventListener("click", onClick);
+      screenEls.work.addEventListener("focusin", onScreenFocus);
+      screenEls.nda.addEventListener("focusin", onScreenFocus);
       raf = requestAnimationFrame(frame);
 
       return () => {
@@ -480,6 +522,8 @@ export default function DeskJourney({ fonts }) {
         window.visualViewport?.removeEventListener("resize", onViewportResize);
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("click", onClick);
+        screenEls.work.removeEventListener("focusin", onScreenFocus);
+        screenEls.nda.removeEventListener("focusin", onScreenFocus);
         document.body.style.cursor = "";
         flyRef.current = null;
         lenis?.destroy();
@@ -494,7 +538,7 @@ export default function DeskJourney({ fonts }) {
       event.preventDefault();
       const timeline = timelineRef.current;
       const y = timeline ? timeline.jumps[key] : refs[key]?.current?.offsetTop ?? 0;
-      if (flyRef.current) flyRef.current(y);
+      if (flyRef.current) flyRef.current(y, key === "top" ? null : key);
       else window.scrollTo(0, y);
     };
   }
@@ -535,15 +579,15 @@ export default function DeskJourney({ fonts }) {
             <span className="label">Product engineer in Accra</span>
             <h1>This is where I build.</h1>
             <p>Products for founders and teams, and guides on how I work.</p>
-            <span className="cue" data-loading={loaded < 1 || undefined}>
-              {loaded < 1 ? (
+            <span className="cue" data-loading={(!noWebGL && loaded < 1) || undefined}>
+              {noWebGL && "The 3D desk couldn't load, so here's the list."}
+              {!noWebGL && loaded < 1 && (
                 <>
                   Setting up the desk <span aria-hidden="true">{Math.round(loaded * 100)}%</span>
                   <span className="bar" style={{ "--loaded": loaded }} aria-hidden="true" />
                 </>
-              ) : (
-                "Scroll, or click anything on the desk"
               )}
+              {!noWebGL && loaded >= 1 && "Scroll, or click an object on the desk"}
             </span>
           </Hero>
         </Section>
@@ -578,6 +622,7 @@ export default function DeskJourney({ fonts }) {
               <span className="label">03 · Guides</span>
               <h2>{guide?.title}</h2>
               <p>{guide?.description}</p>
+              {guide?.price && <p className="note price">{guide.price}</p>}
               {guide && (
                 <CtaRow>
                   <a className="primary" href={guide.link} target="_blank" rel="noopener noreferrer">
@@ -588,7 +633,6 @@ export default function DeskJourney({ fonts }) {
                   </a>
                 </CtaRow>
               )}
-              {guide?.price && <p className="note">{guide.price}</p>}
             </div>
           </Card>
         </Section>
@@ -607,7 +651,7 @@ export default function DeskJourney({ fonts }) {
                       <img className="thumb" src={thumbOf(p.imgSrc)} alt="" width={60} height={38} loading="lazy" />
                       <span className="name">
                         {p.name}
-                        <small>{p.description}</small>
+                        <small>{p.summary ?? p.description}</small>
                       </span>
                       <span aria-hidden="true">↗</span>
                     </a>

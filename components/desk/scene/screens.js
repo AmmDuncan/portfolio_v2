@@ -156,7 +156,7 @@ function paintNotifications(ctx, arrive) {
   ctx.textAlign = "left";
   ctx.fillStyle = INK;
   ctx.font = `600 32px ${SANS}`;
-  ctx.fillText("You", 146, 852);
+  ctx.fillText("A founder", 146, 852);
   ctx.textAlign = "right";
   ctx.fillStyle = "rgba(232, 235, 240, 0.6)";
   ctx.font = `500 24px ${SANS}`;
