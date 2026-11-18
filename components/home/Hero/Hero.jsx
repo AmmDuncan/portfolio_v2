@@ -40,7 +40,7 @@ function Hero() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 1, type: "spring", delay: 0.2, mass: 1.5 }}
           >
-            Fullstack Web Developer-Frontend Heavy, User Interface Designer, Writer sometimes.
+            Product engineer in Accra.
           </motion.p>
 
           <motion.div

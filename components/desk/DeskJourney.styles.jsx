@@ -616,9 +616,63 @@ export const Nav = styled.nav`
     }
   }
 
+  .sections {
+    display: none;
+    align-items: center;
+    min-height: 4.4rem;
+    padding: 0 1.6rem;
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+  }
+
   @media (max-width: 760px) {
+    .sections {
+      display: inline-flex;
+    }
+
+    &[data-open] .sections {
+      border-color: var(--accent);
+    }
+
     ul {
-      display: none;
+      position: absolute;
+      top: calc(100% - 0.4rem);
+      left: clamp(1.6rem, 4vw, 6.4rem);
+      right: clamp(1.6rem, 4vw, 6.4rem);
+      flex-direction: column;
+      padding: 0.8rem;
+      border-radius: 1.6rem;
+      background: #0c0e13;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+      font-size: 1.6rem;
+      transform-origin: top right;
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+      visibility: hidden;
+      transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1), transform 180ms cubic-bezier(0.23, 1, 0.32, 1),
+        visibility 0s 180ms;
+
+      a {
+        display: flex;
+        align-items: center;
+        min-height: 4.4rem;
+        padding: 0 1.6rem;
+        border-radius: 1rem;
+      }
+    }
+
+    &[data-open] ul {
+      opacity: 1;
+      transform: none;
+      visibility: visible;
+      transition-delay: 0s;
+    }
+  }
+
+  @media (max-width: 760px) and (prefers-reduced-motion: reduce) {
+    ul {
+      transform: none;
     }
   }
 `;

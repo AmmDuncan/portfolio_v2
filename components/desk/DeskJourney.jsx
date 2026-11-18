@@ -47,8 +47,8 @@ const SCREEN_COPY = {
 };
 const NDA_COPY = {
   label: "02 · Under NDA",
-  title: "6 platforms I can't show",
-  intro: "Client work from 2023 to 2026 that I can't name or show.",
+  title: "6 platforms under NDA",
+  intro: "Client work, 2023-2026. I can't name the clients or show the screens.",
   stack: ["Nuxt", "Vue", "TypeScript", "TanStack Query", "Tailwind CSS"],
 };
 
@@ -266,6 +266,9 @@ export default function DeskJourney({ fonts }) {
   }));
   const [noWebGL, setNoWebGL] = React.useState(false);
   const [loaded, setLoaded] = React.useState(0);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const navRef = React.useRef(null);
+  const menuButtonRef = React.useRef(null);
   const refs = {
     work: React.useRef(null),
     nda: React.useRef(null),
@@ -533,9 +536,28 @@ export default function DeskJourney({ fonts }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  React.useEffect(() => {
+    if (!menuOpen) return undefined;
+    const onPointerDown = (event) => {
+      if (!navRef.current?.contains(event.target)) setMenuOpen(false);
+    };
+    const onKeyDown = (event) => {
+      if (event.key !== "Escape") return;
+      setMenuOpen(false);
+      menuButtonRef.current?.focus();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menuOpen]);
+
   function jumpTo(key) {
     return (event) => {
       event.preventDefault();
+      setMenuOpen(false);
       const timeline = timelineRef.current;
       const y = timeline ? timeline.jumps[key] : refs[key]?.current?.offsetTop ?? 0;
       if (flyRef.current) flyRef.current(y, key === "top" ? null : key);
@@ -550,12 +572,22 @@ export default function DeskJourney({ fonts }) {
       {!noWebGL && createPortal(<ScreenUI {...SCREEN_COPY.work} scrollerRef={scrollerRefs.work} />, screenEls.work)}
       {!noWebGL && createPortal(<LockScreen {...NDA_COPY} scrollerRef={scrollerRefs.nda} />, screenEls.nda)}
       <HoverTag ref={hoverRef} hidden aria-hidden="true" />
-      <Nav aria-label="Sections">
+      <Nav aria-label="Sections" ref={navRef} data-open={menuOpen || undefined}>
         <a className="name" href="#top" onClick={jumpTo("top")}>
           <LogoPurple width={24} height={24} viewBox="0 0 48 48" aria-hidden="true" />
           Ammiel Yawson
         </a>
-        <ul>
+        <button
+          ref={menuButtonRef}
+          type="button"
+          className="sections"
+          aria-expanded={menuOpen}
+          aria-controls="desk-sections"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          Sections
+        </button>
+        <ul id="desk-sections">
           {SECTIONS.map(({ key, label }) => (
             <li key={key}>
               <a href={`#${key}`} onClick={jumpTo(key)}>
