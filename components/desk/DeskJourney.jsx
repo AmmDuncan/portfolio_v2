@@ -454,6 +454,13 @@ export default function DeskJourney({ fonts }) {
       resizeObserver.observe(document.documentElement);
       resizeObserver.observe(screens.work.scroller);
       resizeObserver.observe(screens.nda.scroller);
+      let resizeFrame = 0;
+      const onViewportResize = () => {
+        cancelAnimationFrame(resizeFrame);
+        resizeFrame = requestAnimationFrame(layout);
+      };
+      window.addEventListener("resize", onViewportResize);
+      window.visualViewport?.addEventListener("resize", onViewportResize);
       window.addEventListener("pointermove", onPointerMove);
       window.addEventListener("click", onClick);
       raf = requestAnimationFrame(frame);
@@ -461,6 +468,9 @@ export default function DeskJourney({ fonts }) {
       return () => {
         cancelAnimationFrame(raf);
         resizeObserver.disconnect();
+        cancelAnimationFrame(resizeFrame);
+        window.removeEventListener("resize", onViewportResize);
+        window.visualViewport?.removeEventListener("resize", onViewportResize);
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("click", onClick);
         document.body.style.cursor = "";
