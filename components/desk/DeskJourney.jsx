@@ -359,9 +359,9 @@ export default function DeskJourney({ fonts }) {
           parts.forEach((el, i) =>
             enter(el, Journey.stagger(t, i, parts.length), i === 0 ? FIGURE_ENTRY : { rise: 24 }, reduceMotion),
           );
-          if (reduceMotion) return;
-          const drift = (top + row.offsetHeight / 2 - viewportHeight / 2) * -0.05;
-          row.querySelector("img").style.transform = `translateY(${Math.max(-24, Math.min(24, drift))}px)`;
+          const focus = 1 - Journey.progress(Math.abs(top + row.offsetHeight / 2 - viewportHeight / 2), 0, viewportHeight * 0.6);
+          row.querySelector("img").style.filter = `brightness(${0.72 + 0.28 * focus})`;
+          parts[0].style.boxShadow = `0 ${24 * focus}px ${64 * focus}px rgba(115, 77, 213, ${0.28 * focus})`;
         });
       }
 

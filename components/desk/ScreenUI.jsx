@@ -196,10 +196,8 @@ const Ui = styled.div`
     background: #151820;
 
     img {
-      position: absolute;
-      top: -6%;
       width: 100%;
-      height: 112%;
+      height: 100%;
       object-fit: cover;
       object-position: top left;
       display: block;
