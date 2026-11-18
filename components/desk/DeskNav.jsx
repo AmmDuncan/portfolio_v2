@@ -2,7 +2,7 @@ import React from "react";
 
 import { LogoPurple } from "../../assets";
 import { BLOG_URL, EMAIL } from "../../data/site";
-import { ArrowUpRight } from "./ArrowUpRight";
+import { FiExternalLink } from "react-icons/fi";
 import { SECTIONS } from "./deskContent";
 import { linkProps } from "./linkProps";
 import { Nav } from "./Nav.styles";
@@ -66,7 +66,7 @@ export function DeskNav({ onJump }) {
         <li>
           <a className="external" href={BLOG_URL} {...linkProps(BLOG_URL)}>
             Blog
-            <ArrowUpRight />
+            <FiExternalLink aria-hidden="true" focusable="false" />
           </a>
         </li>
       </ul>
