@@ -171,6 +171,7 @@ function buildTimeline(scene, els, screens, vh, vw) {
     side: top(els.side) - vh * 0.15,
     contact: top(els.contact) - vh * 0.15,
   };
+  scrolls.work.reset = [arrive.guides, arrive.side];
   const introPose = { position: wide.position.map((v, i) => v + (v - wide.target[i]) * 0.35), target: wide.target };
   const k = (at, pose) => ({ at, ...pose });
   const keyframes = [
@@ -352,7 +353,8 @@ export default function DeskJourney({ fonts }) {
         screenEls.nda.inert = active !== "nda";
         rootRef.current.toggleAttribute("data-on-screen", active === "work");
         Object.entries(timeline.scrolls).forEach(([key, screen]) => {
-          const offset = screen.scrollable * Journey.progress(contentY, screen.start(), screen.end());
+          const back = screen.reset ? Journey.smoothstep(Journey.progress(contentY, ...screen.reset)) : 0;
+          const offset = screen.scrollable * Journey.progress(contentY, screen.start(), screen.end()) * (1 - back);
           screen.scroller.style.transform = `translateY(${-offset}px)`;
           if (!screen.scroller.isConnected) return;
           revealScreen(screen, offset, Journey.progress(contentY, ...timeline.screenArrivals[key]));
@@ -625,27 +627,23 @@ export default function DeskJourney({ fonts }) {
         </Section>
 
         <Section ref={refs.work} id="work">
-          {noWebGL && (
-            <Screen>
+          <Screen className="fallback">
               <span className="label">{SCREEN_COPY.work.label}</span>
               <h2>{SCREEN_COPY.work.title}</h2>
               <p className="intro">{SCREEN_COPY.work.intro}</p>
               <FallbackRows items={work} />
-            </Screen>
-          )}
+          </Screen>
         </Section>
 
         <Section $vh={140} />
 
         <Section ref={refs.nda} id="nda">
-          {noWebGL && (
-            <Screen>
+          <Screen className="fallback">
               <span className="label">{NDA_COPY.label}</span>
               <h2>{NDA_COPY.title}</h2>
               <p className="intro">{NDA_COPY.intro}</p>
               <p className="note">{NDA_COPY.stack.join(" · ")}</p>
-            </Screen>
-          )}
+          </Screen>
         </Section>
 
         <Section ref={refs.guides} id="guides" $vh={220}>

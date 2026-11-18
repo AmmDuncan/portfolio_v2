@@ -62,6 +62,74 @@ export const Root = styled.div`
     display: none;
   }
 
+  .fallback {
+    display: none;
+  }
+
+  &[data-no-webgl] .fallback {
+    display: block;
+  }
+
+  @media print {
+    --ink: #111;
+    --muted: #444;
+    --glass: transparent;
+    --line: #ccc;
+    background: #fff;
+
+    canvas,
+    nav,
+    .cue,
+    main > section:first-child > div::before,
+    &::before,
+    & > div:first-child {
+      display: none !important;
+    }
+
+    .fallback {
+      display: block;
+      background: none;
+      padding: 2.4rem 0;
+    }
+
+    .fallback::before,
+    .fallback::after {
+      display: none;
+    }
+
+    section,
+    section > * {
+      position: static !important;
+      height: auto !important;
+    }
+
+    main * {
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+    }
+
+    .panel {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      break-inside: avoid;
+    }
+
+    .fallback ol,
+    .fallback ul {
+      display: block;
+    }
+
+    .fallback li {
+      display: grid;
+      grid: auto / 1fr 1fr;
+      gap: 2.4rem;
+      align-items: start;
+      margin-bottom: 3.2rem;
+      break-inside: avoid;
+    }
+  }
+
   &[data-no-webgl] section {
     height: auto;
     padding-block: 4.8rem;
