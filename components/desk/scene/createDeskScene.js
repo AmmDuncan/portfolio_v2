@@ -5,7 +5,7 @@ import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLigh
 import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
-import { keypadDisplay, phoneScreen, shadowTexture } from "./screens";
+import { carbonFibre, keypadDisplay, phoneScreen, shadowTexture } from "./screens";
 
 const SIT_HEIGHT = 0.74;
 const STAND_HEIGHT = 1.12;
@@ -22,7 +22,6 @@ const MONITOR_SCREEN = [0.7, 0.394];
 const LAPTOP_SCREEN = [0.35, 0.226];
 
 const mat = {
-  deskTop: new THREE.MeshStandardMaterial({ color: "#131315", roughness: 0.62, dithering: true }),
   frame: new THREE.MeshStandardMaterial({ color: "#1b1b1e", roughness: 0.42, metalness: 0.6 }),
   wall: new THREE.MeshStandardMaterial({ color: "#b9bcbf", roughness: 0.95, dithering: true }),
   floor: new THREE.MeshStandardMaterial({ color: "#1d1c1b", roughness: 0.9, dithering: true }),
@@ -53,6 +52,23 @@ function contactShadow(texture, w, d, opacity = 0.7) {
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.y = 0.0015;
   return mesh;
+}
+
+const CARBON_TILE = 0.024;
+
+/** Desk top finish: carbon-fibre twill under a glossy clear coat. */
+function carbonTop() {
+  const { map, bumpMap } = carbonFibre();
+  [map, bumpMap].forEach((texture) => texture.repeat.set(DESK.width / CARBON_TILE, DESK.depth / CARBON_TILE));
+  return new THREE.MeshPhysicalMaterial({
+    map,
+    bumpMap,
+    bumpScale: 0.12,
+    roughness: 0.38,
+    clearcoat: 1,
+    clearcoatRoughness: 0.08,
+    dithering: true,
+  });
 }
 
 function buildRoom(scene) {
@@ -213,7 +229,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   top.position.y = SIT_HEIGHT;
   scene.add(top);
   top.add(frame.inner);
-  const deskTop = box(DESK.width, DESK.thickness, DESK.depth, mat.deskTop, 0.006);
+  const deskTop = box(DESK.width, DESK.thickness, DESK.depth, carbonTop(), 0.006);
   deskTop.position.y = -DESK.thickness / 2;
   top.add(deskTop);
 

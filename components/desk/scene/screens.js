@@ -251,3 +251,51 @@ export function shadowTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
+/** Repeating 2x2 twill carbon-fibre weave: colour and bump textures, CELLS x CELLS tows per tile. */
+export function carbonFibre(cells = 8, size = 512) {
+  const color = makeCanvas(size, size);
+  const bump = makeCanvas(size, size);
+  const c = color.getContext("2d");
+  const b = bump.getContext("2d");
+  const cell = size / cells;
+  for (let i = 0; i < cells; i += 1) {
+    for (let j = 0; j < cells; j += 1) {
+      const across = (i + j) % 4 < 2;
+      const x = i * cell;
+      const y = j * cell;
+      const sheen = across ? c.createLinearGradient(x, y, x, y + cell) : c.createLinearGradient(x, y, x + cell, y);
+      sheen.addColorStop(0, "#050506");
+      sheen.addColorStop(0.5, across ? "#17181b" : "#0f1012");
+      sheen.addColorStop(1, "#050506");
+      c.fillStyle = sheen;
+      c.fillRect(x, y, cell, cell);
+      const height = across ? b.createLinearGradient(x, y, x, y + cell) : b.createLinearGradient(x, y, x + cell, y);
+      height.addColorStop(0, "#606060");
+      height.addColorStop(0.5, "#ffffff");
+      height.addColorStop(1, "#606060");
+      b.fillStyle = height;
+      b.fillRect(x, y, cell, cell);
+      c.strokeStyle = "rgba(255, 255, 255, 0.02)";
+      c.lineWidth = 1;
+      for (let f = 3; f < cell; f += 4) {
+        c.beginPath();
+        if (across) {
+          c.moveTo(x, y + f);
+          c.lineTo(x + cell, y + f);
+        } else {
+          c.moveTo(x + f, y);
+          c.lineTo(x + f, y + cell);
+        }
+        c.stroke();
+      }
+    }
+  }
+  const map = toTexture(color);
+  const bumpMap = new THREE.CanvasTexture(bump);
+  [map, bumpMap].forEach((texture) => {
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.anisotropy = 16;
+  });
+  return { map, bumpMap };
+}
