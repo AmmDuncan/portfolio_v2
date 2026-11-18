@@ -52,6 +52,16 @@ export const projects = [
     link: "https://findingconsensus.ai",
   },
   {
+    name: "Viewpoints.xyz",
+    year: "2024",
+    imgSrc: "/assets/projects/viewpoints.png",
+    description:
+      "Polling platform for meetings, events and communities that shows where a group agrees. I built poll creation, live-updating results and the results view.",
+    tools: ["Next.js", "React", "Tailwind CSS", "Clerk", "Kysely"],
+    note: "Frontend contributor",
+    link: "https://viewpoints.xyz",
+  },
+  {
     name: "SeedFi",
     year: "2023",
     imgSrc: "/assets/projects/seedfi.jpeg",
