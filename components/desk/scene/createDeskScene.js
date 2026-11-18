@@ -12,8 +12,7 @@ const STAND_HEIGHT = 1.12;
 const DESK = { width: 1.6, depth: 0.75, thickness: 0.035 };
 const ACCENT = new THREE.Color("#3d7fff");
 const MODEL_URLS = { monitor: "/models/g7.glb", laptop: "/models/macbook.glb", controller: "/models/dualsense.glb" };
-// Flat DOM plane sized past the curved panel's chord so the curve's edges never show a gap.
-const MONITOR_SCREEN = [0.75, 0.4];
+const MONITOR_SCREEN = [0.7, 0.394];
 const LAPTOP_SCREEN = [0.35, 0.226];
 
 const mat = {
@@ -90,7 +89,7 @@ function buildMonitor(model, shadowTex) {
   const group = new THREE.Group();
   cutScreenHole(model);
   const screen = model.getObjectByName("ScreenCenter");
-  group.add(model, contactShadow(shadowTex, 0.72, 0.4));
+  group.add(model, contactShadow(shadowTex, 0.42, 0.36));
   return { group, screen, size: MONITOR_SCREEN };
 }
 
@@ -231,10 +230,10 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   top.add(monitor.group, laptop.group, phone.group, controller, guides, keypad.group);
 
   const biasLight = new THREE.RectAreaLight(ACCENT, 7, 0.6, 0.3);
-  biasLight.position.set(0, 0.3, -0.09);
+  biasLight.position.set(0, 0.3, -0.02);
   monitor.group.add(biasLight);
   const monitorLight = new THREE.RectAreaLight("#dfe7ff", 8, 0.68, 0.39);
-  monitorLight.position.set(0, 0.3, 0.075);
+  monitorLight.position.set(0, 0.3, 0.08);
   monitorLight.rotation.y = Math.PI;
   monitor.group.add(monitorLight);
   const laptopLight = new THREE.RectAreaLight("#e6ecff", 6, 0.345, 0.223);
@@ -280,7 +279,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     });
   }
 
-  const pickable = { work: monitor.group, tools: laptop.group, guides, side: controller, contact: phone.group };
+  const pickable = { work: monitor.group, nda: laptop.group, guides, side: controller, contact: phone.group };
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
 

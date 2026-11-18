@@ -20,7 +20,7 @@ export default function Desk() {
         <title>Ammiel Yawson · Product engineer</title>
         <meta
           name="description"
-          content="Product engineer in Accra. Products for founders, tools for building with AI, and guides on how I work."
+          content="Product engineer in Accra. Products for founders and teams, and guides on how I work."
         />
         <meta name="theme-color" content="#07080a" />
         <meta name="robots" content="noindex" />

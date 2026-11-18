@@ -7,16 +7,15 @@ import { projects, sideProjects } from "../../data/projects";
 import { books } from "../../data/books";
 import { createDeskScene, loadDeskModels } from "./scene/createDeskScene";
 import { setScreenFonts } from "./scene/screens";
-import { makeScreenElement, SCREEN_SIZES, ScreenUI } from "./ScreenUI";
+import { LockScreen, makeScreenElement, SCREEN_SIZES, ScreenUI } from "./ScreenUI";
 import { Card, CssHost, CtaRow, Hero, HoverTag, Nav, ProjectList, Root, Screen, Section, Stage } from "./DeskJourney.styles";
 
 const EMAIL = "ammielgyanyawson@gmail.com";
-const tools = projects.filter((p) => p.kind === "tool");
-const work = projects.filter((p) => p.kind !== "tool" && p.name !== "Portfolio");
+const work = projects.filter((p) => p.name !== "Portfolio");
 const guide = books[0];
 const SECTIONS = [
   { key: "work", label: "Work" },
-  { key: "tools", label: "Tools" },
+  { key: "nda", label: "Under NDA" },
   { key: "guides", label: "Guides" },
   { key: "side", label: "Side projects" },
   { key: "contact", label: "Contact" },
@@ -30,13 +29,13 @@ const SCREEN_COPY = {
     intro: "For clients and for myself, from security platforms to stores for social sellers in Ghana.",
     items: work,
   },
-  tools: {
-    path: "~/tools",
-    label: "02 · Tools",
-    title: "Tools for building with AI",
-    intro: "Things I built because I needed them, mostly for working with coding agents.",
-    items: tools,
-  },
+};
+const NDA_COPY = {
+  label: "02 · Under NDA",
+  title: "10 platforms I can't show",
+  intro: "Client work from 2023 to 2026 that I can't name or show. Frontend, plus backend where the project needed it.",
+  stack: ["Nuxt", "Vue", "TypeScript", "TanStack Query", "Tailwind CSS", "Django"],
+  contactHref: `mailto:${EMAIL}`,
 };
 
 /** Shifts a pose sideways (desktop) or down (portrait) so the object clears the text card. */
@@ -77,7 +76,7 @@ function buildTimeline(scene, els, screens, vh, vw) {
 
   const fits = {
     work: screenFit(anchors.monitor, scene.fov, aspect, vw),
-    tools: screenFit(anchors.laptop, scene.fov, aspect, vw),
+    nda: screenFit(anchors.laptop, scene.fov, aspect, vw),
   };
   const hold = vh * 0.3;
   const scrolls = {};
@@ -133,9 +132,9 @@ function buildTimeline(scene, els, screens, vh, vw) {
     k(top(els.work) - vh * 1.3, wideIn),
     k(top(els.work), fits.work.pose),
     k(bottom(els.work), fits.work.pose),
-    k(top(els.tools) - vh * 0.7, between),
-    k(top(els.tools), fits.tools.pose),
-    k(bottom(els.tools), fits.tools.pose),
+    k(top(els.nda) - vh * 0.7, between),
+    k(top(els.nda), fits.nda.pose),
+    k(bottom(els.nda), fits.nda.pose),
     k(top(els.guides) + vh * 0.25, laptopOut),
     k(arrive.guides, guides),
     k(bottom(els.guides) - vh * 0.95, guides),
@@ -159,14 +158,14 @@ function buildTimeline(scene, els, screens, vh, vw) {
     jumps: {
       top: 0,
       work: top(els.work) + hold,
-      tools: top(els.tools) + hold,
+      nda: top(els.nda) + hold,
       guides: arrive.guides,
       side: arrive.side,
       contact: arrive.contact,
     },
     ranges: {
       work: [top(els.work), bottom(els.work)],
-      tools: [top(els.tools), bottom(els.tools)],
+      nda: [top(els.nda), bottom(els.nda)],
       guides: [arrive.guides, bottom(els.guides)],
       side: [arrive.side, bottom(els.side)],
       contact: [arrive.contact, bottom(els.contact)],
@@ -180,6 +179,7 @@ function FallbackRows({ items }) {
       {items.map((item) => (
         <li key={item.name}>
           <div className="meta">
+            {item.year && <span className="tools">{item.year}</span>}
             <h3>{item.name}</h3>
             {item.note && <span className="tools">{item.note}</span>}
             <p>{item.description}</p>
@@ -207,15 +207,15 @@ export default function DeskJourney({ fonts }) {
   const hoverRef = React.useRef(null);
   const lenisRef = React.useRef(null);
   const timelineRef = React.useRef(null);
-  const scrollerRefs = { work: React.useRef(null), tools: React.useRef(null) };
+  const scrollerRefs = { work: React.useRef(null), nda: React.useRef(null) };
   const [screenEls] = React.useState(() => ({
     work: makeScreenElement(SCREEN_SIZES.monitor),
-    tools: makeScreenElement(SCREEN_SIZES.laptop),
+    nda: makeScreenElement(SCREEN_SIZES.laptop),
   }));
   const [noWebGL, setNoWebGL] = React.useState(false);
   const refs = {
     work: React.useRef(null),
-    tools: React.useRef(null),
+    nda: React.useRef(null),
     guides: React.useRef(null),
     side: React.useRef(null),
     contact: React.useRef(null),
@@ -244,7 +244,7 @@ export default function DeskJourney({ fonts }) {
         scene = createDeskScene(canvasRef.current, {
           coverSrcs: books.map((b) => b.coverSrc),
           cssHost: cssHostRef.current,
-          screenElements: { monitor: screenEls.work, laptop: screenEls.tools },
+          screenElements: { monitor: screenEls.work, laptop: screenEls.nda },
           models,
         });
       } catch {
@@ -255,7 +255,7 @@ export default function DeskJourney({ fonts }) {
       const els = Object.fromEntries(Object.entries(refs).map(([key, ref]) => [key, ref.current]));
       const screens = {
         work: { element: screenEls.work, scroller: scrollerRefs.work.current },
-        tools: { element: screenEls.tools, scroller: scrollerRefs.tools.current },
+        nda: { element: screenEls.nda, scroller: scrollerRefs.nda.current },
       };
       let dirty = true;
       const pointer = { x: 0, y: 0, moved: false, mouse: false };
@@ -342,7 +342,7 @@ export default function DeskJourney({ fonts }) {
       const resizeObserver = new ResizeObserver(layout);
       resizeObserver.observe(document.documentElement);
       resizeObserver.observe(screens.work.scroller);
-      resizeObserver.observe(screens.tools.scroller);
+      resizeObserver.observe(screens.nda.scroller);
       window.addEventListener("pointermove", onPointerMove);
       window.addEventListener("click", onClick);
       raf = requestAnimationFrame(frame);
@@ -377,10 +377,8 @@ export default function DeskJourney({ fonts }) {
     <Root data-no-webgl={noWebGL || undefined}>
       <CssHost ref={cssHostRef} />
       <Stage ref={canvasRef} aria-hidden="true" />
-      {!noWebGL &&
-        Object.entries(SCREEN_COPY).map(([key, copy]) =>
-          createPortal(<ScreenUI {...copy} scrollerRef={scrollerRefs[key]} />, screenEls[key], key),
-        )}
+      {!noWebGL && createPortal(<ScreenUI {...SCREEN_COPY.work} scrollerRef={scrollerRefs.work} />, screenEls.work)}
+      {!noWebGL && createPortal(<LockScreen {...NDA_COPY} scrollerRef={scrollerRefs.nda} />, screenEls.nda)}
       <HoverTag ref={hoverRef} hidden aria-hidden="true" />
       <Nav aria-label="Sections">
         <a className="name" href="#top" onClick={jumpTo("top")}>
@@ -404,7 +402,7 @@ export default function DeskJourney({ fonts }) {
           <Hero ref={heroRef}>
             <span className="label">Product engineer in Accra</span>
             <h1>This is where I build.</h1>
-            <p>Products for founders, tools for building with AI, and guides on how I work.</p>
+            <p>Products for founders and teams, and guides on how I work.</p>
             <span className="cue">Scroll, or click anything on the desk</span>
           </Hero>
         </Section>
@@ -422,13 +420,13 @@ export default function DeskJourney({ fonts }) {
 
         <Section $vh={140} />
 
-        <Section ref={refs.tools} id="tools">
+        <Section ref={refs.nda} id="nda">
           {noWebGL && (
             <Screen>
-              <span className="label">{SCREEN_COPY.tools.label}</span>
-              <h2>{SCREEN_COPY.tools.title}</h2>
-              <p className="intro">{SCREEN_COPY.tools.intro}</p>
-              <FallbackRows items={tools} />
+              <span className="label">{NDA_COPY.label}</span>
+              <h2>{NDA_COPY.title}</h2>
+              <p className="intro">{NDA_COPY.intro}</p>
+              <p className="note">{NDA_COPY.stack.join(" · ")}</p>
             </Screen>
           )}
         </Section>

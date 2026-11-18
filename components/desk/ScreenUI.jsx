@@ -154,6 +154,13 @@ const Ui = styled.div`
     color: var(--muted);
   }
 
+  .year {
+    font-family: var(--font-mono), monospace;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+
   a {
     color: inherit;
     font-size: 16px;
@@ -200,6 +207,7 @@ export function ScreenUI({ path, label, title, intro, items, scrollerRef }) {
             {items.map((item) => (
               <li key={item.name}>
                 <div className="meta">
+                  {item.year && <span className="year">{item.year}</span>}
                   <h3>{item.name}</h3>
                   {item.note && <span className="note">{item.note}</span>}
                   <p>{item.description}</p>
@@ -220,5 +228,102 @@ export function ScreenUI({ path, label, title, intro, items, scrollerRef }) {
         </div>
       </div>
     </Ui>
+  );
+}
+
+const Lock = styled.div`
+  --ink: #eef0f4;
+  --muted: #9aa3b2;
+  --accent: #3d7fff;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(120% 90% at 50% 0%, #1a2440 0%, #0b0d12 62%);
+  color: var(--ink);
+  font-family: var(--font-sans), sans-serif;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+
+  .inner {
+    display: grid;
+    justify-items: center;
+    gap: 16px;
+    max-width: min(760px, var(--col, 88%));
+  }
+
+  svg {
+    width: 44px;
+    height: 44px;
+    color: var(--accent);
+  }
+
+  .label {
+    font-family: var(--font-mono), monospace;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-display), sans-serif;
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+
+  [data-narrow] & h2 {
+    font-size: 36px;
+  }
+
+  p {
+    margin: 0;
+    max-width: 44ch;
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  .stack {
+    font-family: var(--font-mono), monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    margin-top: 8px;
+    padding: 0 24px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+`;
+
+/** Laptop lock screen for client work that can't be named or shown. */
+export function LockScreen({ label, title, intro, stack, contactHref, scrollerRef }) {
+  return (
+    <Lock>
+      <div className="inner" ref={scrollerRef}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+          <rect x="5" y="10.5" width="14" height="10" rx="2" />
+          <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+        </svg>
+        <span className="label">{label}</span>
+        <h2>{title}</h2>
+        <p>{intro}</p>
+        <span className="stack">{stack.join(" · ")}</span>
+        <a href={contactHref}>Ask me about them</a>
+      </div>
+    </Lock>
   );
 }

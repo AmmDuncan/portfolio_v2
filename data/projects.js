@@ -1,6 +1,15 @@
 export const projects = [
   {
+    name: "Harmony",
+    year: "2023–2026",
+    imgSrc: "/assets/projects/harmony.png",
+    description:
+      "Restaurant management platform: point of sale, kitchen display, reservations, tables, menus with branch pricing and stock, and sales reports, plus a mobile menu and bill for guests.",
+    tools: ["Nuxt", "Vue", "TypeScript", "Nuxt UI", "Tailwind CSS", "TanStack Query"],
+  },
+  {
     name: "Rotate",
+    year: "2024–2026",
     imgSrc: "/assets/projects/withrotate.png",
     description:
       "360° AI protection platform with managed detection and response spanning email, devices, data, users and applications.",
@@ -17,6 +26,7 @@ export const projects = [
   },
   {
     name: "StoreLink",
+    year: "2026",
     imgSrc: "/assets/projects/storelink.png",
     description:
       "Platform that lets social sellers in Ghana create their own online store in minutes, automating their current selling flow.",
@@ -25,30 +35,12 @@ export const projects = [
   },
   {
     name: "Local Dictation",
-    kind: "tool",
+    year: "2026",
     imgSrc: "/assets/projects/local-dictation.png",
     description:
       "A private, on-device dictation app for macOS. Hold ⌃Space, speak, release: Whisper transcribes and a local model cleans up, 100% offline. Nothing leaves your Mac.",
     tools: ["Claude Code", "Swift", "SwiftUI", "whisper.cpp", "llama.cpp", "macOS"],
     link: "/local-dictation",
-  },
-  {
-    name: "easel",
-    kind: "tool",
-    imgSrc: "/assets/projects/easel.png",
-    description:
-      "A live browser tab for every AI coding session. An MCP server that lets agents push HTML — mockups, diagrams, diffs, comparisons — to a scrolling feed you keep open in split-screen.",
-    tools: ["TypeScript", "Node.js", "MCP"],
-    link: "https://github.com/AmmDuncan/easel",
-  },
-  {
-    name: "Pitstop",
-    kind: "tool",
-    imgSrc: "/assets/projects/pitstop.png",
-    description:
-      "An in-app review loop for AI-agent work. The agent walks your browser through every surface it touched, pinning your feedback to each step and acting on it with full context.",
-    tools: ["TypeScript", "Bun", "SolidJS", "MCP", "SSE"],
-    link: "https://github.com/AmmDuncan/pitstop",
   },
   {
     name: "Finding Consensus",
@@ -60,6 +52,7 @@ export const projects = [
   },
   {
     name: "SeedFi",
+    year: "2023",
     imgSrc: "/assets/projects/seedfi.jpeg",
     description:
       "SeedFi provides simplified digital lending. Apply online, get quick approval, and access funds for your needs. No more hassle!",
@@ -75,6 +68,7 @@ export const projects = [
   // },
   {
     name: "Kwerty.io",
+    year: "2021–2022",
     imgSrc: "/assets/projects/kwerty.png",
     description:
       "Public data bank that uses various visualization methods to simplify data for easy digestion by users.",
@@ -83,6 +77,7 @@ export const projects = [
   },
   {
     name: "HRMs by Enyata",
+    year: "2021–2024",
     imgSrc: "/assets/projects/hrms.png",
     description:
       "Software to manage Human Resource in a company from Hiring, to Assessments, to Employee managament.",
@@ -98,6 +93,24 @@ export const projects = [
 ];
 
 export const sideProjects = [
+  {
+    name: "easel",
+    year: "2026",
+    imgSrc: "/assets/projects/easel.png",
+    description:
+      "A live browser tab for every AI coding session. An MCP server that lets agents push HTML — mockups, diagrams, diffs, comparisons — to a scrolling feed you keep open in split-screen.",
+    tools: ["TypeScript", "Node.js", "MCP"],
+    link: "https://github.com/AmmDuncan/easel",
+  },
+  {
+    name: "Pitstop",
+    year: "2026",
+    imgSrc: "/assets/projects/pitstop.png",
+    description:
+      "An in-app review loop for AI-agent work. The agent walks your browser through every surface it touched, pinning your feedback to each step and acting on it with full context.",
+    tools: ["TypeScript", "Bun", "SolidJS", "MCP", "SSE"],
+    link: "https://github.com/AmmDuncan/pitstop",
+  },
   {
     name: "Dev in Details",
     imgSrc: "/assets/projects/devindets.png",
