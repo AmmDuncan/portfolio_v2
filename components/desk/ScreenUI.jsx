@@ -65,7 +65,7 @@ const Ui = styled.div`
   .scroller {
     width: var(--col, 88%);
     margin-inline: auto;
-    padding-block: 64px 120px;
+    padding-block: 120px;
   }
 
   .label {

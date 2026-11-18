@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import Lenis from "lenis";
 
 import { DeskJourney as Journey } from "../../domains/DeskJourney";
+import { LogoPurple } from "../../assets";
 import { projects, sideProjects } from "../../data/projects";
 import { books } from "../../data/books";
 import { createDeskScene, loadDeskModels } from "./scene/createDeskScene";
@@ -52,6 +53,11 @@ function frameBeside(position, target, aspect, amount, portraitAmount = amount *
 
 function thumbOf(imgSrc) {
   return imgSrc.replace("/projects/", "/projects/thumbs/").replace(/\.png$/, ".webp");
+}
+
+/** The same view pushed a little closer, so a held shot still moves while you scroll. */
+function driftIn(pose, amount = 0.1) {
+  return { position: pose.position.map((v, i) => v + (pose.target[i] - v) * amount), target: pose.target };
 }
 
 function lookFrom(point, offset, distance) {
@@ -140,15 +146,15 @@ function buildTimeline(scene, els, screens, vh, vw) {
     k(bottom(els.work), fits.work.pose),
     k(top(els.nda) - vh * 0.7, between),
     k(top(els.nda), fits.nda.pose),
-    k(bottom(els.nda), fits.nda.pose),
+    k(bottom(els.nda), driftIn(fits.nda.pose, 0.04)),
     k(top(els.guides) + vh * 0.25, laptopOut),
     k(arrive.guides, guides),
-    k(bottom(els.guides) - vh * 0.95, guides),
+    k(bottom(els.guides) - vh * 0.95, driftIn(guides)),
     k(arrive.side, controller),
-    k(bottom(els.side) - vh * 0.95, controller),
+    k(bottom(els.side) - vh * 0.95, driftIn(controller)),
     k(arrive.contact, phone),
-    k(top(els.contact) + vh * 1.0, phone),
-    k(top(els.contact) + vh * 1.6, final),
+    k(top(els.contact) + vh * 0.8, driftIn(phone)),
+    k(top(els.contact) + vh * 1.3, final),
   ];
   return {
     keyframes,
@@ -161,7 +167,7 @@ function buildTimeline(scene, els, screens, vh, vw) {
       { key: "contact", range: [arrive.contact - vh * 0.5, arrive.contact - vh * 0.1] },
     ],
     phoneLit: [top(els.contact) - vh * 0.1, top(els.contact) + vh * 0.5],
-    rise: [top(els.contact) + vh * 1.6, top(els.contact) + vh * 2.5],
+    rise: [top(els.contact) + vh * 1.3, top(els.contact) + vh * 2.0],
     jumps: {
       top: 0,
       work: top(els.work) + hold,
@@ -398,6 +404,7 @@ export default function DeskJourney({ fonts }) {
       <HoverTag ref={hoverRef} hidden aria-hidden="true" />
       <Nav aria-label="Sections">
         <a className="name" href="#top" onClick={jumpTo("top")}>
+          <LogoPurple width={24} height={24} viewBox="0 0 48 48" aria-hidden="true" />
           Ammiel Yawson
         </a>
         <ul>
@@ -419,7 +426,7 @@ export default function DeskJourney({ fonts }) {
         </a>
       </Nav>
       <main id="top">
-        <Section $vh={210}>
+        <Section $vh={160}>
           <Hero ref={heroRef}>
             <span className="label">Product engineer in Accra</span>
             <h1>This is where I build.</h1>
@@ -452,7 +459,7 @@ export default function DeskJourney({ fonts }) {
           )}
         </Section>
 
-        <Section ref={refs.guides} id="guides" $vh={260}>
+        <Section ref={refs.guides} id="guides" $vh={220}>
           <Card ref={cardRefs.guides}>
             <div className="panel">
               <span className="label">03 · Guides</span>
@@ -473,7 +480,7 @@ export default function DeskJourney({ fonts }) {
           </Card>
         </Section>
 
-        <Section ref={refs.side} id="side" $vh={220}>
+        <Section ref={refs.side} id="side" $vh={170}>
           <Card ref={cardRefs.side}>
             <div className="panel">
               <span className="label">04 · Side projects</span>
@@ -498,7 +505,7 @@ export default function DeskJourney({ fonts }) {
           </Card>
         </Section>
 
-        <Section ref={refs.contact} id="contact" $vh={360}>
+        <Section ref={refs.contact} id="contact" $vh={300}>
           <Card ref={cardRefs.contact}>
             <div className="panel">
               <span className="label">05 · Contact</span>

@@ -485,7 +485,10 @@ export const Nav = styled.nav`
   }
 
   .name {
-    padding: 0.8rem 1.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 1.6rem 0.6rem 1rem;
     font-weight: 600;
     margin-right: auto;
   }
