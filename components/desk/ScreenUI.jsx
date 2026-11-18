@@ -158,6 +158,7 @@ const Ui = styled.div`
     color: inherit;
     font-size: 16px;
     font-weight: 500;
+    text-decoration: underline;
     text-underline-offset: 0.3em;
     text-decoration-color: var(--accent);
   }

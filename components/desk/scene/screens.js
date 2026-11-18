@@ -56,7 +56,7 @@ export function phoneScreen() {
   ctx.fillText("NEW MESSAGE", 72, 580);
   ctx.fillStyle = INK;
   ctx.font = `600 40px ${SANS}`;
-  ctx.fillText("Message Ammiel", 72, 640);
+  ctx.fillText("You", 72, 640);
   ctx.fillStyle = "#c7cfdd";
   ctx.font = `400 30px ${SANS}`;
   ctx.fillText("Hi Ammiel, quick question about...", 72, 690);

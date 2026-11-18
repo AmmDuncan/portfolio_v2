@@ -318,8 +318,9 @@ export const Card = styled.div`
   li a {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 1.6rem;
-    padding: 1.2rem 0;
+    padding: 1rem 0;
     border-bottom: 1px solid var(--line);
     font-size: 1.6rem;
     text-decoration: none;
@@ -327,6 +328,20 @@ export const Card = styled.div`
     &:hover {
       color: var(--accent);
     }
+  }
+
+  .name {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  small {
+    overflow: hidden;
+    font-size: 1.3rem;
+    color: var(--muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   @media (max-aspect-ratio: 1/1) {
@@ -386,7 +401,7 @@ export const Nav = styled.nav`
   gap: 2.4rem;
   padding: 1.6rem clamp(2.4rem, 6vw, 9.6rem) 3.2rem;
   font-size: 1.4rem;
-  background: linear-gradient(to bottom, rgba(7, 8, 10, 0.92) 40%, rgba(7, 8, 10, 0));
+  background: linear-gradient(to bottom, rgba(7, 8, 10, 0.96) 60%, rgba(7, 8, 10, 0));
 
   a {
     text-decoration: none;

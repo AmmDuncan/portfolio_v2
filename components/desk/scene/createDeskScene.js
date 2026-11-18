@@ -269,14 +269,14 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   ].map(({ mesh, size, element }) => {
     const object = new CSS3DObject(element);
     cssScene.add(object);
-    return { mesh, object, scale: size[0] / Number(element.dataset.width) };
+    return { mesh, object, size, element };
   });
   const tmpScale = new THREE.Vector3();
 
   function syncDomScreens() {
-    domScreens.forEach(({ mesh, object, scale }) => {
+    domScreens.forEach(({ mesh, object, size, element }) => {
       mesh.matrixWorld.decompose(object.position, object.quaternion, tmpScale);
-      object.scale.setScalar(scale);
+      object.scale.setScalar(size[0] / Number(element.dataset.width));
     });
   }
 

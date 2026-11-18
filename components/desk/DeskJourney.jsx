@@ -34,7 +34,7 @@ const SCREEN_COPY = {
     path: "~/tools",
     label: "02 · Tools",
     title: "Tools for building with AI",
-    intro: "Things I built because I needed them while working with coding agents.",
+    intro: "Things I built because I needed them, mostly for working with coding agents.",
     items: tools,
   },
 };
@@ -54,16 +54,17 @@ function lookFrom(point, offset, distance) {
   return { position: point.map((v, i) => v + offset[i] * distance), target: point };
 }
 
-/** How a device screen maps to the viewport once the camera has pushed into it. */
-function screenFit(anchor, virtual, fov, aspect, viewportWidth) {
+/** Sizes a device screen so one CSS pixel lands on one viewport pixel once the camera has pushed in, keeping text crisp. */
+function screenFit(anchor, fov, aspect, viewportWidth) {
   const pose = Journey.screenPose(anchor, fov, aspect);
   const distance = Math.hypot(...pose.position.map((v, i) => v - anchor.center[i]));
   const visibleWidth = 2 * distance * Math.tan((fov * Math.PI) / 360) * aspect;
-  const shownFraction = Math.min(1, visibleWidth / anchor.width);
+  const width = Math.round((anchor.width / visibleWidth) * viewportWidth);
   return {
     pose,
-    virtualPerPx: virtual.width / ((anchor.width / visibleWidth) * viewportWidth),
-    columnPx: virtual.width * shownFraction * 0.9,
+    width,
+    height: Math.round(width * (anchor.height / anchor.width)),
+    columnPx: width * Math.min(1, visibleWidth / anchor.width) * 0.9,
   };
 }
 
@@ -75,18 +76,21 @@ function buildTimeline(scene, els, screens, vh, vw) {
   const bottom = (el) => el.offsetTop + el.offsetHeight;
 
   const fits = {
-    work: screenFit(anchors.monitor, SCREEN_SIZES.monitor, scene.fov, aspect, vw),
-    tools: screenFit(anchors.laptop, SCREEN_SIZES.laptop, scene.fov, aspect, vw),
+    work: screenFit(anchors.monitor, scene.fov, aspect, vw),
+    tools: screenFit(anchors.laptop, scene.fov, aspect, vw),
   };
   const hold = vh * 0.3;
   const scrolls = {};
   Object.entries(fits).forEach(([key, fit]) => {
     const { element, scroller } = screens[key];
+    element.dataset.width = String(fit.width);
+    element.style.width = `${fit.width}px`;
+    element.style.height = `${fit.height}px`;
     element.style.setProperty("--col", `${Math.round(fit.columnPx)}px`);
     element.toggleAttribute("data-narrow", fit.columnPx < 760);
-    const viewportHeight = element.offsetHeight - 44;
+    const viewportHeight = fit.height - 44;
     const scrollable = Math.max(0, scroller.offsetHeight - viewportHeight * 0.9);
-    els[key].style.height = `${Math.round(hold * 2 + scrollable / fit.virtualPerPx)}px`;
+    els[key].style.height = `${Math.round(hold * 2 + scrollable)}px`;
     scrolls[key] = { scroller, scrollable, start: () => top(els[key]) + hold, end: () => bottom(els[key]) - hold };
   });
 
@@ -120,8 +124,8 @@ function buildTimeline(scene, els, screens, vh, vw) {
 
   const arrive = {
     guides: top(els.guides) + vh * 0.7,
-    side: top(els.side) + vh * 0.35,
-    contact: top(els.contact) + vh * 0.35,
+    side: top(els.side) - vh * 0.15,
+    contact: top(els.contact) - vh * 0.15,
   };
   const k = (at, pose) => ({ at, ...pose });
   const keyframes = [
@@ -134,9 +138,9 @@ function buildTimeline(scene, els, screens, vh, vw) {
     k(bottom(els.tools), fits.tools.pose),
     k(top(els.guides) + vh * 0.25, laptopOut),
     k(arrive.guides, guides),
-    k(bottom(els.guides) - vh * 1.1, guides),
+    k(bottom(els.guides) - vh * 0.95, guides),
     k(arrive.side, controller),
-    k(bottom(els.side) - vh * 1.1, controller),
+    k(bottom(els.side) - vh * 0.95, controller),
     k(arrive.contact, phone),
     k(top(els.contact) + vh * 1.0, phone),
     k(top(els.contact) + vh * 1.6, final),
@@ -147,8 +151,8 @@ function buildTimeline(scene, els, screens, vh, vw) {
     heroFade: [vh * 0.25, vh * 0.85],
     cards: [
       { key: "guides", range: [arrive.guides - vh * 0.3, arrive.guides] },
-      { key: "side", range: [arrive.side - vh * 0.3, arrive.side] },
-      { key: "contact", range: [arrive.contact - vh * 0.3, arrive.contact] },
+      { key: "side", range: [arrive.side - vh * 0.5, arrive.side - vh * 0.1] },
+      { key: "contact", range: [arrive.contact - vh * 0.5, arrive.contact - vh * 0.1] },
     ],
     phoneLit: [top(els.contact) - vh * 0.1, top(els.contact) + vh * 0.5],
     rise: [top(els.contact) + vh * 1.6, top(els.contact) + vh * 2.5],
@@ -460,7 +464,11 @@ export default function DeskJourney({ fonts }) {
                 {sideProjects.map((p) => (
                   <li key={p.name}>
                     <a href={p.link} target="_blank" rel="noopener noreferrer">
-                      {p.name}
+                      <span className="name">
+                        {p.name}
+                        <small>{p.description}</small>
+                      </span>
+                      <span aria-hidden="true">↗</span>
                     </a>
                   </li>
                 ))}
@@ -472,7 +480,7 @@ export default function DeskJourney({ fonts }) {
         <Section ref={refs.contact} id="contact" $vh={360}>
           <Card ref={cardRefs.contact}>
             <div className="panel">
-              <span className="label">05 · Get in touch</span>
+              <span className="label">05 · Contact</span>
               <h2>Have a product to build?</h2>
               <p>Tell me what you&apos;re working on.</p>
               <CtaRow>
