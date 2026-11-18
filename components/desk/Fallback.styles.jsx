@@ -30,8 +30,6 @@ export const Screen = styled.div`
   h2 {
     margin: 1.2rem 0 1.2rem;
     font-size: clamp(3.6rem, 4.6vw, 6.4rem);
-    font-weight: 600;
-    letter-spacing: -0.03em;
     line-height: 1.02;
   }
 

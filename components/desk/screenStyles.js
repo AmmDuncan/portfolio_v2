@@ -70,20 +70,10 @@ export const Ui = styled.div`
     padding-block: 120px;
   }
 
-  .label {
-    font-family: var(--font-mono), monospace;
-    font-size: 13px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-
   h2 {
     margin: 12px 0;
     font-family: var(--font-display), sans-serif;
     font-size: 56px;
-    font-weight: 600;
-    letter-spacing: -0.03em;
     line-height: 1.02;
   }
 
@@ -141,8 +131,6 @@ export const Ui = styled.div`
     padding: 4px 10px;
     border-radius: 99px;
     background: rgba(${ACCENT_RGB}, 0.22);
-    color: #c9baf3;
-    font-size: 13px;
     font-weight: 500;
   }
 
@@ -222,14 +210,6 @@ export const Lock = styled.div`
   svg {
     width: 44px;
     height: 44px;
-    color: var(--accent);
-  }
-
-  .label {
-    font-family: var(--font-mono), monospace;
-    font-size: 13px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
     color: var(--accent);
   }
 

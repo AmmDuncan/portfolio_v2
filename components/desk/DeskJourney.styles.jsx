@@ -109,7 +109,7 @@ export const Root = styled.div`
       filter: none !important;
     }
 
-    .panel {
+    main .panel {
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
       break-inside: avoid;

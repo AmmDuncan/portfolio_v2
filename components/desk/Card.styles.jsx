@@ -9,7 +9,6 @@ export const Card = styled.div`
   display: grid;
   align-content: center;
   padding-inline: clamp(2.4rem, 6vw, 9.6rem);
-  pointer-events: none;
 
   .panel {
     pointer-events: auto;
@@ -29,8 +28,6 @@ export const Card = styled.div`
   h2 {
     margin: 1.2rem 0 1.2rem;
     font-size: clamp(3rem, 3vw, 4.4rem);
-    font-weight: 600;
-    letter-spacing: -0.025em;
     line-height: 1.05;
   }
 
