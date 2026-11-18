@@ -16,6 +16,7 @@ const MODEL_URLS = {
   laptop: "/models/macbook.glb",
   controller: "/models/dualsense.glb",
   phone: "/models/iphone.glb",
+  console: "/models/ps5slim.glb",
 };
 const PHONE_SCREEN = [0.0712, 0.1544];
 const MONITOR_SCREEN = [0.7, 0.394];
@@ -195,9 +196,9 @@ function pointAnchor(object, offset = [0, 0, 0]) {
   return v.add(new THREE.Vector3(...offset)).toArray();
 }
 
-/** Loads the G7, MacBook, DualSense and iPhone models, keyed by the object they become. */
+/** Loads the G7, MacBook, DualSense, iPhone and PS5 models, keyed by the object they become. */
 /** Approximate file sizes, used for progress when the server compresses and sends no length. */
-const MODEL_BYTES = { monitor: 64e3, laptop: 337e3, controller: 600e3, phone: 165e3 };
+const MODEL_BYTES = { monitor: 64e3, laptop: 337e3, controller: 600e3, phone: 165e3, console: 282e3 };
 
 export async function loadDeskModels(onProgress = () => {}) {
   const loader = new GLTFLoader();
@@ -270,7 +271,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   top.add(deskTop);
 
   const monitor = buildMonitor(models.monitor);
-  monitor.group.position.set(0.34, 0, -0.16);
+  monitor.group.position.set(0.27, 0, -0.16);
   monitor.group.rotation.y = -0.12;
   const laptop = buildLaptop(models.laptop);
   laptop.group.position.set(-0.4, 0, -0.04);
@@ -281,12 +282,15 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   const controller = buildController(models.controller);
   controller.position.set(0.36, 0, 0.21);
   controller.rotation.y = -0.4;
+  const ps5 = models.console;
+  ps5.position.set(0.62, 0, -0.262);
+  ps5.rotation.y = 0;
   const guides = buildGuides(coverSrcs);
   guides.position.set(-0.6, 0, 0.25);
   guides.rotation.y = 0.18;
   const keypad = buildKeypad();
   keypad.group.position.set(0.6, -0.022, DESK.depth / 2 + 0.008);
-  top.add(monitor.group, laptop.group, phone.group, controller, guides, keypad.group);
+  top.add(monitor.group, laptop.group, phone.group, controller, ps5, guides, keypad.group);
 
   const glowMaterial = new THREE.MeshBasicMaterial({
     map: wallGlow(),
@@ -297,7 +301,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     toneMapped: false,
   });
   const biasGlow = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.95), glowMaterial);
-  biasGlow.position.set(0.34, 0.36, -0.414);
+  biasGlow.position.set(0.27, 0.36, -0.414);
   top.add(biasGlow);
   const shadows = createContactShadows({ width: DESK.width, depth: DESK.depth, blur: 4, darkness: 2.6, opacity: 1 });
   top.add(shadows.group);
