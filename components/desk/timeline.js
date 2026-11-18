@@ -54,8 +54,6 @@ export function sizeScreens(fits, screens, sections, vh) {
   const sized = {};
   Object.entries(fits).forEach(([key, fit]) => {
     const { element, scroller } = screens[key];
-    element.dataset.width = String(fit.width);
-    element.dataset.height = String(fit.height);
     element.style.width = `${fit.width}px`;
     element.style.height = `${fit.height}px`;
     element.style.setProperty("--col", `${Math.round(fit.columnPx)}px`);

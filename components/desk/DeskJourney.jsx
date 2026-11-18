@@ -3,11 +3,9 @@ import { createPortal } from "react-dom";
 
 import { TAGLINE } from "../../data/site";
 import { HERO_COPY, NDA_COPY, WORK_COPY } from "./deskContent";
-// Import order is load-bearing: styled-components emits CSS in evaluation order, and shared class names
-// (.label, .note) depend on the screen styles coming before Card, Nav and DeskJourney styles.
 import { FallbackRows } from "./FallbackRows";
 import { LockScreen } from "./LockScreen";
-import { makeScreenElement, SCREEN_SIZES, ScreenUI } from "./ScreenUI";
+import { ScreenUI } from "./ScreenUI";
 import "./Card.styles";
 import { Screen } from "./Fallback.styles";
 import "./Nav.styles";
@@ -20,8 +18,8 @@ import { useDeskJourney, useJourneyRefs } from "./useDeskJourney";
 export default function DeskJourney({ fonts }) {
   const refs = useJourneyRefs();
   const [screenEls] = React.useState(() => ({
-    work: makeScreenElement(SCREEN_SIZES.monitor),
-    nda: makeScreenElement(SCREEN_SIZES.laptop),
+    work: document.createElement("div"),
+    nda: document.createElement("div"),
   }));
   const { status, loadProgress, flyTo } = useDeskJourney({ fonts, refs, screenEls });
   const { sections: sectionRefs, cards: cardRefs, scrollers: scrollerRefs } = refs;

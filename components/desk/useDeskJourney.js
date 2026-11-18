@@ -2,8 +2,8 @@ import React from "react";
 
 import { books } from "../../data/books";
 import { createJourney } from "./journey/createJourney";
-import { createDeskScene, loadDeskModels } from "./scene/createDeskScene";
-import { setScreenFonts } from "./scene/screens";
+import { createDeskScene } from "./scene/createDeskScene";
+import { loadDeskModels } from "./scene/loadDeskModels";
 
 const refMap = (keys) => Object.fromEntries(keys.map((key) => [key, React.createRef()]));
 const elements = (refs) => Object.fromEntries(Object.entries(refs).map(([key, ref]) => [key, ref.current]));
@@ -48,7 +48,6 @@ export function useDeskJourney({ fonts, refs, screenEls }) {
     }
 
     function start(models) {
-      setScreenFonts({ sans, mono, display });
       let scene = null;
       try {
         scene = createDeskScene(refs.canvas.current, {
@@ -56,6 +55,7 @@ export function useDeskJourney({ fonts, refs, screenEls }) {
           cssHost: refs.cssHost.current,
           screenElements: { monitor: screenEls.work, laptop: screenEls.nda },
           models,
+          fonts: { sans, mono, display },
         });
       } catch (error) {
         fail(error);

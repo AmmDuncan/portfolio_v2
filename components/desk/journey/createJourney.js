@@ -8,6 +8,7 @@ import { measureCard, measureScreen } from "./reveal";
 import { createScroller } from "./scroller";
 
 const INTRO_MS = 2600;
+const SCENE_SCREEN = { work: "monitor", nda: "laptop" };
 
 /**
  * Runs the scroll journey on a created scene: lays the page out, drives the camera from scroll position each
@@ -56,6 +57,7 @@ export function createJourney({ scene, dom, screenEls, reduceMotion }) {
     scene.resize(w, h);
     const fits = screenFits(scene, w, h);
     const sized = sizeScreens(fits, screens, dom.sections, h);
+    Object.entries(fits).forEach(([key, fit]) => scene.setScreenSize(SCENE_SCREEN[key], fit.width, fit.height));
     timeline = buildTimeline(scene, dom.sections, fits, sized, h, w);
     Object.entries(screens).forEach(([key, screen]) => {
       screen.measured = measureScreen(screen.scroller, sized[key].viewportHeight);

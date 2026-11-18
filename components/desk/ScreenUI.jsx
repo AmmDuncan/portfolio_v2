@@ -1,20 +1,5 @@
 import { Ui } from "./screenStyles";
 
-export const SCREEN_SIZES = {
-  monitor: { width: 1600, height: 853 },
-  laptop: { width: 1280, height: 826 },
-};
-
-/** A detached element the 3D scene places on a device screen. */
-export function makeScreenElement({ width, height }) {
-  const element = document.createElement("div");
-  element.dataset.width = String(width);
-  element.dataset.height = String(height);
-  element.style.width = `${width}px`;
-  element.style.height = `${height}px`;
-  return element;
-}
-
 /** Device-screen UI: a window bar and a list the page scroll moves. */
 export function ScreenUI({ path, label, title, intro, items, scrollerRef }) {
   return (

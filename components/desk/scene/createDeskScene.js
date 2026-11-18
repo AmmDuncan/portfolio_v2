@@ -2,23 +2,18 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
+import { DeskJourney as JourneyMath } from "../../../domains/DeskJourney";
 import { ACCENT } from "../theme";
+import { carbonFibre, keypadDisplay, resolveFonts, shadowTexture, wallGlow } from "./canvasTextures";
 import { createContactShadows } from "./contactShadows";
-import { carbonFibre, keypadDisplay, phoneScreen, shadowTexture, wallGlow } from "./screens";
+import { createDomScreens } from "./domScreens";
+import { phoneScreen } from "./phoneLockScreen";
 
 const SIT_HEIGHT = 0.74;
 const STAND_HEIGHT = 1.12;
 const DESK = { width: 1.6, depth: 0.75, thickness: 0.035 };
 const ACCENT_COLOR = new THREE.Color(ACCENT);
-const MODEL_URLS = {
-  monitor: "/models/g7.glb",
-  laptop: "/models/macbook.glb",
-  controller: "/models/dualsense.glb",
-  phone: "/models/iphone.glb",
-  console: "/models/ps5slim.glb",
-};
 const PHONE_SCREEN = [0.0712, 0.1544];
 const MONITOR_SCREEN = [0.7, 0.394];
 /** Height-adjustable stand raised so the panel clears the console lying behind it. */
@@ -133,7 +128,7 @@ function buildLaptop(model) {
   return { group, screen, size: LAPTOP_SCREEN };
 }
 
-function buildPhone(model) {
+function buildPhone(model, fonts) {
   const group = new THREE.Group();
   const standBase = box(0.075, 0.007, 0.075, mat.standMetal, 0.003);
   standBase.position.set(0, 0.0035, -0.008);
@@ -142,7 +137,7 @@ function buildPhone(model) {
   tilt.rotation.x = -0.3;
   const backrest = box(0.05, 0.11, 0.005, mat.standMetal, 0.002);
   backrest.position.set(0, 0.055, -0.0106);
-  const lockScreen = phoneScreen();
+  const lockScreen = phoneScreen(fonts);
   const screenMaterial = new THREE.MeshBasicMaterial({ map: lockScreen.texture, color: "#000000", toneMapped: false });
   model.getObjectByName("Screen").traverse((node) => {
     if (node.isMesh) node.material = screenMaterial;
@@ -177,8 +172,8 @@ function buildGuides(covers) {
   return group;
 }
 
-function buildKeypad() {
-  const display = keypadDisplay();
+function buildKeypad(fonts) {
+  const display = keypadDisplay(fonts);
   const group = new THREE.Group();
   const body = box(0.09, 0.022, 0.03, mat.blackPlastic, 0.004);
   const led = new THREE.Mesh(new THREE.PlaneGeometry(0.034, 0.013), new THREE.MeshBasicMaterial({ map: display.texture, toneMapped: false }));
@@ -202,51 +197,9 @@ function pointAnchor(object, offset = [0, 0, 0]) {
   return v.add(new THREE.Vector3(...offset)).toArray();
 }
 
-/** Loads the G7, MacBook, DualSense, iPhone and PS5 models, keyed by the object they become. */
-/** Approximate file sizes, used for progress when the server compresses and sends no length. */
-const MODEL_BYTES = { monitor: 64e3, laptop: 337e3, controller: 600e3, phone: 165e3, console: 282e3 };
-
-export async function loadDeskModels(onProgress = () => {}) {
-  const loader = new GLTFLoader();
-  const loaded = Object.fromEntries(Object.keys(MODEL_URLS).map((key) => [key, 0]));
-  const totalBytes = Object.values(MODEL_BYTES).reduce((sum, bytes) => sum + bytes, 0);
-  const report = (key, fraction) => {
-    loaded[key] = Math.min(fraction, 1) * MODEL_BYTES[key];
-    onProgress(Object.values(loaded).reduce((sum, bytes) => sum + bytes, 0) / totalBytes);
-  };
-  const entries = await Promise.all(
-    Object.entries(MODEL_URLS).map(async ([key, url]) => {
-      const gltf = await loader.loadAsync(url, (event) =>
-        report(key, Math.min(event.loaded / (event.total || MODEL_BYTES[key]), 0.98)),
-      );
-      report(key, 1);
-      return [key, gltf.scene];
-    }),
-  );
-  return Object.fromEntries(entries);
-}
-
-/** CSS matrix3d that maps a width x height element onto a screen-space quad (top-left, top-right, bottom-right, bottom-left). */
-function quadMatrix(width, height, [p0, p1, p2, p3]) {
-  const dx1 = p1.x - p2.x;
-  const dx2 = p3.x - p2.x;
-  const dx3 = p0.x - p1.x + p2.x - p3.x;
-  const dy1 = p1.y - p2.y;
-  const dy2 = p3.y - p2.y;
-  const dy3 = p0.y - p1.y + p2.y - p3.y;
-  const det = dx1 * dy2 - dx2 * dy1;
-  const g = (dx3 * dy2 - dx2 * dy3) / det;
-  const h = (dx1 * dy3 - dx3 * dy1) / det;
-  const a = p1.x - p0.x + g * p1.x;
-  const b = p3.x - p0.x + h * p3.x;
-  const d = p1.y - p0.y + g * p1.y;
-  const e = p3.y - p0.y + h * p3.y;
-  const m = [a / width, d / width, 0, g / width, b / height, e / height, 0, h / height, 0, 0, 1, 0, p0.x, p0.y, 0, 1];
-  return `matrix3d(${m.join(",")})`;
-}
-
-/** Builds the desk scene into a canvas. Returns controls driven by scroll. */
-export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElements, models }) {
+/** Builds the desk scene into a canvas. Returns controls driven by scroll. `fonts` is { sans, mono, display }. */
+export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElements, models, fonts }) {
+  const textFonts = resolveFonts(fonts);
   RectAreaLightUniformsLib.init();
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -282,7 +235,7 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   const laptop = buildLaptop(models.laptop);
   laptop.group.position.set(-0.4, 0, -0.04);
   laptop.group.rotation.y = 0.1;
-  const phone = buildPhone(models.phone);
+  const phone = buildPhone(models.phone, textFonts);
   phone.group.position.set(-0.15, 0, 0.15);
   phone.group.rotation.y = 0.08;
   const controller = buildController(models.controller);
@@ -290,11 +243,10 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   controller.rotation.y = -0.4;
   const ps5 = models.console;
   ps5.position.set(0.62, 0, -0.262);
-  ps5.rotation.y = 0;
   const guides = buildGuides(coverSrcs);
   guides.position.set(-0.6, 0, 0.25);
   guides.rotation.y = 0.18;
-  const keypad = buildKeypad();
+  const keypad = buildKeypad(textFonts);
   keypad.group.position.set(0.6, -0.022, DESK.depth / 2 + 0.008);
   top.add(monitor.group, laptop.group, phone.group, controller, ps5, guides, keypad.group);
 
@@ -335,45 +287,16 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     phone: screenAnchor(phone.screen, PHONE_SCREEN),
     guides: pointAnchor(guides, [0, 0.01, 0]),
     controller: pointAnchor(controller, [0, 0.025, 0]),
-    desk: [0, SIT_HEIGHT, 0],
   };
 
-  const domScreens = [
-    { mesh: monitor.screen, size: monitor.size, element: screenElements.monitor },
-    { mesh: laptop.screen, size: laptop.size, element: screenElements.laptop },
-  ].map(({ mesh, size, element }) => {
-    Object.assign(element.style, { position: "absolute", left: "0", top: "0", transformOrigin: "0 0", pointerEvents: "auto" });
-    cssHost.appendChild(element);
-    return { mesh, size, element, corners: [0, 1, 2, 3].map(() => new THREE.Vector3()) };
+  const domScreens = createDomScreens({
+    cssHost,
+    camera,
+    screens: {
+      monitor: { mesh: monitor.screen, size: monitor.size, element: screenElements.monitor },
+      laptop: { mesh: laptop.screen, size: laptop.size, element: screenElements.laptop },
+    },
   });
-  const viewport = { width: 1, height: 1 };
-  const tmpPosition = new THREE.Vector3();
-  const tmpQuaternion = new THREE.Quaternion();
-  const tmpScale = new THREE.Vector3();
-  const screenMatrix = new THREE.Matrix4();
-  const unitScale = new THREE.Vector3(1, 1, 1);
-  const cornerSigns = [[-1, 1], [1, 1], [1, -1], [-1, -1]];
-
-  /** Pins each DOM screen onto its mesh by projecting the corners and warping the element with one matrix3d (no CSS 3D context, which WebKit misplaces). */
-  function syncDomScreens() {
-    domScreens.forEach(({ mesh, size, element, corners }) => {
-      const width = Number(element.dataset.width);
-      const height = Number(element.dataset.height);
-      const halfWidth = size[0] / 2;
-      const halfHeight = (size[0] * height) / width / 2;
-      mesh.matrixWorld.decompose(tmpPosition, tmpQuaternion, tmpScale);
-      screenMatrix.compose(tmpPosition, tmpQuaternion, unitScale);
-      const visible = corners.every((corner, i) => {
-        corner.set(cornerSigns[i][0] * halfWidth, cornerSigns[i][1] * halfHeight, 0).applyMatrix4(screenMatrix);
-        const inFront = corner.clone().applyMatrix4(camera.matrixWorldInverse).z < -camera.near;
-        corner.project(camera);
-        corner.set(((corner.x + 1) / 2) * viewport.width, ((1 - corner.y) / 2) * viewport.height, 0);
-        return inFront;
-      });
-      element.style.visibility = visible ? "" : "hidden";
-      if (visible) element.style.transform = quadMatrix(width, height, corners);
-    });
-  }
   const pickable = { work: monitor.group, nda: laptop.group, guides, side: controller, contact: phone.group };
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -418,21 +341,19 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   function setPhoneLit(t) {
     phone.screenMaterial.color.setScalar(t);
     phoneLight.intensity = 6 * t;
-    const arrive = Math.min(1, Math.max(0, (t - 0.45) / 0.55));
-    phone.lockScreen.draw(arrive * arrive * (3 - 2 * arrive));
+    phone.lockScreen.draw(JourneyMath.smoothstep(JourneyMath.progress(t, 0.45, 1)));
   }
 
   function resize(width, height) {
     renderer.setSize(width, height, false);
-    viewport.width = width;
-    viewport.height = height;
+    domScreens.setViewport(width, height);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   }
 
   function render() {
     renderer.render(scene, camera);
-    syncDomScreens();
+    domScreens.sync();
   }
 
   function dispose() {
@@ -448,11 +369,23 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     scene.environment?.dispose();
     pmrem.dispose();
     renderer.dispose();
-    domScreens.forEach(({ element }) => element.remove());
+    domScreens.dispose();
   }
 
   setRise(0);
   setPhoneLit(0);
   shadows.bake(renderer, scene);
-  return { anchors, camera, pick, setPose, setPower, setRise, setPhoneLit, resize, render, dispose, fov: camera.fov };
+  return {
+    anchors,
+    pick,
+    setPose,
+    setScreenSize: domScreens.setSize,
+    setPower,
+    setRise,
+    setPhoneLit,
+    resize,
+    render,
+    dispose,
+    fov: camera.fov,
+  };
 }
