@@ -226,7 +226,7 @@ export default function DeskJourney({ fonts }) {
   const heroRef = React.useRef(null);
   const heightRef = React.useRef(null);
   const hoverRef = React.useRef(null);
-  const lenisRef = React.useRef(null);
+  const flyRef = React.useRef(null);
   const timelineRef = React.useRef(null);
   const scrollerRefs = { work: React.useRef(null), nda: React.useRef(null) };
   const [screenEls] = React.useState(() => ({
@@ -295,28 +295,34 @@ export default function DeskJourney({ fonts }) {
 
       function update(scrollY) {
         const timeline = timelineRef.current;
-        const pose = Journey.poseAt(scrollY, timeline.keyframes);
         const intro = introProgress();
-        scene.setPose(intro < 1 ? Journey.blendPose(timeline.introPose, pose, Journey.easeOutCubic(intro)) : pose);
+        let pose = Journey.poseAt(scrollY, timeline.keyframes);
+        if (flight) pose = Journey.flightPose(flight.from, flight.to, flightProgress());
+        else if (intro < 1) pose = Journey.blendPose(timeline.introPose, pose, Journey.easeOutCubic(intro));
+        scene.setPose(pose);
+        lastPose = pose;
         const power = Journey.smoothstep(Journey.progress(intro, 0.3, 0.75));
         scene.setPower(power);
         cssHostRef.current.style.opacity = String(power);
+        const contentY = flight ? flight.y : scrollY;
+        const travel = (value) =>
+          flight ? Journey.lerp(value(flight.fromY), value(flight.y), Journey.smoothstep(flightProgress())) : value(scrollY);
         Object.values(timeline.scrolls).forEach(({ scroller, scrollable, revealLine, start, end }) => {
-          const offset = scrollable * Journey.progress(scrollY, start(), end());
+          const offset = scrollable * Journey.progress(contentY, start(), end());
           scroller.style.transform = `translateY(${-offset}px)`;
           if (!scroller.isConnected) return;
           scroller.querySelectorAll("[data-reveal]:not([data-in])").forEach((row) => {
             if (row.offsetTop - offset < revealLine) row.toggleAttribute("data-in", true);
           });
         });
-        if (scrollY > timeline.ndaReveal && screens.nda.scroller.isConnected) screens.nda.scroller.toggleAttribute("data-in", true);
-        scene.setPhoneLit(Journey.progress(scrollY, ...timeline.phoneLit));
-        const rise = Journey.smoothstep(Journey.progress(scrollY, ...timeline.rise));
+        if (contentY > timeline.ndaReveal && screens.nda.scroller.isConnected) screens.nda.scroller.toggleAttribute("data-in", true);
+        scene.setPhoneLit(travel((y) => Journey.progress(y, ...timeline.phoneLit)));
+        const rise = travel((y) => Journey.smoothstep(Journey.progress(y, ...timeline.rise)));
         scene.setRise(rise);
         heightRef.current.textContent = `Desk height ${Math.round(74 + (112 - 74) * rise)} cm`;
-        heroRef.current.style.opacity = String(1 - Journey.progress(scrollY, ...timeline.heroFade));
+        heroRef.current.style.opacity = String(1 - Journey.progress(contentY, ...timeline.heroFade));
         timeline.cards.forEach(({ key, range }) => {
-          const shown = Journey.progress(scrollY, ...range);
+          const shown = Journey.progress(contentY, ...range);
           cardRefs[key].current.style.opacity = String(shown);
           if (shown > 0.3) cardRefs[key].current.toggleAttribute("data-in", true);
         });
@@ -328,7 +334,8 @@ export default function DeskJourney({ fonts }) {
       }
 
       function updateHover() {
-        const key = scene.pick(pointer.x, pointer.y, window.innerWidth, window.innerHeight);
+        const overUi = document.elementFromPoint(pointer.x, pointer.y)?.closest("a, button, nav, .panel");
+        const key = overUi ? null : scene.pick(pointer.x, pointer.y, window.innerWidth, window.innerHeight);
         const target = key && key !== activeSection(window.scrollY) ? key : null;
         document.body.style.cursor = target ? "pointer" : "";
         const tag = hoverRef.current;
@@ -350,24 +357,53 @@ export default function DeskJourney({ fonts }) {
         if (event.target.closest("a, button, nav, .panel")) return;
         const key = scene.pick(event.clientX, event.clientY, window.innerWidth, window.innerHeight);
         if (!key || key === activeSection(window.scrollY)) return;
-        scrollToY(timelineRef.current.jumps[key]);
+        flyTo(timelineRef.current.jumps[key]);
       }
 
       const lenis = reduceMotion ? null : new Lenis({ lerp: 0.09 });
-      lenisRef.current = lenis;
+      let flight = null;
+      let lastPose = null;
+      const flightProgress = () => Math.min(1, (performance.now() - flight.start) / flight.duration);
+
+      /** Flies the camera straight to the pose at scroll position y, then moves the page there. */
+      function flyTo(y) {
+        if (!lenis || !lastPose || flight) {
+          window.scrollTo(0, y);
+          return;
+        }
+        const to = Journey.poseAt(y, timelineRef.current.keyframes);
+        const distance = Math.hypot(...to.position.map((v, i) => v - lastPose.position[i]));
+        const duration = Journey.flightDuration(distance);
+        flight = { from: lastPose, to, y, fromY: window.scrollY, start: performance.now(), duration };
+        lenis.stop();
+        rootRef.current.toggleAttribute("data-flying", true);
+        hoverRef.current.hidden = true;
+      }
+
+      function land() {
+        const { y } = flight;
+        flight = null;
+        lenis.start();
+        lenis.scrollTo(y, { immediate: true, force: true });
+        rootRef.current.toggleAttribute("data-flying", false);
+        dirty = true;
+      }
+
+      flyRef.current = flyTo;
       let raf = 0;
       let lastY = -1;
       function frame(time) {
         lenis?.raf(time);
         const y = window.scrollY;
-        if (dirty || y !== lastY || introProgress() < 1) {
+        if (flight && flightProgress() >= 1) land();
+        if (dirty || y !== lastY || introProgress() < 1 || flight) {
           update(y);
           scene.render();
           lastY = y;
           dirty = false;
           pointer.moved = true;
         }
-        if (pointer.moved && pointer.mouse) {
+        if (pointer.moved && pointer.mouse && !flight) {
           updateHover();
           pointer.moved = false;
         }
@@ -391,6 +427,7 @@ export default function DeskJourney({ fonts }) {
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("click", onClick);
         document.body.style.cursor = "";
+        flyRef.current = null;
         lenis?.destroy();
         scene.dispose();
       };
@@ -398,16 +435,13 @@ export default function DeskJourney({ fonts }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function scrollToY(y) {
-    if (lenisRef.current) lenisRef.current.scrollTo(y, { duration: 1.8 });
-    else window.scrollTo(0, y);
-  }
-
   function jumpTo(key) {
     return (event) => {
       event.preventDefault();
       const timeline = timelineRef.current;
-      scrollToY(timeline ? timeline.jumps[key] : refs[key]?.current?.offsetTop ?? 0);
+      const y = timeline ? timeline.jumps[key] : refs[key]?.current?.offsetTop ?? 0;
+      if (flyRef.current) flyRef.current(y);
+      else window.scrollTo(0, y);
     };
   }
 

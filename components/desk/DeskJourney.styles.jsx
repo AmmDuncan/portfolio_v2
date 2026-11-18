@@ -49,6 +49,12 @@ export const Root = styled.div`
     position: relative;
     z-index: 2;
     pointer-events: none;
+    transition: opacity 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  &[data-flying] main {
+    opacity: 0;
+    transition-duration: 200ms;
   }
 
   .note {
