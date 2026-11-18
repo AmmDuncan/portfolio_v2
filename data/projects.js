@@ -1,13 +1,5 @@
 export const projects = [
   {
-    name: "Harmony",
-    year: "2023–2026",
-    imgSrc: "/assets/projects/harmony.png",
-    description:
-      "Restaurant management platform: point of sale, kitchen display, reservations, tables, menus with branch pricing and stock, and sales reports, plus a mobile menu and bill for guests.",
-    tools: ["Nuxt", "Vue", "TypeScript", "Nuxt UI", "Tailwind CSS", "TanStack Query"],
-  },
-  {
     name: "Rotate",
     year: "2024–2026",
     imgSrc: "/assets/projects/withrotate.png",
@@ -32,6 +24,14 @@ export const projects = [
       "Platform that lets social sellers in Ghana create their own online store in minutes, automating their current selling flow.",
     tools: ["Next.js", "Tailwind CSS", "Supabase", "Recharts", "Paystack"],
     link: "https://storelinkgh.com",
+  },
+  {
+    name: "Harmony",
+    year: "2023–2026",
+    imgSrc: "/assets/projects/harmony.png",
+    description:
+      "Restaurant management platform: point of sale, kitchen display, reservations, tables, menus with branch pricing and stock, and sales reports, plus a mobile menu and bill for guests.",
+    tools: ["Nuxt", "Vue", "TypeScript", "Nuxt UI", "Tailwind CSS", "TanStack Query"],
   },
   {
     name: "Local Dictation",

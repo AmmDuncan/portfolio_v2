@@ -319,8 +319,8 @@ export const Card = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1.6rem;
-    padding: 1rem 0;
+    gap: 1.2rem;
+    padding: 0.8rem 0;
     border-bottom: 1px solid var(--line);
     font-size: 1.6rem;
     text-decoration: none;
@@ -330,7 +330,17 @@ export const Card = styled.div`
     }
   }
 
+  .thumb {
+    flex: none;
+    width: 6rem;
+    height: 3.8rem;
+    border: 1px solid var(--line);
+    border-radius: 0.6rem;
+    object-fit: cover;
+  }
+
   .name {
+    flex: 1;
     display: grid;
     gap: 0.2rem;
     min-width: 0;
@@ -350,6 +360,19 @@ export const Card = styled.div`
 
     .panel {
       padding: 2.4rem;
+    }
+
+    li a {
+      padding: 0.6rem 0;
+    }
+
+    .thumb {
+      width: 4.8rem;
+      height: 3rem;
+    }
+
+    small {
+      display: none;
     }
   }
 `;

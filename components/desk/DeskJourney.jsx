@@ -32,7 +32,7 @@ const SCREEN_COPY = {
 };
 const NDA_COPY = {
   label: "02 · Under NDA",
-  title: "10 platforms I can't show",
+  title: "6 platforms I can't show",
   intro: "Client work from 2023 to 2026 that I can't name or show.",
   stack: ["Nuxt", "Vue", "TypeScript", "TanStack Query", "Tailwind CSS"],
 };
@@ -46,6 +46,10 @@ function frameBeside(position, target, aspect, amount, portraitAmount = amount *
   }
   const dy = -portraitAmount * d;
   return { position: [position[0], position[1] + dy, position[2]], target: [target[0], target[1] + dy, target[2]] };
+}
+
+function thumbOf(imgSrc) {
+  return imgSrc.replace("/projects/", "/projects/thumbs/").replace(/\.png$/, ".webp");
 }
 
 function lookFrom(point, offset, distance) {
@@ -461,6 +465,8 @@ export default function DeskJourney({ fonts }) {
                 {sideProjects.map((p) => (
                   <li key={p.name}>
                     <a href={p.link} target="_blank" rel="noopener noreferrer">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img className="thumb" src={thumbOf(p.imgSrc)} alt="" width={60} height={38} loading="lazy" />
                       <span className="name">
                         {p.name}
                         <small>{p.description}</small>
