@@ -25,7 +25,13 @@ export default function Desk() {
         <meta name="theme-color" content="#07080a" />
         <meta name="robots" content="noindex" />
       </Head>
-      <DeskJourney fonts={{ sans: instrumentSans.style.fontFamily, mono: jetbrains.style.fontFamily }} />
+      <DeskJourney
+        fonts={{
+          sans: instrumentSans.style.fontFamily,
+          mono: jetbrains.style.fontFamily,
+          display: unbounded.style.fontFamily,
+        }}
+      />
     </div>
   );
 }

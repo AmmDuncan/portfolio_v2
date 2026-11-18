@@ -173,7 +173,7 @@ function buildTimeline(scene, els, screens, vh, vw) {
       { key: "side", range: [arrive.side - vh * 0.5, arrive.side - vh * 0.1] },
       { key: "contact", range: [arrive.contact - vh * 0.5, arrive.contact - vh * 0.1] },
     ],
-    phoneLit: [top(els.contact) - vh * 0.1, top(els.contact) + vh * 0.5],
+    phoneLit: [top(els.contact) - vh * 0.45, top(els.contact) + vh * 0.05],
     rise: [top(els.contact) + vh * 1.3, top(els.contact) + vh * 2.0],
     jumps: {
       top: 0,
@@ -264,6 +264,7 @@ export default function DeskJourney({ fonts }) {
       const introStart = performance.now();
       const playIntro = !reduceMotion && window.scrollY < window.innerHeight * 0.1;
       const introProgress = () => (playIntro ? Math.min(1, (performance.now() - introStart) / INTRO_MS) : 1);
+      setScreenFonts(fonts);
       let scene = null;
       try {
         scene = createDeskScene(canvasRef.current, {
@@ -276,7 +277,6 @@ export default function DeskJourney({ fonts }) {
         setNoWebGL(true);
         return null;
       }
-      setScreenFonts(fonts);
       const els = Object.fromEntries(Object.entries(refs).map(([key, ref]) => [key, ref.current]));
       const screens = {
         work: { element: screenEls.work, scroller: scrollerRefs.work.current },

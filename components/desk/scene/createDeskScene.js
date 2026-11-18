@@ -116,14 +116,15 @@ function buildPhone(model, shadowTex) {
   const tilt = new THREE.Group();
   tilt.position.set(0, 0.008, -0.004);
   tilt.rotation.x = -0.3;
-  const screenMaterial = new THREE.MeshBasicMaterial({ map: phoneScreen(), color: "#000000", toneMapped: false });
+  const lockScreen = phoneScreen();
+  const screenMaterial = new THREE.MeshBasicMaterial({ map: lockScreen.texture, color: "#000000", toneMapped: false });
   model.getObjectByName("Screen").traverse((node) => {
     if (node.isMesh) node.material = screenMaterial;
   });
   const screen = model.getObjectByName("ScreenCenter");
   tilt.add(model);
   group.add(standBase, tilt, contactShadow(shadowTex, 0.14, 0.12, 0.6));
-  return { group, screen, screenMaterial };
+  return { group, screen, screenMaterial, lockScreen };
 }
 
 function buildController(model, shadowTex) {
@@ -328,6 +329,8 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
   function setPhoneLit(t) {
     phone.screenMaterial.color.setScalar(t);
     phoneLight.intensity = 6 * t;
+    const arrive = Math.min(1, Math.max(0, (t - 0.45) / 0.55));
+    phone.lockScreen.draw(arrive * arrive * (3 - 2 * arrive));
   }
 
   function resize(width, height) {
