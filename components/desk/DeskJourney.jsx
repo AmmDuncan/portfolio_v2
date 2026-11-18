@@ -252,6 +252,7 @@ export default function DeskJourney({ fonts }) {
     nda: makeScreenElement(SCREEN_SIZES.laptop),
   }));
   const [noWebGL, setNoWebGL] = React.useState(false);
+  const [loaded, setLoaded] = React.useState(0);
   const refs = {
     work: React.useRef(null),
     nda: React.useRef(null),
@@ -264,7 +265,7 @@ export default function DeskJourney({ fonts }) {
   React.useEffect(() => {
     let cancelled = false;
     let stop = null;
-    loadDeskModels()
+    loadDeskModels((fraction) => !cancelled && setLoaded(Math.floor(fraction * 100) / 100))
       .then((models) => {
         if (!cancelled) stop = startJourney(models);
       })
@@ -517,7 +518,16 @@ export default function DeskJourney({ fonts }) {
             <span className="label">Product engineer in Accra</span>
             <h1>This is where I build.</h1>
             <p>Products for founders and teams, and guides on how I work.</p>
-            <span className="cue">Scroll, or click anything on the desk</span>
+            <span className="cue" data-loading={loaded < 1 || undefined}>
+              {loaded < 1 ? (
+                <>
+                  Setting up the desk <span aria-hidden="true">{Math.round(loaded * 100)}%</span>
+                  <span className="bar" style={{ "--loaded": loaded }} aria-hidden="true" />
+                </>
+              ) : (
+                "Scroll, or click anything on the desk"
+              )}
+            </span>
           </Hero>
         </Section>
 

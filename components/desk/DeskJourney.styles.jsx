@@ -188,6 +188,32 @@ export const Hero = styled.div`
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
+
+    .bar {
+      display: block;
+      width: 16rem;
+      height: 2px;
+      margin-top: 1.2rem;
+      border-radius: 1px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+
+    .bar::after {
+      content: "";
+      display: block;
+      height: 100%;
+      background: var(--accent-ink);
+      transform: scaleX(var(--loaded));
+      transform-origin: left;
+      transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bar::after {
+        transition: none;
+      }
+    }
   }
 
   &::before {

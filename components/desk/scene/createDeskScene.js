@@ -134,8 +134,6 @@ function buildPhone(model) {
   const tilt = new THREE.Group();
   tilt.position.set(0, 0.007, 0.004);
   tilt.rotation.x = -0.3;
-  const lip = box(0.07, 0.006, 0.005, mat.standMetal, 0.002);
-  lip.position.set(0, 0.003, 0.0066);
   const backrest = box(0.05, 0.11, 0.005, mat.standMetal, 0.002);
   backrest.position.set(0, 0.055, -0.0106);
   const lockScreen = phoneScreen();
@@ -144,7 +142,7 @@ function buildPhone(model) {
     if (node.isMesh) node.material = screenMaterial;
   });
   const screen = model.getObjectByName("ScreenCenter");
-  tilt.add(model, lip, backrest);
+  tilt.add(model, backrest);
   group.add(standBase, tilt);
   return { group, screen, screenMaterial, lockScreen };
 }
@@ -199,10 +197,25 @@ function pointAnchor(object, offset = [0, 0, 0]) {
 }
 
 /** Loads the G7, MacBook, DualSense and iPhone models, keyed by the object they become. */
-export async function loadDeskModels() {
+/** Approximate file sizes, used for progress when the server compresses and sends no length. */
+const MODEL_BYTES = { monitor: 64e3, laptop: 337e3, controller: 600e3, phone: 165e3 };
+
+export async function loadDeskModels(onProgress = () => {}) {
   const loader = new GLTFLoader();
+  const loaded = Object.fromEntries(Object.keys(MODEL_URLS).map((key) => [key, 0]));
+  const totalBytes = Object.values(MODEL_BYTES).reduce((sum, bytes) => sum + bytes, 0);
+  const report = (key, fraction) => {
+    loaded[key] = Math.min(fraction, 1) * MODEL_BYTES[key];
+    onProgress(Object.values(loaded).reduce((sum, bytes) => sum + bytes, 0) / totalBytes);
+  };
   const entries = await Promise.all(
-    Object.entries(MODEL_URLS).map(async ([key, url]) => [key, (await loader.loadAsync(url)).scene]),
+    Object.entries(MODEL_URLS).map(async ([key, url]) => {
+      const gltf = await loader.loadAsync(url, (event) =>
+        report(key, Math.min(event.loaded / (event.total || MODEL_BYTES[key]), 0.98)),
+      );
+      report(key, 1);
+      return [key, gltf.scene];
+    }),
   );
   return Object.fromEntries(entries);
 }
