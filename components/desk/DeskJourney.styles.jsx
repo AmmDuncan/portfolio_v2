@@ -485,6 +485,17 @@ export const Card = styled.div`
     text-overflow: ellipsis;
   }
 
+  @media (min-aspect-ratio: 1/1) and (min-width: 1100px) {
+    .panel:has(ul) {
+      width: min(72rem, 100%);
+    }
+
+    ul {
+      grid: auto-flow / 1fr 1fr;
+      column-gap: 2.4rem;
+    }
+  }
+
   @media (max-aspect-ratio: 1/1) {
     align-content: end;
     padding-bottom: 3.2rem;
