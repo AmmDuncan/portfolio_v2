@@ -44,11 +44,20 @@ function progress(scrollY, start, end) {
   return clamp01((scrollY - start) / (end - start));
 }
 
+/** Pose part way from one camera pose to another. */
+function blendPose(from, to, t) {
+  return { position: lerpVec(from.position, to.position, t), target: lerpVec(from.target, to.target, t) };
+}
+
+const easeOutCubic = (t) => 1 - (1 - t) ** 3;
+
 export const DeskJourney = {
   coverDistance,
   screenPose,
   poseAt,
   progress,
   smoothstep,
+  easeOutCubic,
+  blendPose,
   lerp,
 };

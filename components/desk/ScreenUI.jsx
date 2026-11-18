@@ -66,7 +66,6 @@ const Ui = styled.div`
     width: var(--col, 88%);
     margin-inline: auto;
     padding-block: 64px 120px;
-    will-change: transform;
   }
 
   .label {

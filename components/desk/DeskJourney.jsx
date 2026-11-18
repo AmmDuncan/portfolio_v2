@@ -20,6 +20,8 @@ const SECTIONS = [
   { key: "side", label: "Side projects" },
   { key: "contact", label: "Contact" },
 ];
+const INTRO_MS = 2600;
+const BLOG_URL = "https://blog.ammielyawson.com";
 const SECTION_LABEL = Object.fromEntries(SECTIONS.map(({ key, label }) => [key, label]));
 const SCREEN_COPY = {
   work: {
@@ -129,6 +131,7 @@ function buildTimeline(scene, els, screens, vh, vw) {
     side: top(els.side) - vh * 0.15,
     contact: top(els.contact) - vh * 0.15,
   };
+  const introPose = { position: wide.position.map((v, i) => v + (v - wide.target[i]) * 0.35), target: wide.target };
   const k = (at, pose) => ({ at, ...pose });
   const keyframes = [
     k(0, wide),
@@ -149,6 +152,7 @@ function buildTimeline(scene, els, screens, vh, vw) {
   ];
   return {
     keyframes,
+    introPose,
     scrolls,
     heroFade: [vh * 0.25, vh * 0.85],
     cards: [
@@ -242,6 +246,10 @@ export default function DeskJourney({ fonts }) {
     };
 
     function startJourney(models) {
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const introStart = performance.now();
+      const playIntro = !reduceMotion && window.scrollY < window.innerHeight * 0.1;
+      const introProgress = () => (playIntro ? Math.min(1, (performance.now() - introStart) / INTRO_MS) : 1);
       let scene = null;
       try {
         scene = createDeskScene(canvasRef.current, {
@@ -273,7 +281,12 @@ export default function DeskJourney({ fonts }) {
 
       function update(scrollY) {
         const timeline = timelineRef.current;
-        scene.setPose(Journey.poseAt(scrollY, timeline.keyframes));
+        const pose = Journey.poseAt(scrollY, timeline.keyframes);
+        const intro = introProgress();
+        scene.setPose(intro < 1 ? Journey.blendPose(timeline.introPose, pose, Journey.easeOutCubic(intro)) : pose);
+        const power = Journey.smoothstep(Journey.progress(intro, 0.3, 0.75));
+        scene.setPower(power);
+        cssHostRef.current.style.opacity = String(power);
         Object.values(timeline.scrolls).forEach(({ scroller, scrollable, start, end }) => {
           const offset = scrollable * Journey.progress(scrollY, start(), end());
           scroller.style.transform = `translateY(${-offset}px)`;
@@ -319,7 +332,6 @@ export default function DeskJourney({ fonts }) {
         scrollToY(timelineRef.current.jumps[key]);
       }
 
-      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const lenis = reduceMotion ? null : new Lenis({ lerp: 0.09 });
       lenisRef.current = lenis;
       let raf = 0;
@@ -327,7 +339,7 @@ export default function DeskJourney({ fonts }) {
       function frame(time) {
         lenis?.raf(time);
         const y = window.scrollY;
-        if (dirty || y !== lastY) {
+        if (dirty || y !== lastY || introProgress() < 1) {
           update(y);
           scene.render();
           lastY = y;
@@ -342,6 +354,7 @@ export default function DeskJourney({ fonts }) {
       }
 
       layout();
+      canvasRef.current.dataset.on = "";
       const resizeObserver = new ResizeObserver(layout);
       resizeObserver.observe(document.documentElement);
       resizeObserver.observe(screens.work.scroller);
@@ -395,6 +408,11 @@ export default function DeskJourney({ fonts }) {
               </a>
             </li>
           ))}
+          <li>
+            <a href={BLOG_URL} target="_blank" rel="noopener noreferrer">
+              Blog ↗
+            </a>
+          </li>
         </ul>
         <a className="email" href={`mailto:${EMAIL}`}>
           Email me
@@ -493,7 +511,7 @@ export default function DeskJourney({ fonts }) {
                 <a className="secondary" href="https://github.com/AmmDuncan" target="_blank" rel="noopener noreferrer">
                   GitHub
                 </a>
-                <a className="secondary" href="https://blog.ammielyawson.com" target="_blank" rel="noopener noreferrer">
+                <a className="secondary" href={BLOG_URL} target="_blank" rel="noopener noreferrer">
                   Blog
                 </a>
               </CtaRow>

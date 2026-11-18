@@ -310,6 +310,15 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
     keypad.display.set(height * 100);
   }
 
+  const screenLights = [biasLight, monitorLight, laptopLight].map((light) => [light, light.intensity]);
+
+  /** Screens and their glow, from off (0) to fully on (1). */
+  function setPower(t) {
+    screenLights.forEach(([light, full]) => {
+      light.intensity = full * t;
+    });
+  }
+
   function setPhoneLit(t) {
     phone.screenMaterial.color.setScalar(t);
     phoneLight.intensity = 6 * t;
@@ -345,5 +354,5 @@ export function createDeskScene(canvas, { coverSrcs = [], cssHost, screenElement
 
   setRise(0);
   setPhoneLit(0);
-  return { anchors, camera, pick, setPose, setRise, setPhoneLit, resize, render, dispose, fov: camera.fov };
+  return { anchors, camera, pick, setPose, setPower, setRise, setPhoneLit, resize, render, dispose, fov: camera.fov };
 }

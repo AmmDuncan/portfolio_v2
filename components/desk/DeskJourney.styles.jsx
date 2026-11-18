@@ -1,4 +1,17 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const rise = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+`;
+
+const fade = keyframes`
+  from {
+    opacity: 0;
+  }
+`;
 
 export const SCREEN_BG = "#0b0d12";
 
@@ -70,6 +83,12 @@ export const Stage = styled.canvas`
   height: 100%;
   display: block;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease-out;
+
+  &[data-on] {
+    opacity: 1;
+  }
 `;
 
 export const HoverTag = styled.div`
@@ -107,6 +126,32 @@ export const Hero = styled.div`
   align-content: center;
   padding-inline: clamp(2.4rem, 6vw, 9.6rem);
   pointer-events: none;
+
+  & > * {
+    animation: ${rise} 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  & > :nth-child(1) {
+    animation-delay: 300ms;
+  }
+
+  & > :nth-child(2) {
+    animation-delay: 420ms;
+  }
+
+  & > :nth-child(3) {
+    animation-delay: 560ms;
+  }
+
+  & > :nth-child(4) {
+    animation-delay: 1400ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & > * {
+      animation-name: ${fade};
+    }
+  }
 
   h1 {
     margin: 1.6rem 0 2rem;
